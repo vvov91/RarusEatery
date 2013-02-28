@@ -1,0 +1,4 @@
+RarusEatery
+===========
+
+Eatery mobile client
