@@ -12,9 +12,14 @@
 bin/
 gen/
 
-# Local configuration file (sdk path, etc)
-local.properties
-
 # Eclipse project files
-.classpath
-.project
+*.pydevproject
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.settings/
+.loadpath
