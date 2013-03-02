@@ -7,6 +7,7 @@ import rarus.eatery.model.Menu;
 import rarus.eatery.model.Order;
 import rarus.eatery.model.OrderHeader;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -209,6 +210,60 @@ public class DBManager extends SQLiteOpenHelper {
 		}		
 	}
 	
+	/**
+	 * Изменяет рейтинг блюда
+	 * 
+	 * @param id
+	 *     id блюда
+	 * @param rating
+	 *     рейтинг
+	 */
+	public void setDishRating(int id, String rating) {
+		ContentValues data = new ContentValues();
+		data.put(DISHES_RATING, rating);
+		
+		mDb.beginTransaction();		
+		try {
+			mDb.update(TABLE_DISHES, data, KEY_ID + " = ?", new String[] {Integer.toString(id)});	    
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+		}
+	}
+
+	/**
+	 * Удаляет блюдо
+	 * 
+	 * @param dishId
+	 *     id блюда
+	 */
+	public void deleteDish(int dishId) {
+		mDb.beginTransaction();
+		try {
+			mDb.delete(TABLE_DISHES, KEY_ID + " = ?", new String[] {Integer.toString(dishId)});
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted dish (id = " + Integer.toString(dishId) + ")");
+		}
+	}
+	
+	/**
+	 * Удаляет все блюда
+	 */
+	public void deleteAllDish() {
+		mDb.beginTransaction();
+		try {
+			mDb.delete(TABLE_DISHES, null, null);
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted all dishes");
+		}
+	}
+	
 	
 	// Меню
 	
@@ -245,7 +300,7 @@ public class DBManager extends SQLiteOpenHelper {
 			Log.i(LOG_TAG, "Added menu (" + Integer.toString(menu.size()) + ")");
 		}
 	}
-	
+
 	
 	// Заголовки заказа
 	
