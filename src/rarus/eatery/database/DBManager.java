@@ -1,10 +1,18 @@
 package rarus.eatery.database;
 
+import java.util.List;
+
+import rarus.eatery.model.Dish;
+import rarus.eatery.model.Menu;
+import rarus.eatery.model.Order;
+import rarus.eatery.model.OrderHeader;
+
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 /**
@@ -163,5 +171,158 @@ public class DBManager extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
+	}
+	
+	// Блюда
+	
+	/**
+	 * Добавляет блюда
+	 * 
+	 * @param dishes
+	 *     {@link List} из объектов {@link Dish}
+	 */
+	public void addDish(List<Dish> dishes) {
+		StringBuilder query = new StringBuilder();	
+		SQLiteStatement insertDishStmt;
+		
+		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertDishStmt = mDb.compileStatement(query.toString());
+		
+		mDb.beginTransaction();
+		try {
+			for (int i = 0; i < dishes.size(); i++) {
+				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getId()));
+				insertDishStmt.bindString(2, dishes.get(i).getName());
+				insertDishStmt.bindString(3, dishes.get(i).getDescription());
+				insertDishStmt.bindString(4, (dishes.get(i).isPortioned() ? "1" : "0"));
+				insertDishStmt.bindString(5, Float.toString(dishes.get(i).getPrice()));
+				insertDishStmt.bindString(6, dishes.get(i).getRating());
+				insertDishStmt.bindString(7, (dishes.get(i).isPreorder() ? "1" : "0"));
+				insertDishStmt.execute();
+			}
+			insertDishStmt.close();
+		    mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size()) + ")");			
+		}		
+	}
+	
+	
+	// Меню
+	
+	/**
+	 * Добавляет меню
+	 * 
+	 * @param menu
+	 *     {@link List} из объектов {@link Menu}
+	 */
+	public void addMenu(List<Menu> menu) {
+		StringBuilder query = new StringBuilder();
+		SQLiteStatement insertMenuStmt;
+		int date;
+		
+		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?)");
+		insertMenuStmt = mDb.compileStatement(query.toString());
+
+		mDb.beginTransaction();
+		try {
+			for (int i = 0; i < menu.size(); i++) {
+				date = menu.get(i).getDate() - (menu.get(i).getDate() % 86400);
+				insertMenuStmt.bindNull(1);
+				insertMenuStmt.bindString(2, Integer.toString(date));
+				insertMenuStmt.bindString(3, Integer.toString(menu.get(i).getDishId()));
+				insertMenuStmt.bindString(4, Float.toString(menu.get(i).getAvailable()));
+				insertMenuStmt.bindString(5, Integer.toString(menu.get(i).getTimestamp()));
+				insertMenuStmt.execute();
+			}
+			insertMenuStmt.close();
+		    mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Added menu (" + Integer.toString(menu.size()) + ")");
+		}
+	}
+	
+	
+	// Заголовки заказа
+	
+	/**
+	 * Добавляет заголовки заказа
+	 * 
+	 * @param orderHeaders
+	 *     {@link List} из объектов {@link OrderHeader}
+	 */
+	public void addOrderHeader(List<OrderHeader> orderHeaders) {
+		StringBuilder query = new StringBuilder();
+		SQLiteStatement insertOrderHeadersStmt;
+		
+		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
+		query.append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
+		
+		mDb.beginTransaction();
+		try {
+			for (int i = 0; i < orderHeaders.size(); i++) {
+				insertOrderHeadersStmt.bindNull(1);
+				insertOrderHeadersStmt.bindString(2,
+						Integer.toString(orderHeaders.get(i).getMenuId()));
+				insertOrderHeadersStmt.bindString(3,
+						(orderHeaders.get(i).isExecute() ? "1" : "0"));
+				insertOrderHeadersStmt.bindString(4,
+						Integer.toString(orderHeaders.get(i).getExecuteDate()));
+				insertOrderHeadersStmt.bindString(5,
+						(orderHeaders.get(i).isModified() ? "1" : "0"));
+				insertOrderHeadersStmt.bindString(6,
+						Integer.toString(orderHeaders.get(i).getTimestamp()));
+				insertOrderHeadersStmt.bindString(7,
+								Integer.toString(orderHeaders.get(i).getOrderSrvNumber()));
+				insertOrderHeadersStmt.execute();
+			}
+			insertOrderHeadersStmt.close();
+		    mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Added order headers (" + Integer.toString(orderHeaders.size()) + ")");
+		}
+	}
+	
+	
+	// Заказы
+	
+	/**
+	 * Добавляет заказы
+	 * 
+	 * @param orders
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public void addOrder(List<Order> orders) {
+		StringBuilder query = new StringBuilder();
+		SQLiteStatement insertOrderStmt;
+		
+		query.append("INSERT INTO ").append(TABLE_ORDERS);
+		query.append(" VALUES (?, ?, ?, ?, ?)");
+		insertOrderStmt = mDb.compileStatement(query.toString());
+		
+		mDb.beginTransaction();
+		try {
+			for (int i = 0; i < orders.size(); i++) {
+				insertOrderStmt.bindNull(1);
+				insertOrderStmt.bindString(2, Integer.toString(orders.get(i).getOrderId()));
+				insertOrderStmt.bindString(3, Integer.toString(orders.get(i).getDishId()));
+				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
+				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
+				insertOrderStmt.execute();
+			}
+			insertOrderStmt.close();
+		    mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Added orders (" + Integer.toString(orders.size()) + ")");
+		}
 	}
 }
