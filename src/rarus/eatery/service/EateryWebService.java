@@ -1,9 +1,12 @@
 package rarus.eatery.service;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import rarus.eatery.database.*;
-import rarus.eatery.model.*;
+import rarus.eatery.database.DBManager;
+import rarus.eatery.model.Dish;
+import rarus.eatery.model.EateryConstants;
+import rarus.eatery.model.Menu;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,7 +25,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	private DBManager db;
 	private EateryServiceBinder binder = new EateryServiceBinder();
 	private ServiceAPI api;
-	SharedPreferences sp;
+	private SharedPreferences sp;
 
 	@Override
 	public void onSuccessfullRequest() {
@@ -98,8 +101,12 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE,null));
 	}
 	
-	private void writeToDB(Menu menu){
-		
+	private void writeToDB(List<Menu> menu,List<Dish> dishes){
+		db=new DBManager(this);
+		db.open();
+		db.addDish(dishes);
+		db.addMenu(menu);
+		db.close();		
 	}
 	class EateryServiceBinder extends Binder {
 		EateryWebService getService() {
