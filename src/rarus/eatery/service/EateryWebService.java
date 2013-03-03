@@ -35,7 +35,8 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			APIMessage message = api.get();
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
-				writeToDB((Menu)message.getContent());
+				ServiceList list=(ServiceList)message.getContent();
+				writeToDB(list.getMenu(),list.getDishes());
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
 				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.GET_MENU_CODE);
@@ -113,5 +114,4 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			return EateryWebService.this;
 		}
 	}
-
 }
