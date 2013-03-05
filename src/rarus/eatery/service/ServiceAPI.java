@@ -61,9 +61,12 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Error:\n" + request.getError());
 			successfull = false;
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
-			processError(request.getResult(), request.getError());
+			//processError(request.getResult(), request.getError());
 		}
 		return list;
+	}	
+	
+	private Object setOrder(){
+		return null;
 	}
-
 }
