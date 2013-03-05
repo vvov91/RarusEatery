@@ -1,6 +1,7 @@
 package rarus.eatery.service;
 
 import rarus.eatery.model.EateryConstants;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 /**
@@ -10,11 +11,13 @@ import android.os.AsyncTask;
  */
 public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
-	ServiceRequestResult serviceResult;
+	private ServiceRequestResult serviceResult;
+	private SharedPreferences sp;
 
-	public ServiceAPI(ServiceRequestResult serviceResult) {
+	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
 		super();
 		this.serviceResult = serviceResult;
+		this.sp = sp;
 	}
 
 	@Override

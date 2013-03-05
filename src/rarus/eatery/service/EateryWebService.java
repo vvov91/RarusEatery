@@ -92,13 +92,13 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	}
 	public void getMenu() {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Get menu");
-		api = new ServiceAPI(this);
+		api = new ServiceAPI(this,PreferenceManager.getDefaultSharedPreferences(this));
 		api.execute(new APIMessage(EateryConstants.GET_MENU_CODE, null));
 	}
 
 	public void setOrder() {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Set order");
-		api = new ServiceAPI(this);
+		api = new ServiceAPI(this, PreferenceManager.getDefaultSharedPreferences(this));
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE,null));
 	}
 	
