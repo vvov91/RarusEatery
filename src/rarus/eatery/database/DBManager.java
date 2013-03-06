@@ -513,7 +513,7 @@ public class DBManager extends SQLiteOpenHelper {
 				insertOrderHeadersStmt.bindString(3,
 						(orderHeaders.get(i).isExecute() ? "1" : "0"));
 				insertOrderHeadersStmt.bindString(4,
-						Integer.toString(orderHeaders.get(i).getExecuteDate()));
+						Integer.toString(orderHeaders.get(i).getExecutionDate()));
 				insertOrderHeadersStmt.bindString(5,
 						(orderHeaders.get(i).isModified() ? "1" : "0"));
 				insertOrderHeadersStmt.bindString(6,
