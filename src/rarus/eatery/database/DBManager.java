@@ -3,9 +3,9 @@ package rarus.eatery.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import rarus.eatery.model.DayMenu;
-import rarus.eatery.model.Dish;
 import rarus.eatery.model.Menu;
+import rarus.eatery.model.Dish;
+import rarus.eatery.model.MenuItem;
 import rarus.eatery.model.Order;
 import rarus.eatery.model.OrderHeader;
 
@@ -274,9 +274,9 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link MenuItem}
 	 */
-	public void addMenu(List<Menu> menu) {
+	public void addMenu(List<MenuItem> menu) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertMenuStmt;
 		
@@ -394,11 +394,11 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link DayMenu}
+	 *     {@link List} из объектов {@link Menu}
 	 */
-	public List<DayMenu> getMenuAtDate(int date) {
+	public List<Menu> getMenuAtDate(int date) {
 		StringBuilder query = new StringBuilder();
-		List<DayMenu> result = new ArrayList<DayMenu>();
+		List<Menu> result = new ArrayList<Menu>();
 		
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
@@ -415,7 +415,7 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new DayMenu(c.getInt(0), formatDate(date), c.getInt(1),
+					result.add(new Menu(c.getInt(0), formatDate(date), c.getInt(1),
 							c.getString(2), c.getString(3), (c.getInt(4) == 0 ? false : true),
 							c.getFloat(5), c.getString(6), (c.getInt(7) == 0 ? false : true),
 							c.getFloat(8), c.getInt(9)));
