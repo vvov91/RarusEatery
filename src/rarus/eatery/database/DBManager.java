@@ -6,8 +6,7 @@ import java.util.List;
 import rarus.eatery.model.Menu;
 import rarus.eatery.model.Dish;
 import rarus.eatery.model.MenuItem;
-import rarus.eatery.model.OrderItem;
-import rarus.eatery.model.OrderHeader;
+import rarus.eatery.model.Order;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -488,65 +487,28 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	
-	// Заголовки заказа
-	
-	/**
-	 * Добавляет заголовки заказа
-	 * 
-	 * @param orderHeaders
-	 *     {@link List} из объектов {@link OrderHeader}
-	 */
-	public void addOrderHeader(List<OrderHeader> orderHeaders) {
-		StringBuilder query = new StringBuilder();
-		SQLiteStatement insertOrderHeadersStmt;
-		
-		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
-		query.append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
-		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
-		
-		mDb.beginTransaction();
-		try {
-			for (int i = 0; i < orderHeaders.size(); i++) {
-				insertOrderHeadersStmt.bindNull(1);
-				insertOrderHeadersStmt.bindString(2,
-						Integer.toString(orderHeaders.get(i).getMenuId()));
-				insertOrderHeadersStmt.bindString(3,
-						(orderHeaders.get(i).isExecute() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(4,
-						Integer.toString(orderHeaders.get(i).getExecutionDate()));
-				insertOrderHeadersStmt.bindString(5,
-						(orderHeaders.get(i).isModified() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(6,
-						Integer.toString(orderHeaders.get(i).getTimestamp()));
-				insertOrderHeadersStmt.bindString(7,
-								Integer.toString(orderHeaders.get(i).getOrderSrvNumber()));
-				insertOrderHeadersStmt.execute();
-			}
-			insertOrderHeadersStmt.close();
-		    mDb.setTransactionSuccessful();
-		} finally {
-			mDb.endTransaction();
-			
-			Log.i(LOG_TAG, "Added order headers (" + Integer.toString(orderHeaders.size()) + ")");
-		}
-	}
-	
-	
 	// Заказы
 	
 	/**
 	 * Добавляет заказы
 	 * 
 	 * @param orders
-	 *     {@link List} из объектов {@link OrderItem}
+	 *     {@link List} из объектов {@link Order}
 	 */
-	public void addOrder(List<OrderItem> orders) {
+	public void addOrder(List<Order> orders) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertOrderStmt;
+		SQLiteStatement insertOrderHeadersStmt;
 		
 		query.append("INSERT INTO ").append(TABLE_ORDERS);
 		query.append(" VALUES (?, ?, ?, ?, ?)");
 		insertOrderStmt = mDb.compileStatement(query.toString());
+		
+		query = new StringBuilder();
+		
+		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
+		query.append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
 		
 		mDb.beginTransaction();
 		try {
@@ -556,7 +518,24 @@ public class DBManager extends SQLiteOpenHelper {
 				insertOrderStmt.bindString(3, Integer.toString(orders.get(i).getDishId()));
 				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
 				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
+				
+				insertOrderHeadersStmt.bindNull(1);
+				insertOrderHeadersStmt.bindString(2,
+						Integer.toString(orders.get(i).getMenuId()));
+				insertOrderHeadersStmt.bindString(3,
+						(orders.get(i).isExecute() ? "1" : "0"));
+				insertOrderHeadersStmt.bindString(4,
+						Integer.toString(orders.get(i).getExecutionDate()));
+				insertOrderHeadersStmt.bindString(5,
+						(orders.get(i).isModified() ? "1" : "0"));
+				insertOrderHeadersStmt.bindString(6,
+						Integer.toString(orders.get(i).getTimestamp()));
+				insertOrderHeadersStmt.bindString(7,
+								Integer.toString(orders.get(i).getOrderSrvNumber()));
+				
+
 				insertOrderStmt.execute();
+				insertOrderHeadersStmt.execute();
 			}
 			insertOrderStmt.close();
 		    mDb.setTransactionSuccessful();
@@ -564,6 +543,290 @@ public class DBManager extends SQLiteOpenHelper {
 			mDb.endTransaction();
 			
 			Log.i(LOG_TAG, "Added orders (" + Integer.toString(orders.size()) + ")");
+		}
+	}
+	
+	/**
+	 * Возвращает все заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersAll() {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
+						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
+						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+						null, new String[] {null},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
+							(c.getInt(4) == 0 ? false : true), c.getInt(5),
+							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
+							c.getFloat(9), c.getFloat(10)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает заказы по id который указан у заказов на сервере  
+	 * 
+	 * @param srvNumber
+	 *     id с сервера
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersBySrvNumber(int srvNumber) {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
+						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
+						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+						ORDERS_H_ORDER_SRV_NUMBER, new String[] {Integer.toString(srvNumber)},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
+							(c.getInt(4) == 0 ? false : true), c.getInt(5),
+							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
+							c.getFloat(9), c.getFloat(10)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает ещё не отправленные заказы
+	 *  
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersNotExecuted() {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
+						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
+						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+						ORDERS_H_EXECUTE, new String[] {"0"},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
+							(c.getInt(4) == 0 ? false : true), c.getInt(5),
+							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
+							c.getFloat(9), c.getFloat(10)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает измененные заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersModified() {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
+						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
+						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+						ORDERS_H_MODIFIED, new String[] {"1"},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
+							(c.getInt(4) == 0 ? false : true), c.getInt(5),
+							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
+							c.getFloat(9), c.getFloat(10)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает количество заказов на определенную дату
+	 * 
+	 * @param date
+	 *     дата в Unix time формате
+	 * @return
+	 *     количество заказов
+	 */
+	public int getOrdersAtDateCount(int date) {
+		StringBuilder query = new StringBuilder();
+		int result = 0;
+		
+		query.append("SELECT COUNT(").append(ORDERS_ORDER_ID).append(") FROM ");
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_MENU).append(" AS MU ON OH.");
+		query.append(ORDERS_H_MENU_ID).append(" = MU.").append(KEY_ID);
+		query.append(" WHERE ").append(MENU_DATE).append(" = ?");
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.rawQuery(query.toString(),
+					new String[] {Integer.toString(formatDate(date))});
+			mDb.setTransactionSuccessful();			
+
+			c.moveToFirst();
+			result = c.getInt(0);
+			c.close();
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;
+	}
+	
+	/**
+	 * Возвращает заказы на определенную дату
+	 * 
+	 * @param date
+	 *     дата в Unix time формате
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersAtDate(int date) {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_MENU).append(" AS MU ON OH.");
+		query.append(ORDERS_H_MENU_ID).append(" = MU.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
+						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
+						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+						MENU_DATE + " = ?", new String[] {Integer.toString(formatDate(date))},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
+							(c.getInt(4) == 0 ? false : true), c.getInt(5),
+							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
+							c.getFloat(9), c.getFloat(10)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Модифицирует значения заказов
+	 * 
+	 * @param orders
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public void editOrder(List<Order> orders) {
+		ContentValues osData = new ContentValues();
+		ContentValues ohData = new ContentValues();
+		
+		mDb.beginTransaction();
+		try {
+			for (int i = 0; i < orders.size(); i++) {
+				osData.put(ORDERS_AMMOUNT, orders.get(i).getAmmount());
+				osData.put(ORDERS_SUM, orders.get(i).getSum());
+				
+				ohData.put(ORDERS_H_EXECUTE, (orders.get(i).isExecute() ? "1" : "0"));
+				ohData.put(ORDERS_H_EXECUTION_DATE, formatDate(orders.get(i).getExecutionDate()));
+				ohData.put(ORDERS_H_MODIFIED, (orders.get(i).isModified() ? "1" : "0"));
+				ohData.put(ORDERS_H_TIMESTAMP, orders.get(i).getTimestamp());
+				ohData.put(ORDERS_H_ORDER_SRV_NUMBER, orders.get(i).getOrderSrvNumber());
+				
+				mDb.update(TABLE_ORDERS, osData, ORDERS_ORDER_ID + " = ?",
+						new String[] {Integer.toString(orders.get(i).getOrderId())});
+				mDb.update(TABLE_ORDERS_HEADERS, ohData, KEY_ID,
+						new String[] {Integer.toString(orders.get(i).getOrderId())});
+				
+				osData = new ContentValues();
+				ohData = new ContentValues();
+			}
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Modified orders (" + orders.size() + ")");
+		}		
+	}
+	
+	/**
+	 * Удаляет все заказы
+	 */
+	public void deleteOrdersAll() {
+		mDb.beginTransaction();
+		try {
+			mDb.delete(TABLE_ORDERS, null, null);
+			mDb.delete(TABLE_ORDERS_HEADERS, null, null);
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted all orders and orders headers");
 		}
 	}
 	
