@@ -6,7 +6,7 @@ import java.util.List;
 import rarus.eatery.model.Menu;
 import rarus.eatery.model.Dish;
 import rarus.eatery.model.MenuItem;
-import rarus.eatery.model.Order;
+import rarus.eatery.model.OrderItem;
 import rarus.eatery.model.OrderHeader;
 
 import android.content.ContentValues;
@@ -538,9 +538,9 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет заказы
 	 * 
 	 * @param orders
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} из объектов {@link OrderItem}
 	 */
-	public void addOrder(List<Order> orders) {
+	public void addOrder(List<OrderItem> orders) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertOrderStmt;
 		
