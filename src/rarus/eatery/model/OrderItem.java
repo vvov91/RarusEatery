@@ -6,14 +6,14 @@ package rarus.eatery.model;
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Order {
+public class OrderItem {
 	private int mId;
 	private int mOrderId;
 	private int mDishId;
 	private float mAmmount;
 	private float mSum;
 	
-	public Order(int mId, int mOrderId, int mDishId, float mAmmount, float mSum) {
+	public OrderItem(int mId, int mOrderId, int mDishId, float mAmmount, float mSum) {
 		this.mId = mId;
 		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;
