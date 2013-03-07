@@ -32,10 +32,18 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		Log.d(EateryConstants.SERVICE_LOG_TAG,
 				"[SERVICE] - SuccessfullReturned");
 		try {
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[SERVICE] - api.get");
 			APIMessage message = api.get();
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[SERVICE] - code");
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - get menu code");
 				ServiceList list=(ServiceList)message.getContent();
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - Servicel list getted");
 				writeToDB(list.getMenu(),list.getDishes());
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
@@ -109,8 +117,8 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		db.addMenu(menu);
 		db.close();		
 	}
-	class EateryServiceBinder extends Binder {
-		EateryWebService getService() {
+	public class EateryServiceBinder extends Binder {
+		public EateryWebService getService() {
 			return EateryWebService.this;
 		}
 	}

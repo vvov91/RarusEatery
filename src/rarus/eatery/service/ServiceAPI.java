@@ -41,10 +41,21 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		}
 		return result;
 	}
-
+	
+	@Override
+	protected void onPostExecute(APIMessage result) {
+		super.onPostExecute(result);
+		if (successfull) {
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - successfull Request post execute");
+			serviceResult.onSuccessfullRequest();
+		} else{
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - unsuccessfull Request post execute");
+			serviceResult.onUnSuccessfullRequest();
+			}
+	}
 	private ServiceList getMenu() {
-		String login = sp.getString(EateryConstants.PREF_LOGIN, "error");
-		String password = sp.getString(EateryConstants.PREF_PASSWORD, "error");
+		String login = sp.getString(EateryConstants.PREF_LOGIN, "mobile");
+		String password = sp.getString(EateryConstants.PREF_PASSWORD, "mobile");
 		String xml = XMLParser.getMenuXMLRequest();
 		ServiceList list = null;
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
@@ -56,9 +67,12 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - getMenuRequestResult:\n" + request.getResult());
 			list = XMLParser.parseXMLMenu(request.getResult());
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - result successfull");
 			successfull = true;
 		} else {
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Error:\n" + request.getError());
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Error:\n" + 
+		(request.getResult().startsWith("<html>")?request.getResult():request.getError()));
 			successfull = false;
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
 			//processError(request.getResult(), request.getError());
