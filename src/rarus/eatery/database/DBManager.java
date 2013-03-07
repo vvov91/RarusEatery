@@ -187,13 +187,23 @@ public class DBManager extends SQLiteOpenHelper {
 	public void addDish(List<Dish> dishes) {
 		StringBuilder query = new StringBuilder();	
 		SQLiteStatement insertDishStmt;
-		
+		int skipped = 0;
+				
 		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertDishStmt = mDb.compileStatement(query.toString());
 		
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < dishes.size(); i++) {
+				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
+						new String[] {Integer.toString(dishes.get(i).getId())}, null, null, null,
+						null);				
+				if (c.getCount() > 0) {
+					c.close();
+					skipped++;
+					continue;
+				}			
+				
 				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getId()));
 				insertDishStmt.bindString(2, dishes.get(i).getName());
 				insertDishStmt.bindString(3, dishes.get(i).getDescription());
@@ -208,7 +218,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size()) + ")");			
+			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size() - skipped) + ")");			
 		}		
 	}
 	
