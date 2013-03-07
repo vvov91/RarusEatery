@@ -825,6 +825,48 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
+	 * Удаляет заказы на определенную дату
+	 *  
+	 * @param date
+	 *     дата в Unix time формате
+	 */
+	public void deleteOrdersAtDate(int date) {
+		int count = 0;
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(TABLE_MENU, new String[] {KEY_ID}, MENU_DATE + " = ?",
+					new String[] {Integer.toString(formatDate(date))}, null, null, null);
+			
+			if (c.moveToFirst()) {
+				do {
+					Cursor co = mDb.query(TABLE_ORDERS_HEADERS, new String[] {KEY_ID},
+							ORDERS_H_MENU_ID + " = ?", new String[] {Integer.toString(c.getInt(0))},
+							null, null, null);
+					
+					if (co.moveToFirst()) {
+						mDb.delete(TABLE_ORDERS, ORDERS_ORDER_ID + " = ?",
+								new String[] {Integer.toString(co.getInt(0))});
+						mDb.delete(TABLE_ORDERS_HEADERS, KEY_ID + " = ?",
+								new String[] {Integer.toString(co.getInt(0))});
+						
+						count++;
+					}
+					co.close();
+				} while (c.moveToNext());
+			}
+			c.close();
+			
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted orders and orders headers (" + count + ") at date ("
+					+ formatDate(date) + ")");
+		}
+	}
+	
+	/**
 	 * Удаляет все заказы
 	 */
 	public void deleteOrdersAll() {
