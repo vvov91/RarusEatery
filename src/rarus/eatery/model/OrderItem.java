@@ -1,23 +1,19 @@
 package rarus.eatery.model;
 
 /**
- * Объект заказ с заголовками
+ * Объект заказ
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Order extends OrderHeader {
+public class OrderItem {
 	private int mId;
 	private int mOrderId;
 	private int mDishId;
 	private float mAmmount;
 	private float mSum;
 	
-	public Order(int mId, int mOrderId, int mDishId, int mMenuId, boolean mExecute, int mExecutionDate,
-			boolean mModified, int mTimestamp, int mOrderSrvNumber, float mAmmount, float mSum) {
-		super(mId, mMenuId, mExecute, mExecutionDate, mModified, mTimestamp,
-				mOrderSrvNumber);
-
+	public OrderItem(int mId, int mOrderId, int mDishId, float mAmmount, float mSum) {
 		this.mId = mId;
 		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;

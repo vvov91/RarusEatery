@@ -10,17 +10,17 @@ public class OrderHeader {
 	private int mId;
 	private int mMenuId;
 	private boolean mExecute;
-	private int mExecuteDate;
+	private int mExecutionDate;
 	private boolean mModified;
 	private int mTimestamp;
 	private int mOrderSrvNumber;
 	
-	public OrderHeader(int mId, int mMenuId, boolean mExecute, int mExecuteDate, boolean mModified,
+	public OrderHeader(int mId, int mMenuId, boolean mExecute, int mExecutionDate, boolean mModified,
 			int mTimestamp, int mOrderSrvNumber) {
 		this.mId = mId;
 		this.mMenuId = mMenuId;
 		this.mExecute = mExecute;
-		this.mExecuteDate = mExecuteDate;
+		this.mExecutionDate = mExecutionDate;
 		this.mModified = mModified;
 		this.mTimestamp = mTimestamp;
 		this.mOrderSrvNumber = mOrderSrvNumber;
@@ -50,12 +50,12 @@ public class OrderHeader {
 		this.mExecute = mExecute;
 	}
 
-	public int getExecuteDate() {
-		return mExecuteDate;
+	public int getExecutionDate() {
+		return mExecutionDate;
 	}
 
-	public void setExecuteDate(int mExecuteDate) {
-		this.mExecuteDate = mExecuteDate;
+	public void setExecutionDate(int mExecutionDate) {
+		this.mExecutionDate = mExecutionDate;
 	}
 
 	public boolean isModified() {

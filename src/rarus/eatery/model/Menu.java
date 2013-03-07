@@ -1,19 +1,23 @@
 package rarus.eatery.model;
 
 /**
- * Объект меню
+ * Объект меню с информацией о блюде
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Menu {
+public class Menu extends Dish {
 	private int mId;
 	private int mDate;
 	private int mDishId;
 	private float mAvailable;
 	private int mTimestamp;
 	
-	public Menu(int mId, int mDate, int mDishId, float mAvailable, int mTimestamp) {
+	public Menu(int mId, int mDate, int mDishId, String mName, String mDescription,
+			boolean mPortioned, float mPrice, String mRating, boolean mPreorder, 
+			float mAvailable, int mTimestamp) {
+		super(mDishId, mName, mDescription, mPortioned, mPrice, mRating, mPreorder);
+		
 		this.mId = mId;
 		this.mDate = mDate;
 		this.mDishId = mDishId;
@@ -59,5 +63,5 @@ public class Menu {
 
 	public void setTimestamp(int mTimestamp) {
 		this.mTimestamp = mTimestamp;
-	}	
+	}
 }
