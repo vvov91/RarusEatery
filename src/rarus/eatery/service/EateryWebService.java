@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import rarus.eatery.database.DBManager;
 import rarus.eatery.model.Dish;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.MenuItem;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +44,10 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				ServiceList list=(ServiceList)message.getContent();
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - Servicel list getted");
+				for(Dish d:list.getDishes()){
+					Log.i(EateryConstants.SERVICE_LOG_TAG,
+							"[SERVICE] - Dish -"+d.toString());
+				}
 				writeToDB(list.getMenu(),list.getDishes());
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
@@ -110,7 +114,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE,null));
 	}
 	
-	private void writeToDB(List<Menu> menu,List<Dish> dishes){
+	private void writeToDB(List<MenuItem> menu,List<Dish> dishes){
 		db=new DBManager(this);
 		db.open();
 		db.addDish(dishes);

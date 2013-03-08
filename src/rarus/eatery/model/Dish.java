@@ -15,6 +15,15 @@ public class Dish {
 	private String mRating;
 	private boolean mPreorder;
 	
+	public String toString(){
+		StringBuilder build=new StringBuilder("Dish:");
+		build.append(mName);
+		build.append(" ID: ");
+		build.append(mId);
+		build.append(" price =");
+		build.append(mPrice);
+		return build.toString();
+	}
 	public Dish(int mId, String mName, String mDescription, boolean mPortioned, float mPrice, 
 			String mRating, boolean mPreorder) {
 		this.mId = mId;

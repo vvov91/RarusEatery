@@ -14,7 +14,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import rarus.eatery.model.Dish;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.MenuItem;
 import android.util.Log;
 import android.util.Xml;
 
@@ -53,14 +53,12 @@ public class XMLParser {
 
 	public static ServiceList parseXMLMenu(String xml) {
 		try {
-			List<Menu> menus = new ArrayList<Menu>();
+			List<MenuItem> menus = new ArrayList<MenuItem>();
 			List<Dish> dishes = new ArrayList<Dish>();
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware(true);
 			XmlPullParser xpp = factory.newPullParser();
-			xpp.setInput(new StringReader(xml));
-			int eventType = xpp.getEventType();
-			String tmp = "";
+			xpp.setInput(new StringReader(xml));			
 			xpp.next();
 			String name = "";
 			while (!name.equals("menuItems")) {
@@ -91,7 +89,7 @@ public class XMLParser {
 					if (xpp.getName().equals("menu")) {
 						Dish d = new Dish(dishId, dishName, description, false,
 								price, rating, false);
-						Menu m = new Menu(count, date, dishId,
+						MenuItem m = new MenuItem(count, date, dishId,
 								availableAmmount, 0);
 						menus.add(m);
 						dishes.add(d);
