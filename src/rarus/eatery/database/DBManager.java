@@ -631,6 +631,45 @@ public class DBManager extends SQLiteOpenHelper {
 		}
 		return result;	
 	}
+	
+	/**
+	 * Возвращает ещё не отправленные заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link Menu}
+	 */
+	public List<Menu> getOrdersNotExecuted() {
+		StringBuilder query = new StringBuilder();
+		List<Menu> result = new ArrayList<Menu>();
+		
+		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
+		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"MU." + KEY_ID, MENU_DATE, "DS." + KEY_ID, DISHES_NAME,
+						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE,
+						DISHES_RATING, DISHES_PREORDER, MENU_AVAILABLE,
+						MENU_AMMOUNT, MENU_MODIFIED, MENU_TIMESTAMP},
+						MENU_MODIFIED + " = ?", new String[] {"1"}, null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Menu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
+							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
+							c.getInt(12)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;
+	}
 		
 	/**
 	 * Удаляет заказы на определенную дату
