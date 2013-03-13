@@ -519,6 +519,35 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
+	 * Возвращает список дат на которые имеются заказы
+	 * 
+	 * @return
+	 *     {@link List} из {@link Integer} Unix time дат.
+	 *     Даты в Unix time формате. Отсортированы по возрастанию.
+	 */
+	public List<Integer> getOrdersDates() {
+		List<Integer> result = new ArrayList<Integer>();
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(true, TABLE_ORDERS_HEADERS, new String[] {ORDERS_H_EXECUTION_DATE},
+					null, null, null, null, ORDERS_H_EXECUTION_DATE + " ASC", null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.getCount() > 0) {
+				c.moveToFirst();
+				do {
+					result.add(c.getInt(0));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;
+	}
+	
+	/**
 	 * Возвращает все заказы
 	 * 
 	 * @return
