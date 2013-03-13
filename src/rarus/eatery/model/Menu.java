@@ -1,66 +1,121 @@
 package rarus.eatery.model;
 
 /**
- * Объект меню с информацией о блюде
+ * Объект элемент меню
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Menu extends Dish {
-	private int mId;
-	private int mDate;
-	private int mDishId;
-	private float mAvailable;
-	private int mTimestamp;
+public class Menu {
+	private int mId;					// id меню
+	private int mDate;					// дата, на которую это меню
+	private int mDishId;				// id блюда, находящегося в меню
+	private String mName;				// название блюда
+	private String mDescription;		// описание блюда
+	private boolean mPortioned;			// флаг порционности блюда
+	private float mPrice;				// цена блюда
+	private String mRating;				// рейтинг блюда
+	private boolean mPreorder;			// флаг возможности предзаказа блюда
+	private float mAvailable;			// объём доступный для заказа
+	private float mAmmount;				// объём заказанного 
+	private boolean mModified;			// флаг состояния изменения меню
+	private int mTimestamp;				// временной штамп меню
 	
-	public Menu(int mId, int mDate, int mDishId, String mName, String mDescription,
-			boolean mPortioned, float mPrice, String mRating, boolean mPreorder, 
-			float mAvailable, int mTimestamp) {
-		super(mDishId, mName, mDescription, mPortioned, mPrice, mRating, mPreorder);
+	public Menu(int mDate, int mDishId, String mName,
+			String mDescription, boolean mPortioned, float mPrice,
+			String mRating, boolean mPreorder, float mAvailable,
+			float mAmmount, boolean mModified, int mTimestamp) {
 		
-		this.mId = mId;
+		this.mId = -1;
 		this.mDate = mDate;
 		this.mDishId = mDishId;
+		this.mName = mName;
+		this.mDescription = mDescription;
+		this.mPortioned = mPortioned;
+		this.mPrice = mPrice;
+		this.mRating = mRating;
+		this.mPreorder = mPreorder;
 		this.mAvailable = mAvailable;
+		this.mAmmount = mAmmount;
+		this.mModified = mModified;
 		this.mTimestamp = mTimestamp;
 	}
-
+	
 	public int getId() {
 		return mId;
 	}
-
 	public void setId(int mId) {
 		this.mId = mId;
 	}
-
 	public int getDate() {
 		return mDate;
 	}
-
 	public void setDate(int mDate) {
 		this.mDate = mDate;
 	}
-
 	public int getDishId() {
 		return mDishId;
 	}
-
 	public void setDishId(int mDishId) {
 		this.mDishId = mDishId;
 	}
-
+	public String getName() {
+		return mName;
+	}
+	public void setName(String mName) {
+		this.mName = mName;
+	}
+	public String getDescription() {
+		return mDescription;
+	}
+	public void setDescription(String mDescription) {
+		this.mDescription = mDescription;
+	}
+	public boolean isPortioned() {
+		return mPortioned;
+	}
+	public void setPortioned(boolean mPortioned) {
+		this.mPortioned = mPortioned;
+	}
+	public float getPrice() {
+		return mPrice;
+	}
+	public void setPrice(float mPrice) {
+		this.mPrice = mPrice;
+	}
+	public String getRating() {
+		return mRating;
+	}
+	public void setRating(String mRating) {
+		this.mRating = mRating;
+	}
+	public boolean isPreorder() {
+		return mPreorder;
+	}
+	public void setPreorder(boolean mPreorder) {
+		this.mPreorder = mPreorder;
+	}
 	public float getAvailable() {
 		return mAvailable;
 	}
-
 	public void setAvailable(float mAvailable) {
 		this.mAvailable = mAvailable;
 	}
-
+	public float getAmmount() {
+		return mAmmount;
+	}
+	public void setAmmount(float mAmmount) {
+		this.mAmmount = mAmmount;
+	}
+	public boolean isModified() {
+		return mModified;
+	}
+	public void setModified(boolean mModified) {
+		this.mModified = mModified;
+	}
 	public int getTimestamp() {
 		return mTimestamp;
 	}
-
 	public void setTimestamp(int mTimestamp) {
 		this.mTimestamp = mTimestamp;
 	}
