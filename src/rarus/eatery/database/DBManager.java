@@ -3,11 +3,8 @@ package rarus.eatery.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import rarus.eatery.model.DayMenu;
-import rarus.eatery.model.Dish;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import rarus.eatery.model.Order;
-import rarus.eatery.model.OrderHeader;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -56,6 +53,8 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String MENU_DATE = "date";
     private static final String MENU_DISH_ID = "dishID";
     private static final String MENU_AVAILABLE = "available";
+    private static final String MENU_AMMOUNT = "ammount";
+    private static final String MENU_MODIFIED = "modified";
     private static final String MENU_TIMESTAMP = "timestamp";
     
     // таблица ORDERS
@@ -65,11 +64,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String ORDERS_SUM = "sum";
     
     // таблица ORDERS HEADERS
-    private static final String ORDERS_H_MENU_ID = "menuID";
-    private static final String ORDERS_H_EXECUTE = "execute";
     private static final String ORDERS_H_EXECUTION_DATE = "executionDate";
-    private static final String ORDERS_H_MODIFIED = "modified";
-    private static final String ORDERS_H_TIMESTAMP = "timestamp";
     private static final String ORDERS_H_ORDER_SRV_NUMBER = "orderSrvNumber";
     
     
@@ -138,7 +133,9 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append(MENU_DATE).append(" INTEGER NOT NULL, ");
 		query.append(MENU_DISH_ID).append(" INTEGER NOT NULL, ");
 		query.append(MENU_AVAILABLE).append(" FLOAT NOT NULL DEFAULT -1, ");
-		query.append(MENU_TIMESTAMP).append(" INTEGER);");
+		query.append(MENU_AMMOUNT).append(" FLOAT DEFAULT 0, ");
+		query.append(MENU_MODIFIED).append(" INTEGER DEFAULT 0, ");
+		query.append(MENU_TIMESTAMP).append(" INTEGER DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
 		query = new StringBuilder();
@@ -159,11 +156,7 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append("CREATE TABLE ");
 		query.append(TABLE_ORDERS_HEADERS).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
-		query.append(ORDERS_H_MENU_ID).append(" INTEGER NOT NULL, ");
-		query.append(ORDERS_H_EXECUTE).append(" INTEGER DEFAULT 0, ");
-		query.append(ORDERS_H_EXECUTION_DATE).append(" INTEGER, ");
-		query.append(ORDERS_H_MODIFIED).append(" INTEGER DEFAULT 0, ");
-		query.append(ORDERS_H_TIMESTAMP).append(" INTEGER, ");
+		query.append(ORDERS_H_EXECUTION_DATE).append(" INTEGER DEFAULT 0, ");
 		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" INTEGER DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
@@ -183,19 +176,29 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет блюда
 	 * 
 	 * @param dishes
-	 *     {@link List} из объектов {@link Dish}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public void addDish(List<Dish> dishes) {
+	public void addDish(List<RarusMenu> dishes) {
 		StringBuilder query = new StringBuilder();	
 		SQLiteStatement insertDishStmt;
-		
+		int skipped = 0;
+				
 		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertDishStmt = mDb.compileStatement(query.toString());
 		
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < dishes.size(); i++) {
-				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getId()));
+				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
+						new String[] {Integer.toString(dishes.get(i).getDishId())},
+						null, null, null, null);				
+				if (c.getCount() > 0) {
+					c.close();
+					skipped++;
+					continue;
+				}
+				
+				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getDishId()));
 				insertDishStmt.bindString(2, dishes.get(i).getName());
 				insertDishStmt.bindString(3, dishes.get(i).getDescription());
 				insertDishStmt.bindString(4, (dishes.get(i).isPortioned() ? "1" : "0"));
@@ -209,7 +212,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size()) + ")");			
+			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size() - skipped) + ")");			
 		}		
 	}
 	
@@ -274,13 +277,13 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public void addMenu(List<Menu> menu) {
+	public void addMenu(List<RarusMenu> menu) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertMenuStmt;
 		
-		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?)");
+		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertMenuStmt = mDb.compileStatement(query.toString());
 
 		mDb.beginTransaction();
@@ -290,43 +293,19 @@ public class DBManager extends SQLiteOpenHelper {
 				insertMenuStmt.bindString(2, Integer.toString(formatDate(menu.get(i).getDate())));
 				insertMenuStmt.bindString(3, Integer.toString(menu.get(i).getDishId()));
 				insertMenuStmt.bindString(4, Float.toString(menu.get(i).getAvailable()));
-				insertMenuStmt.bindString(5, Integer.toString(menu.get(i).getTimestamp()));
+				insertMenuStmt.bindString(5, Float.toString(menu.get(i).getAmmount()));
+				insertMenuStmt.bindString(6, (menu.get(i).isModified() ? "1" : "0"));
+				insertMenuStmt.bindString(7, Integer.toString(menu.get(i).getTimestamp()));
 				insertMenuStmt.execute();
 			}
 			insertMenuStmt.close();
+			
 		    mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
 			
 			Log.i(LOG_TAG, "Added menu (" + Integer.toString(menu.size()) + ")");
 		}
-	}
-	
-	/**
-	 * Вовзращает количество дат на которые доступно меню
-	 * 
-	 * @return
-	 *     int с кол-вом дат
-	 */
-	public int getMenuDatesCount() {
-		StringBuilder query = new StringBuilder();
-		int result = 0;
-		
-		query.append("SELECT COUNT(DISTINCT ").append(MENU_DATE).append(") ");
-		query.append("FROM ").append(TABLE_MENU);
-		
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.rawQuery(query.toString(), new String[] {});
-			mDb.setTransactionSuccessful();			
-
-			c.moveToFirst();
-			result = c.getInt(0);
-			c.close();
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;
 	}
 	
 	/**
@@ -358,47 +337,18 @@ public class DBManager extends SQLiteOpenHelper {
 		return result;
 	}
 	
-	/**
-	 * Возвращает количество блюд в меню на определенную дату
-	 * 
-	 * @param date
-	 *     дата в Unix time формате
-	 * @return
-	 *     int кол-во блюд
-	 */
-	public int getMenuAtDateCount(int date) {
-		StringBuilder query = new StringBuilder();
-		int result = 0;
 		
-		query.append("SELECT COUNT(").append(MENU_DISH_ID).append(") FROM ");
-		query.append(TABLE_MENU).append(" WHERE ").append(MENU_DATE).append(" = ?");
-		
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.rawQuery(query.toString(),
-					new String[] {Integer.toString(formatDate(date))});
-			mDb.setTransactionSuccessful();			
-
-			c.moveToFirst();
-			result = c.getInt(0);
-			c.close();
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;
-	}
-	
 	/**
 	 * Возвращает меню на определенную дату
 	 * 
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link DayMenu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public List<DayMenu> getMenuAtDate(int date) {
+	public List<RarusMenu> getMenuAtDate(int date) {
 		StringBuilder query = new StringBuilder();
-		List<DayMenu> result = new ArrayList<DayMenu>();
+		List<RarusMenu> result = new ArrayList<RarusMenu>();
 		
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
@@ -406,19 +356,21 @@ public class DBManager extends SQLiteOpenHelper {
 		mDb.beginTransaction();
 		try {
 			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"MU." + KEY_ID, "DS." + KEY_ID, DISHES_NAME,
-						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE, DISHES_RATING,
-						DISHES_PREORDER, MENU_AVAILABLE, MENU_TIMESTAMP},
+					new String[] {"MU." + KEY_ID, MENU_DATE, "DS." + KEY_ID, DISHES_NAME,
+						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE,
+						DISHES_RATING, DISHES_PREORDER, MENU_AVAILABLE,
+						MENU_AMMOUNT, MENU_MODIFIED, MENU_TIMESTAMP},
 						MENU_DATE + " = ?", new String[] {Integer.toString(formatDate(date))},
 						null, null, null, null);
 			mDb.setTransactionSuccessful();
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new DayMenu(c.getInt(0), formatDate(date), c.getInt(1),
-							c.getString(2), c.getString(3), (c.getInt(4) == 0 ? false : true),
-							c.getFloat(5), c.getString(6), (c.getInt(7) == 0 ? false : true),
-							c.getFloat(8), c.getInt(9)));
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
+							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
+							c.getInt(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -488,50 +440,6 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	
-	// Заголовки заказа
-	
-	/**
-	 * Добавляет заголовки заказа
-	 * 
-	 * @param orderHeaders
-	 *     {@link List} из объектов {@link OrderHeader}
-	 */
-	public void addOrderHeader(List<OrderHeader> orderHeaders) {
-		StringBuilder query = new StringBuilder();
-		SQLiteStatement insertOrderHeadersStmt;
-		
-		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
-		query.append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
-		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
-		
-		mDb.beginTransaction();
-		try {
-			for (int i = 0; i < orderHeaders.size(); i++) {
-				insertOrderHeadersStmt.bindNull(1);
-				insertOrderHeadersStmt.bindString(2,
-						Integer.toString(orderHeaders.get(i).getMenuId()));
-				insertOrderHeadersStmt.bindString(3,
-						(orderHeaders.get(i).isExecute() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(4,
-						Integer.toString(orderHeaders.get(i).getExecuteDate()));
-				insertOrderHeadersStmt.bindString(5,
-						(orderHeaders.get(i).isModified() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(6,
-						Integer.toString(orderHeaders.get(i).getTimestamp()));
-				insertOrderHeadersStmt.bindString(7,
-								Integer.toString(orderHeaders.get(i).getOrderSrvNumber()));
-				insertOrderHeadersStmt.execute();
-			}
-			insertOrderHeadersStmt.close();
-		    mDb.setTransactionSuccessful();
-		} finally {
-			mDb.endTransaction();
-			
-			Log.i(LOG_TAG, "Added order headers (" + Integer.toString(orderHeaders.size()) + ")");
-		}
-	}
-	
-	
 	// Заказы
 	
 	/**
@@ -543,27 +451,273 @@ public class DBManager extends SQLiteOpenHelper {
 	public void addOrder(List<Order> orders) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertOrderStmt;
+		SQLiteStatement insertDishStmt;
+		SQLiteStatement insertOrderHeadersStmt;
+		int orderId = 0;
+		int dishId = 0;
 		
 		query.append("INSERT INTO ").append(TABLE_ORDERS);
 		query.append(" VALUES (?, ?, ?, ?, ?)");
 		insertOrderStmt = mDb.compileStatement(query.toString());
 		
+		query = new StringBuilder();
+		
+		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertDishStmt = mDb.compileStatement(query.toString());
+		
+		query = new StringBuilder();
+		
+		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
+		query.append(" VALUES (?, ?, ?)");
+		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
+		
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < orders.size(); i++) {
+				insertOrderHeadersStmt.bindNull(1);
+				insertOrderHeadersStmt.bindString(2,
+						Integer.toString(orders.get(i).getExecutionDate()));
+				insertOrderHeadersStmt.bindString(3,
+						Integer.toString(orders.get(i).getOrderSrvNumber()));
+				orderId = (int) insertOrderHeadersStmt.executeInsert();
+				
+				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
+						new String[] {Integer.toString(orders.get(i).getDishId())},
+						null, null, null, null);
+				
+				if (c.getCount() > 0) {
+					dishId = c.getInt(0);
+				}
+				else {
+					insertDishStmt.bindString(1, Integer.toString(orders.get(i).getDishId()));
+					insertDishStmt.bindString(2, orders.get(i).getName());
+					insertDishStmt.bindString(3, orders.get(i).getDescription());
+					insertDishStmt.bindString(4, (orders.get(i).isPortioned() ? "1" : "0"));
+					insertDishStmt.bindString(5, Float.toString(orders.get(i).getPrice()));
+					insertDishStmt.bindString(6, orders.get(i).getRating());
+					insertDishStmt.bindString(7, (orders.get(i).isPreorder() ? "1" : "0"));
+					dishId = (int) insertDishStmt.executeInsert();
+				}
+				c.close();
+								
 				insertOrderStmt.bindNull(1);
-				insertOrderStmt.bindString(2, Integer.toString(orders.get(i).getOrderId()));
-				insertOrderStmt.bindString(3, Integer.toString(orders.get(i).getDishId()));
+				insertOrderStmt.bindString(2, Integer.toString(orderId));
+				insertOrderStmt.bindString(3, Integer.toString(dishId));
 				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
 				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
-				insertOrderStmt.execute();
 			}
+			insertOrderHeadersStmt.close();
+			insertDishStmt.close();
 			insertOrderStmt.close();
+			
 		    mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
 			
 			Log.i(LOG_TAG, "Added orders (" + Integer.toString(orders.size()) + ")");
+		}
+	}
+	
+	/**
+	 * Возвращает список дат на которые имеются заказы
+	 * 
+	 * @return
+	 *     {@link List} из {@link Integer} Unix time дат.
+	 *     Даты в Unix time формате. Отсортированы по возрастанию.
+	 */
+	public List<Integer> getOrdersDates() {
+		List<Integer> result = new ArrayList<Integer>();
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(true, TABLE_ORDERS_HEADERS, new String[] {ORDERS_H_EXECUTION_DATE},
+					null, null, null, null, ORDERS_H_EXECUTION_DATE + " ASC", null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.getCount() > 0) {
+				c.moveToFirst();
+				do {
+					result.add(c.getInt(0));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;
+	}
+	
+	/**
+	 * Возвращает все заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersAll() {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
+		query.append(ORDERS_DISH_ID).append(" = DS.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "DS." + KEY_ID,
+						"DS." + DISHES_NAME, "DS." + DISHES_DESCRIPTION, "DS." + DISHES_PORTIONED,
+						"DS." + DISHES_PRICE, "DS." + DISHES_RATING, "DS." + DISHES_PREORDER,
+						"OS." + ORDERS_AMMOUNT, "OS." + ORDERS_SUM, "OH." + ORDERS_H_EXECUTION_DATE,
+						"OH." + ORDERS_H_ORDER_SRV_NUMBER},
+						null, new String[] {null},
+						null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
+							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
+							c.getFloat(10), c.getInt(11), c.getInt(12)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает заказы на определенную дату
+	 * 
+	 * @param date
+	 *     дата в Unix time формате
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrdersAtDate(int date) {
+		StringBuilder query = new StringBuilder();
+		List<Order> result = new ArrayList<Order>();
+		
+		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
+		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
+		query.append(ORDERS_DISH_ID).append(" = DS.").append(KEY_ID);
+
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "DS." + KEY_ID,
+					"DS." + DISHES_NAME, "DS." + DISHES_DESCRIPTION, "DS." + DISHES_PORTIONED,
+					"DS." + DISHES_PRICE, "DS." + DISHES_RATING, "DS." + DISHES_PREORDER,
+					"OS." + ORDERS_AMMOUNT, "OS." + ORDERS_SUM, "OH." + ORDERS_H_EXECUTION_DATE,
+					"OH." + ORDERS_H_ORDER_SRV_NUMBER}, ORDERS_H_EXECUTION_DATE + " = ?",
+					new String[] {Integer.toString(formatDate(date))}, null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
+							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
+							c.getFloat(10), c.getInt(11), c.getInt(12)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;	
+	}
+	
+	/**
+	 * Возвращает ещё не отправленные заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link RarusMenu}
+	 */
+	public List<RarusMenu> getOrdersNotExecuted() {
+		StringBuilder query = new StringBuilder();
+		List<RarusMenu> result = new ArrayList<RarusMenu>();
+		
+		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
+		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
+		
+		mDb.beginTransaction();
+		try {
+			Cursor c = mDb.query(false, query.toString(),
+					new String[] {"MU." + KEY_ID, MENU_DATE, "DS." + KEY_ID, DISHES_NAME,
+						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE,
+						DISHES_RATING, DISHES_PREORDER, MENU_AVAILABLE,
+						MENU_AMMOUNT, MENU_MODIFIED, MENU_TIMESTAMP},
+						MENU_MODIFIED + " = ?", new String[] {"1"}, null, null, null, null);
+			mDb.setTransactionSuccessful();
+			
+			if (c.moveToFirst()) {
+				do {
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
+							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
+							c.getInt(12)));
+				} while(c.moveToNext());
+				c.close();
+			}
+		} finally {
+			mDb.endTransaction();
+		}
+		return result;
+	}
+		
+	/**
+	 * Удаляет заказы на определенную дату
+	 *  
+	 * @param date
+	 *     дата в Unix time формате
+	 */
+	public void deleteOrdersAtDate(int date) {
+		int count = 0;
+		
+		mDb.beginTransaction();
+		try {			
+			Cursor c = mDb.query(TABLE_ORDERS_HEADERS, new String[] {KEY_ID},
+					ORDERS_H_EXECUTION_DATE + " = ?",
+					new String[] {Integer.toString(formatDate(date))}, null, null, null);
+			
+			if (c.moveToFirst()) {
+				mDb.delete(TABLE_ORDERS, ORDERS_ORDER_ID + " = ?",
+						new String[] {Integer.toString(c.getInt(0))});
+				mDb.delete(TABLE_ORDERS_HEADERS, KEY_ID + " = ?",
+						new String[] {Integer.toString(c.getInt(0))});
+				count++;
+			}
+			c.close();
+			
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted orders and orders headers (" + count + ") at date ("
+					+ formatDate(date) + ")");
+		}
+	}
+	
+	/**
+	 * Удаляет все заказы
+	 */
+	public void deleteOrdersAll() {
+		mDb.beginTransaction();
+		try {
+			mDb.delete(TABLE_ORDERS, null, null);
+			mDb.delete(TABLE_ORDERS_HEADERS, null, null);
+			
+			mDb.setTransactionSuccessful();
+		} finally {
+			mDb.endTransaction();
+			
+			Log.i(LOG_TAG, "Deleted all orders and orders headers");
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package rarus.eatery.adapters;
+package rarus.eatery.activity;
 
 import java.util.List;
 

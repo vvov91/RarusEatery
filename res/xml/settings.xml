@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <ListPreference
-        android:entries="@array/mode"
-        android:entryValues="@array/mode_values"
-        android:key="mode"
-        android:summary="@string/mode"
-        android:title="Режим" >
-    </ListPreference>
-
     <EditTextPreference
         android:key="servAdress"
         android:summary="@string/serverAdr"

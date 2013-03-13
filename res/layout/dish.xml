@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
- xmlns:android="http://schemas.android.com/apk/res/android"
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:background="@drawable/rect"
- android:orientation="horizontal">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rect"
+    android:orientation="horizontal" >
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"        >
+        android:layout_height="match_parent" >
 
         <Button
             android:id="@+id/btnMinus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-			android:layout_toLeftOf="@+id/tvAmount"
+            android:layout_toLeftOf="@+id/tvAmount"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="-" />
 
         <TextView
             android:id="@+id/tvAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_alignTop="@+id/btnMinus"
             android:layout_alignBottom="@+id/btnMinus"
+            android:layout_alignTop="@+id/btnMinus"
+            android:layout_centerInParent="true"
             android:text="5"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -34,9 +35,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/btnMinus"
-            android:layout_alignTop="@+id/btnMinus"
             android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/btnMinus"
             android:layout_toRightOf="@+id/tvAmount"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:text="+" />
 
         <TextView
@@ -46,7 +49,7 @@
             android:layout_below="@+id/btnMinus"
             android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
-            android:lines="4"
+            android:lines="2"
             android:text="Название блюда можно длинное"
             android:textSize="20sp" />
 
@@ -54,28 +57,9 @@
             android:id="@+id/tvPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
             android:layout_below="@+id/tvName"
-            android:layout_marginRight="10dp"
             android:text="50 грн" />
-
-        <Button
-            android:id="@+id/btnRating"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvPrice"
-            android:layout_alignLeft="@+id/btnMinus"
-            android:text="4.7(50)" />
-
-        <Button
-            android:id="@+id/btnRate"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvPrice"
-            android:layout_alignRight="@+id/btnPlus"
-            android:text="A" />
 
     </RelativeLayout>
 
