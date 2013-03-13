@@ -3,6 +3,7 @@ package rarus.eatery.database;
 import java.util.List;
 
 import rarus.eatery.model.Menu;
+import rarus.eatery.model.Order;
 
 import android.content.Context;
 
@@ -30,7 +31,7 @@ public class EateryDB {
 	// Меню
 	
 	/**
-	 * Возвращает меню на определенную дату
+	 * Возвращает список дат на которые доступно меню
 	 * 
 	 * @param date
 	 *     дата в Unix time формате
@@ -62,13 +63,13 @@ public class EateryDB {
 	}	
 	
 	/**
-	 * Сохраняет меню на определенную дату
+	 * Сохраняет меню
 	 * 
 	 * @param menu
 	 *     {@link List} из объектов {@link Menu}
 	 */
 	public void saveMenu(List<Menu> menu) {
-		if(menu.size() == 0) return;
+		if (menu.size() == 0) return;
 				
 		db.open();
 		for (int i = 0; i < menu.size(); i++) {
@@ -79,6 +80,55 @@ public class EateryDB {
 				break;
 			}
 		}
+		db.close();
+	}
+	
+	
+	// Заказы
+	
+	/**
+	 * Возвращает список дат на которые имеются заказы
+	 * 
+	 * @param date
+	 *     дата в Unix time формате
+	 * @return
+	 *     {@link List} из объектов {@link Menu}
+	 */
+	public List<Integer> getOrdersDates() {
+		db.open();
+		List<Integer> result = db.getOrdersDates();
+		db.close();
+		return result;
+	}
+	
+	/**
+	 * Возвращает заказы на определенную дату
+	 * 
+	 * @param date
+	 *     дата в Unix time формате
+	 * @return
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public List<Order> getOrders(int date) {
+		db.open();
+		List<Order> result = db.getOrdersAtDate(date);
+		db.close();
+		
+		return result;
+	}
+		
+	/**
+	 * Сохраняет заказы
+	 * 
+	 * @param orders
+	 *     {@link List} из объектов {@link Order}
+	 */
+	public void saveOrders(List<Order> orders) {
+		if (orders.size() == 0) return;
+		
+		db.open();
+		db.deleteOrdersAll();
+		db.addOrder(orders);
 		db.close();
 	}
 }
