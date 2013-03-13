@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rarus.eatery.model.Menu;
-import rarus.eatery.model.Dish;
-import rarus.eatery.model.MenuItem;
 import rarus.eatery.model.Order;
 
 import android.content.ContentValues;
@@ -178,9 +176,9 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет блюда
 	 * 
 	 * @param dishes
-	 *     {@link List} из объектов {@link Dish}
+	 *     {@link List} из объектов {@link Menu}
 	 */
-	public void addDish(List<Dish> dishes) {
+	public void addDish(List<Menu> dishes) {
 		StringBuilder query = new StringBuilder();	
 		SQLiteStatement insertDishStmt;
 		int skipped = 0;
@@ -192,15 +190,15 @@ public class DBManager extends SQLiteOpenHelper {
 		try {
 			for (int i = 0; i < dishes.size(); i++) {
 				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
-						new String[] {Integer.toString(dishes.get(i).getId())}, null, null, null,
-						null);				
+						new String[] {Integer.toString(dishes.get(i).getDishId())},
+						null, null, null, null);				
 				if (c.getCount() > 0) {
 					c.close();
 					skipped++;
 					continue;
-				}			
+				}
 				
-				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getId()));
+				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getDishId()));
 				insertDishStmt.bindString(2, dishes.get(i).getName());
 				insertDishStmt.bindString(3, dishes.get(i).getDescription());
 				insertDishStmt.bindString(4, (dishes.get(i).isPortioned() ? "1" : "0"));
@@ -279,13 +277,13 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link MenuItem}
+	 *     {@link List} из объектов {@link Menu}
 	 */
-	public void addMenu(List<MenuItem> menu) {
+	public void addMenu(List<Menu> menu) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertMenuStmt;
 		
-		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?)");
+		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertMenuStmt = mDb.compileStatement(query.toString());
 
 		mDb.beginTransaction();
@@ -295,43 +293,19 @@ public class DBManager extends SQLiteOpenHelper {
 				insertMenuStmt.bindString(2, Integer.toString(formatDate(menu.get(i).getDate())));
 				insertMenuStmt.bindString(3, Integer.toString(menu.get(i).getDishId()));
 				insertMenuStmt.bindString(4, Float.toString(menu.get(i).getAvailable()));
-				insertMenuStmt.bindString(5, Integer.toString(menu.get(i).getTimestamp()));
+				insertMenuStmt.bindString(5, Float.toString(menu.get(i).getAmmount()));
+				insertMenuStmt.bindString(6, (menu.get(i).isModified() ? "1" : "0"));
+				insertMenuStmt.bindString(7, Integer.toString(menu.get(i).getTimestamp()));
 				insertMenuStmt.execute();
 			}
 			insertMenuStmt.close();
+			
 		    mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
 			
 			Log.i(LOG_TAG, "Added menu (" + Integer.toString(menu.size()) + ")");
 		}
-	}
-	
-	/**
-	 * Вовзращает количество дат на которые доступно меню
-	 * 
-	 * @return
-	 *     int с кол-вом дат
-	 */
-	public int getMenuDatesCount() {
-		StringBuilder query = new StringBuilder();
-		int result = 0;
-		
-		query.append("SELECT COUNT(DISTINCT ").append(MENU_DATE).append(") ");
-		query.append("FROM ").append(TABLE_MENU);
-		
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.rawQuery(query.toString(), new String[] {});
-			mDb.setTransactionSuccessful();			
-
-			c.moveToFirst();
-			result = c.getInt(0);
-			c.close();
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;
 	}
 	
 	/**
@@ -363,36 +337,7 @@ public class DBManager extends SQLiteOpenHelper {
 		return result;
 	}
 	
-	/**
-	 * Возвращает количество блюд в меню на определенную дату
-	 * 
-	 * @param date
-	 *     дата в Unix time формате
-	 * @return
-	 *     int кол-во блюд
-	 */
-	public int getMenuAtDateCount(int date) {
-		StringBuilder query = new StringBuilder();
-		int result = 0;
 		
-		query.append("SELECT COUNT(").append(MENU_DISH_ID).append(") FROM ");
-		query.append(TABLE_MENU).append(" WHERE ").append(MENU_DATE).append(" = ?");
-		
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.rawQuery(query.toString(),
-					new String[] {Integer.toString(formatDate(date))});
-			mDb.setTransactionSuccessful();			
-
-			c.moveToFirst();
-			result = c.getInt(0);
-			c.close();
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;
-	}
-	
 	/**
 	 * Возвращает меню на определенную дату
 	 * 
@@ -411,19 +356,21 @@ public class DBManager extends SQLiteOpenHelper {
 		mDb.beginTransaction();
 		try {
 			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"MU." + KEY_ID, "DS." + KEY_ID, DISHES_NAME,
-						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE, DISHES_RATING,
-						DISHES_PREORDER, MENU_AVAILABLE, MENU_TIMESTAMP},
+					new String[] {"MU." + KEY_ID, MENU_DATE, "DS." + KEY_ID, DISHES_NAME,
+						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE,
+						DISHES_RATING, DISHES_PREORDER, MENU_AVAILABLE,
+						MENU_AMMOUNT, MENU_MODIFIED, MENU_TIMESTAMP},
 						MENU_DATE + " = ?", new String[] {Integer.toString(formatDate(date))},
 						null, null, null, null);
 			mDb.setTransactionSuccessful();
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Menu(c.getInt(0), formatDate(date), c.getInt(1),
-							c.getString(2), c.getString(3), (c.getInt(4) == 0 ? false : true),
-							c.getFloat(5), c.getString(6), (c.getInt(7) == 0 ? false : true),
-							c.getFloat(8), c.getInt(9)));
+					result.add(new Menu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
+							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
+							c.getInt(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -504,7 +451,10 @@ public class DBManager extends SQLiteOpenHelper {
 	public void addOrder(List<Order> orders) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertOrderStmt;
+		SQLiteStatement insertDishStmt;
 		SQLiteStatement insertOrderHeadersStmt;
+		int orderId = 0;
+		int dishId = 0;
 		
 		query.append("INSERT INTO ").append(TABLE_ORDERS);
 		query.append(" VALUES (?, ?, ?, ?, ?)");
@@ -512,38 +462,54 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query = new StringBuilder();
 		
+		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertDishStmt = mDb.compileStatement(query.toString());
+		
+		query = new StringBuilder();
+		
 		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
-		query.append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		query.append(" VALUES (?, ?, ?)");
 		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
 		
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < orders.size(); i++) {
-				insertOrderStmt.bindNull(1);
-				insertOrderStmt.bindString(2, Integer.toString(orders.get(i).getOrderId()));
-				insertOrderStmt.bindString(3, Integer.toString(orders.get(i).getDishId()));
-				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
-				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
-				
 				insertOrderHeadersStmt.bindNull(1);
 				insertOrderHeadersStmt.bindString(2,
-						Integer.toString(orders.get(i).getMenuId()));
-				insertOrderHeadersStmt.bindString(3,
-						(orders.get(i).isExecute() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(4,
 						Integer.toString(orders.get(i).getExecutionDate()));
-				insertOrderHeadersStmt.bindString(5,
-						(orders.get(i).isModified() ? "1" : "0"));
-				insertOrderHeadersStmt.bindString(6,
-						Integer.toString(orders.get(i).getTimestamp()));
-				insertOrderHeadersStmt.bindString(7,
-								Integer.toString(orders.get(i).getOrderSrvNumber()));
+				insertOrderHeadersStmt.bindString(3,
+						Integer.toString(orders.get(i).getOrderSrvNumber()));
+				orderId = (int) insertOrderHeadersStmt.executeInsert();
 				
-
-				insertOrderStmt.execute();
-				insertOrderHeadersStmt.execute();
+				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
+						new String[] {Integer.toString(orders.get(i).getDishId())},
+						null, null, null, null);
+				
+				if (c.getCount() > 0) {
+					dishId = c.getInt(0);
+				}
+				else {
+					insertDishStmt.bindString(1, Integer.toString(orders.get(i).getDishId()));
+					insertDishStmt.bindString(2, orders.get(i).getName());
+					insertDishStmt.bindString(3, orders.get(i).getDescription());
+					insertDishStmt.bindString(4, (orders.get(i).isPortioned() ? "1" : "0"));
+					insertDishStmt.bindString(5, Float.toString(orders.get(i).getPrice()));
+					insertDishStmt.bindString(6, orders.get(i).getRating());
+					insertDishStmt.bindString(7, (orders.get(i).isPreorder() ? "1" : "0"));
+					dishId = (int) insertDishStmt.executeInsert();
+				}
+				c.close();
+								
+				insertOrderStmt.bindNull(1);
+				insertOrderStmt.bindString(2, Integer.toString(orderId));
+				insertOrderStmt.bindString(3, Integer.toString(dishId));
+				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
+				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
 			}
+			insertOrderHeadersStmt.close();
+			insertDishStmt.close();
 			insertOrderStmt.close();
+			
 		    mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
@@ -564,23 +530,27 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
 		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
+		query.append(ORDERS_DISH_ID).append(" = DS.").append(KEY_ID);
 
 		mDb.beginTransaction();
 		try {
 			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
-						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
-						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "DS." + KEY_ID,
+						"DS." + DISHES_NAME, "DS." + DISHES_DESCRIPTION, "DS." + DISHES_PORTIONED,
+						"DS." + DISHES_PRICE, "DS." + DISHES_RATING, "DS." + DISHES_PREORDER,
+						"OS." + ORDERS_AMMOUNT, "OS." + ORDERS_SUM, "OH." + ORDERS_H_EXECUTION_DATE,
+						"OH." + ORDERS_H_ORDER_SRV_NUMBER},
 						null, new String[] {null},
 						null, null, null, null);
 			mDb.setTransactionSuccessful();
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
-							(c.getInt(4) == 0 ? false : true), c.getInt(5),
-							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
-							c.getFloat(9), c.getFloat(10)));
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
+							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
+							c.getFloat(10), c.getInt(11), c.getInt(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -588,156 +558,6 @@ public class DBManager extends SQLiteOpenHelper {
 			mDb.endTransaction();
 		}
 		return result;	
-	}
-	
-	/**
-	 * Возвращает заказы по id который указан у заказов на сервере  
-	 * 
-	 * @param srvNumber
-	 *     id с сервера
-	 * @return
-	 *     {@link List} из объектов {@link Order}
-	 */
-	public List<Order> getOrdersBySrvNumber(int srvNumber) {
-		StringBuilder query = new StringBuilder();
-		List<Order> result = new ArrayList<Order>();
-		
-		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
-		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
-
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
-						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
-						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
-						ORDERS_H_ORDER_SRV_NUMBER, new String[] {Integer.toString(srvNumber)},
-						null, null, null, null);
-			mDb.setTransactionSuccessful();
-			
-			if (c.moveToFirst()) {
-				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
-							(c.getInt(4) == 0 ? false : true), c.getInt(5),
-							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
-							c.getFloat(9), c.getFloat(10)));
-				} while(c.moveToNext());
-				c.close();
-			}
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;	
-	}
-	
-	/**
-	 * Возвращает ещё не отправленные заказы
-	 *  
-	 * @return
-	 *     {@link List} из объектов {@link Order}
-	 */
-	public List<Order> getOrdersNotExecuted() {
-		StringBuilder query = new StringBuilder();
-		List<Order> result = new ArrayList<Order>();
-		
-		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
-		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
-
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
-						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
-						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
-						ORDERS_H_EXECUTE, new String[] {"0"},
-						null, null, null, null);
-			mDb.setTransactionSuccessful();
-			
-			if (c.moveToFirst()) {
-				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
-							(c.getInt(4) == 0 ? false : true), c.getInt(5),
-							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
-							c.getFloat(9), c.getFloat(10)));
-				} while(c.moveToNext());
-				c.close();
-			}
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;	
-	}
-	
-	/**
-	 * Возвращает измененные заказы
-	 * 
-	 * @return
-	 *     {@link List} из объектов {@link Order}
-	 */
-	public List<Order> getOrdersModified() {
-		StringBuilder query = new StringBuilder();
-		List<Order> result = new ArrayList<Order>();
-		
-		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
-		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
-
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
-						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
-						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
-						ORDERS_H_MODIFIED, new String[] {"1"},
-						null, null, null, null);
-			mDb.setTransactionSuccessful();
-			
-			if (c.moveToFirst()) {
-				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
-							(c.getInt(4) == 0 ? false : true), c.getInt(5),
-							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
-							c.getFloat(9), c.getFloat(10)));
-				} while(c.moveToNext());
-				c.close();
-			}
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;	
-	}
-	
-	/**
-	 * Возвращает количество заказов на определенную дату
-	 * 
-	 * @param date
-	 *     дата в Unix time формате
-	 * @return
-	 *     количество заказов
-	 */
-	public int getOrdersAtDateCount(int date) {
-		StringBuilder query = new StringBuilder();
-		int result = 0;
-		
-		query.append("SELECT COUNT(").append(ORDERS_ORDER_ID).append(") FROM ");
-		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
-		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
-		query.append(" INNER JOIN ").append(TABLE_MENU).append(" AS MU ON OH.");
-		query.append(ORDERS_H_MENU_ID).append(" = MU.").append(KEY_ID);
-		query.append(" WHERE ").append(MENU_DATE).append(" = ?");
-		
-		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.rawQuery(query.toString(),
-					new String[] {Integer.toString(formatDate(date))});
-			mDb.setTransactionSuccessful();			
-
-			c.moveToFirst();
-			result = c.getInt(0);
-			c.close();
-		} finally {
-			mDb.endTransaction();
-		}
-		return result;
 	}
 	
 	/**
@@ -754,25 +574,26 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
 		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
-		query.append(" INNER JOIN ").append(TABLE_MENU).append(" AS MU ON OH.");
-		query.append(ORDERS_H_MENU_ID).append(" = MU.").append(KEY_ID);
+		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
+		query.append(ORDERS_DISH_ID).append(" = DS.").append(KEY_ID);
 
 		mDb.beginTransaction();
 		try {
 			Cursor c = mDb.query(false, query.toString(),
-					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "OS." + ORDERS_DISH_ID,
-						ORDERS_H_MENU_ID, ORDERS_H_EXECUTE, ORDERS_H_EXECUTION_DATE,
-						ORDERS_H_MODIFIED, "OH." + ORDERS_H_TIMESTAMP, ORDERS_H_ORDER_SRV_NUMBER},
-						MENU_DATE + " = ?", new String[] {Integer.toString(formatDate(date))},
-						null, null, null, null);
+					new String[] {"OS." + KEY_ID, "OS." + ORDERS_ORDER_ID, "DS." + KEY_ID,
+					"DS." + DISHES_NAME, "DS." + DISHES_DESCRIPTION, "DS." + DISHES_PORTIONED,
+					"DS." + DISHES_PRICE, "DS." + DISHES_RATING, "DS." + DISHES_PREORDER,
+					"OS." + ORDERS_AMMOUNT, "OS." + ORDERS_SUM, "OH." + ORDERS_H_EXECUTION_DATE,
+					"OH." + ORDERS_H_ORDER_SRV_NUMBER}, ORDERS_H_EXECUTION_DATE + " = ?",
+					new String[] {Integer.toString(formatDate(date))}, null, null, null, null);
 			mDb.setTransactionSuccessful();
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3),
-							(c.getInt(4) == 0 ? false : true), c.getInt(5),
-							(c.getInt(6) == 0 ? false : true), c.getInt(7), c.getInt(8),
-							c.getFloat(9), c.getFloat(10)));
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
+							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
+							c.getFloat(10), c.getInt(11), c.getInt(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -781,45 +602,7 @@ public class DBManager extends SQLiteOpenHelper {
 		}
 		return result;	
 	}
-	
-	/**
-	 * Модифицирует значения заказов
-	 * 
-	 * @param orders
-	 *     {@link List} из объектов {@link Order}
-	 */
-	public void editOrder(List<Order> orders) {
-		ContentValues osData = new ContentValues();
-		ContentValues ohData = new ContentValues();
 		
-		mDb.beginTransaction();
-		try {
-			for (int i = 0; i < orders.size(); i++) {
-				osData.put(ORDERS_AMMOUNT, orders.get(i).getAmmount());
-				osData.put(ORDERS_SUM, orders.get(i).getSum());
-				
-				ohData.put(ORDERS_H_EXECUTE, (orders.get(i).isExecute() ? "1" : "0"));
-				ohData.put(ORDERS_H_EXECUTION_DATE, formatDate(orders.get(i).getExecutionDate()));
-				ohData.put(ORDERS_H_MODIFIED, (orders.get(i).isModified() ? "1" : "0"));
-				ohData.put(ORDERS_H_TIMESTAMP, orders.get(i).getTimestamp());
-				ohData.put(ORDERS_H_ORDER_SRV_NUMBER, orders.get(i).getOrderSrvNumber());
-				
-				mDb.update(TABLE_ORDERS, osData, ORDERS_ORDER_ID + " = ?",
-						new String[] {Integer.toString(orders.get(i).getOrderId())});
-				mDb.update(TABLE_ORDERS_HEADERS, ohData, KEY_ID,
-						new String[] {Integer.toString(orders.get(i).getOrderId())});
-				
-				osData = new ContentValues();
-				ohData = new ContentValues();
-			}
-			mDb.setTransactionSuccessful();
-		} finally {
-			mDb.endTransaction();
-			
-			Log.i(LOG_TAG, "Modified orders (" + orders.size() + ")");
-		}		
-	}
-	
 	/**
 	 * Удаляет заказы на определенную дату
 	 *  
@@ -830,26 +613,17 @@ public class DBManager extends SQLiteOpenHelper {
 		int count = 0;
 		
 		mDb.beginTransaction();
-		try {
-			Cursor c = mDb.query(TABLE_MENU, new String[] {KEY_ID}, MENU_DATE + " = ?",
+		try {			
+			Cursor c = mDb.query(TABLE_ORDERS_HEADERS, new String[] {KEY_ID},
+					ORDERS_H_EXECUTION_DATE + " = ?",
 					new String[] {Integer.toString(formatDate(date))}, null, null, null);
 			
 			if (c.moveToFirst()) {
-				do {
-					Cursor co = mDb.query(TABLE_ORDERS_HEADERS, new String[] {KEY_ID},
-							ORDERS_H_MENU_ID + " = ?", new String[] {Integer.toString(c.getInt(0))},
-							null, null, null);
-					
-					if (co.moveToFirst()) {
-						mDb.delete(TABLE_ORDERS, ORDERS_ORDER_ID + " = ?",
-								new String[] {Integer.toString(co.getInt(0))});
-						mDb.delete(TABLE_ORDERS_HEADERS, KEY_ID + " = ?",
-								new String[] {Integer.toString(co.getInt(0))});
-						
-						count++;
-					}
-					co.close();
-				} while (c.moveToNext());
+				mDb.delete(TABLE_ORDERS, ORDERS_ORDER_ID + " = ?",
+						new String[] {Integer.toString(c.getInt(0))});
+				mDb.delete(TABLE_ORDERS_HEADERS, KEY_ID + " = ?",
+						new String[] {Integer.toString(c.getInt(0))});
+				count++;
 			}
 			c.close();
 			
@@ -870,6 +644,7 @@ public class DBManager extends SQLiteOpenHelper {
 		try {
 			mDb.delete(TABLE_ORDERS, null, null);
 			mDb.delete(TABLE_ORDERS_HEADERS, null, null);
+			
 			mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
