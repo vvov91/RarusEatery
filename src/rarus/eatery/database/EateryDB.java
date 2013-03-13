@@ -83,6 +83,15 @@ public class EateryDB {
 		db.close();
 	}
 	
+	/**
+	 * Удаляет все имеющиеся меню
+	 */
+	public void deleteMenu() {
+		db.open();
+		db.deleteMenuAll();
+		db.close();
+	}
+	
 	
 	// Заказы
 	
@@ -116,6 +125,20 @@ public class EateryDB {
 		
 		return result;
 	}
+	
+	/**
+	 * Возвращает ещё не отправленные заказы
+	 * 
+	 * @return
+	 *     {@link List} из объектов {@link Menu}
+	 */
+	public List<Menu> getOrdersNotExecuted() {
+		db.open();
+		List<Menu> result = db.getOrdersNotExecuted();
+		db.close();
+		
+		return result;
+	}
 		
 	/**
 	 * Сохраняет заказы
@@ -129,6 +152,15 @@ public class EateryDB {
 		db.open();
 		db.deleteOrdersAll();
 		db.addOrder(orders);
+		db.close();
+	}
+	
+	/**
+	 * Удаляет все имеющиеся заказы
+	 */
+	public void deleteOrders() {
+		db.open();
+		db.deleteOrdersAll();
 		db.close();
 	}
 }
