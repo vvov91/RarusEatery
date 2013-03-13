@@ -21,12 +21,12 @@ public class Menu {
 	private boolean mModified;			// флаг состояния изменения меню
 	private int mTimestamp;				// временной штамп меню
 	
-	public Menu(int mDate, int mDishId, String mName,
+	public Menu(int mId, int mDate, int mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
 			String mRating, boolean mPreorder, float mAvailable,
 			float mAmmount, boolean mModified, int mTimestamp) {
 		
-		this.mId = -1;
+		this.mId = mId;
 		this.mDate = mDate;
 		this.mDishId = mDishId;
 		this.mName = mName;
