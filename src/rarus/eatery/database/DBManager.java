@@ -55,6 +55,8 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String MENU_DATE = "date";
     private static final String MENU_DISH_ID = "dishID";
     private static final String MENU_AVAILABLE = "available";
+    private static final String MENU_AMMOUNT = "ammount";
+    private static final String MENU_MODIFIED = "modified";
     private static final String MENU_TIMESTAMP = "timestamp";
     
     // таблица ORDERS
@@ -64,11 +66,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String ORDERS_SUM = "sum";
     
     // таблица ORDERS HEADERS
-    private static final String ORDERS_H_MENU_ID = "menuID";
-    private static final String ORDERS_H_EXECUTE = "execute";
     private static final String ORDERS_H_EXECUTION_DATE = "executionDate";
-    private static final String ORDERS_H_MODIFIED = "modified";
-    private static final String ORDERS_H_TIMESTAMP = "timestamp";
     private static final String ORDERS_H_ORDER_SRV_NUMBER = "orderSrvNumber";
     
     
@@ -137,7 +135,9 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append(MENU_DATE).append(" INTEGER NOT NULL, ");
 		query.append(MENU_DISH_ID).append(" INTEGER NOT NULL, ");
 		query.append(MENU_AVAILABLE).append(" FLOAT NOT NULL DEFAULT -1, ");
-		query.append(MENU_TIMESTAMP).append(" INTEGER);");
+		query.append(MENU_AMMOUNT).append(" FLOAT DEFAULT 0, ");
+		query.append(MENU_MODIFIED).append(" INTEGER DEFAULT 0, ");
+		query.append(MENU_TIMESTAMP).append(" INTEGER DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
 		query = new StringBuilder();
@@ -158,11 +158,7 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append("CREATE TABLE ");
 		query.append(TABLE_ORDERS_HEADERS).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
-		query.append(ORDERS_H_MENU_ID).append(" INTEGER NOT NULL, ");
-		query.append(ORDERS_H_EXECUTE).append(" INTEGER DEFAULT 0, ");
-		query.append(ORDERS_H_EXECUTION_DATE).append(" INTEGER, ");
-		query.append(ORDERS_H_MODIFIED).append(" INTEGER DEFAULT 0, ");
-		query.append(ORDERS_H_TIMESTAMP).append(" INTEGER, ");
+		query.append(ORDERS_H_EXECUTION_DATE).append(" INTEGER DEFAULT 0, ");
 		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" INTEGER DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
