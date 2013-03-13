@@ -7,7 +7,8 @@ package rarus.eatery.model;
  *
  */
 public class Order {
-	private int mId;					// id заказа
+	private int mId;					// служебный id
+	private int mOrderId;				// id заказа
 	private int mDishId;				// id блюда, находящегося в заказе
 	private String mName;				// название блюда
 	private String mDescription;		// описание блюда
@@ -18,10 +19,11 @@ public class Order {
 	private float mAmmount;				// объём заказанного 
 	private float mSum;					// сумма по заказу
 	
-	public Order(int mId, int mDishId, String mName, String mDescription,
+	public Order(int mId, int mOrderId, int mDishId, String mName, String mDescription,
 			boolean mPortioned, float mPrice, String mRating,
 			boolean mPreorder, float mAmmount, float mSum) {
 		this.mId = mId;
+		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;
 		this.mName = mName;
 		this.mDescription = mDescription;
@@ -38,6 +40,12 @@ public class Order {
 	}
 	public void setId(int mId) {
 		this.mId = mId;
+	}
+	public int getOrderId() {
+		return mOrderId;
+	}
+	public void setOrderId(int mOrderId) {
+		this.mOrderId = mOrderId;
 	}
 	public int getDishId() {
 		return mDishId;
