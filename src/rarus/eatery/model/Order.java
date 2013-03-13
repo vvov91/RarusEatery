@@ -18,10 +18,13 @@ public class Order {
 	private boolean mPreorder;			// флаг возможности предзаказа блюда
 	private float mAmmount;				// объём заказанного 
 	private float mSum;					// сумма по заказу
+	private int mExecutionDate;			// дата выполнения заказа
+	private int mOrderSrvNumber;		// номер заказа на сервере
 	
 	public Order(int mId, int mOrderId, int mDishId, String mName, String mDescription,
 			boolean mPortioned, float mPrice, String mRating,
-			boolean mPreorder, float mAmmount, float mSum) {
+			boolean mPreorder, float mAmmount, float mSum,
+			int mExecutionDate, int mOrderSrvNumber) {
 		this.mId = mId;
 		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;
@@ -33,6 +36,8 @@ public class Order {
 		this.mPreorder = mPreorder;
 		this.mAmmount = mAmmount;
 		this.mSum = mSum;
+		this.mExecutionDate = mExecutionDate;
+		this.mOrderSrvNumber = mOrderSrvNumber;
 	}
 	
 	public int getId() {
@@ -100,5 +105,17 @@ public class Order {
 	}
 	public void setSum(float mSum) {
 		this.mSum = mSum;
+	}
+	public int getExecutionDate() {
+		return mExecutionDate;
+	}
+	public void setExecutionDate(int mExecutionDate) {
+		this.mExecutionDate = mExecutionDate;
+	}
+	public int getOrderSrvNumber() {
+		return mOrderSrvNumber;
+	}
+	public void setOrderSrvNumber(int mOrderSrvNumber) {
+		this.mOrderSrvNumber = mOrderSrvNumber;
 	}
 }
