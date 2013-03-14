@@ -12,11 +12,11 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-import rarus.eatery.model.Dish;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.MenuItem;
+import rarus.eatery.model.Menu;
 import android.util.Log;
 import android.util.Xml;
+import android.view.MenuItem;
 
 /**
  * Класс с набюором статических методов для формирования XML запросов и разбора
@@ -51,10 +51,9 @@ public class XMLParser {
 		}
 	}
 
-	public static ServiceList parseXMLMenu(String xml) {
+	public static List<Menu> parseXMLMenu(String xml) {
 		try {
-			List<MenuItem> menus = new ArrayList<MenuItem>();
-			List<Dish> dishes = new ArrayList<Dish>();
+			List<Menu> menu = new ArrayList<Menu>();			
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware(true);
 			XmlPullParser xpp = factory.newPullParser();
@@ -67,18 +66,20 @@ public class XMLParser {
 				}
 				xpp.next();
 			}
-			// MenuOnDate menuOnDate = null;
-			int count = 0;
+			int idMenu = 0;
 			Integer date = null;
 			int dishId = 0;
 			String dishName = "";
-			String description = "";
+			String dishDescription = "";
+			boolean portioned=false;
 			float price = 0;
 			String rating = "";
+			boolean preorder=false;
 			float availableAmmount = 0;
 			float orderedAmmount = 0;
-			while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
-
+			boolean modified=false;
+			int timestamp=0;
+			while (xpp.getEventType() != XmlPullParser.END_DOCUMENT){
 				switch (xpp.getEventType()) {
 				case XmlPullParser.START_DOCUMENT:
 					break;
@@ -87,14 +88,12 @@ public class XMLParser {
 					break;
 				case XmlPullParser.END_TAG:
 					if (xpp.getName().equals("menu")) {
-						Dish d = new Dish(dishId, dishName, description, false,
-								price, rating, false);
-						MenuItem m = new MenuItem(count, date, dishId,
-								availableAmmount, 0);
-						menus.add(m);
-						dishes.add(d);
-						count++;
-						Log.i("Dish_log", d.toString());
+						Menu m = new Menu(idMenu, date, dishId, dishName, dishDescription,
+								portioned, price, rating, preorder, availableAmmount, orderedAmmount,
+								modified, timestamp);					
+						menu.add(m);						
+						idMenu++;
+						Log.i("Dish_log", m.toString());
 
 					}
 					if (xpp.getName().equals("menuItems")) {
@@ -114,7 +113,7 @@ public class XMLParser {
 						dishName = xpp.getText();
 					}
 					if (name.equals("description")) {
-						description = xpp.getText();
+						dishDescription = xpp.getText();
 					}
 					if (name.equals("price")) {
 						price = (float) Double.parseDouble(xpp.getText());
@@ -130,6 +129,15 @@ public class XMLParser {
 						orderedAmmount = (float) Double.parseDouble(xpp
 								.getText());
 					}
+					if (name.equals("preorder")) {
+						//to do protder
+					}
+					if (name.equals("portioned")) {
+						//to do portioned
+					}
+					if (name.equals("timestamp")) {
+						//to do timestamp
+					}
 					break;
 
 				default:
@@ -138,7 +146,7 @@ public class XMLParser {
 				xpp.next();
 			}
 
-			return new ServiceList(menus, dishes);
+			return menu;
 		} catch (XmlPullParserException e) {
 			return null;
 		} catch (IOException e) {
