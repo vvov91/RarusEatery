@@ -9,6 +9,7 @@ public class EateryConstants {
 	public static final String GUI_LOG_TAG = "rarus.eatery.gui";
 	public static final String SERVICE_RESULT = "rarus.eatery.service.result";
 	public static final String SERVICE_RESULT_CODE = "rarus.eatery.service.resultcode";
+	public static final String SERVICE_ERROR = "rarus.eatery.service.error";
 	public static final String BROADCAST_ACTION = "rarus.eatery.service.broadcast";
 	public static final String PREF_LOGIN = "LOGIN";
 	public static final String PREF_PASSWORD = "PASSWORD";

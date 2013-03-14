@@ -69,6 +69,12 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			APIMessage message = api.get();
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
+				String error =(String) message.getContent();
+				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
+				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
+				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.GET_MENU_CODE);
+				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				sendBroadcast(intent);
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
