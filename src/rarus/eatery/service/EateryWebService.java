@@ -3,10 +3,9 @@ package rarus.eatery.service;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import rarus.eatery.database.DBManager;
-import rarus.eatery.model.Dish;
+import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.MenuItem;
+import rarus.eatery.model.Menu;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,7 +21,7 @@ import android.util.Log;
  */
 public class EateryWebService extends Service implements ServiceRequestResult {
 
-	private DBManager db;
+	private EateryDB mDBManager;
 	private EateryServiceBinder binder = new EateryServiceBinder();
 	private ServiceAPI api;
 	private SharedPreferences sp;
@@ -41,14 +40,10 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - get menu code");
-				ServiceList list=(ServiceList)message.getContent();
+				List<Menu> list=(List<Menu>)message.getContent();
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - Servicel list getted");
-				for(Dish d:list.getDishes()){
-					Log.i(EateryConstants.SERVICE_LOG_TAG,
-							"[SERVICE] - Dish -"+d.toString());
-				}
-				writeToDB(list.getMenu(),list.getDishes());
+				writeToDB(list);
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
 				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.GET_MENU_CODE);
@@ -114,12 +109,9 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE,null));
 	}
 	
-	private void writeToDB(List<MenuItem> menu,List<Dish> dishes){
-		db=new DBManager(this);
-		db.open();
-		db.addDish(dishes);
-		db.addMenu(menu);
-		db.close();		
+	private void writeToDB(List<Menu> menu){
+		mDBManager=new EateryDB(this);
+		mDBManager.saveMenu(menu);	
 	}
 	public class EateryServiceBinder extends Binder {
 		public EateryWebService getService() {
