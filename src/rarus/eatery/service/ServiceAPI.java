@@ -1,6 +1,9 @@
 package rarus.eatery.service;
 
+import java.util.List;
+
 import rarus.eatery.model.EateryConstants;
+import rarus.eatery.model.Menu;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -53,11 +56,11 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			serviceResult.onUnSuccessfullRequest();
 			}
 	}
-	private ServiceList getMenu() {
+	private List<Menu> getMenu() {
 		String login = sp.getString(EateryConstants.PREF_LOGIN, "mobile");
 		String password = sp.getString(EateryConstants.PREF_PASSWORD, "mobile");
 		String xml = XMLParser.getMenuXMLRequest();
-		ServiceList list = null;
+		List<Menu> menu = null;
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
 		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
 				login, password, xml);
@@ -66,7 +69,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 				&& !request.getResult().startsWith("<html>")) {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - getMenuRequestResult:\n" + request.getResult());
-			list = XMLParser.parseXMLMenu(request.getResult());
+			menu = XMLParser.parseXMLMenu(request.getResult());
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - result successfull");
 			successfull = true;
@@ -77,7 +80,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
 			//processError(request.getResult(), request.getError());
 		}
-		return list;
+		return menu;
 	}	
 	
 	private Object setOrder(){
