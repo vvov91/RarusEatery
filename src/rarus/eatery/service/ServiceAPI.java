@@ -61,6 +61,8 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		String password = sp.getString(EateryConstants.PREF_PASSWORD, "mobile");
 		String xml = XMLParser.getMenuXMLRequest();
 		List<Menu> menu = null;
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login " + login);
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass " + password);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
 		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
 				login, password, xml);

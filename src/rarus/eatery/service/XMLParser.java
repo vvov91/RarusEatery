@@ -26,7 +26,49 @@ import android.view.MenuItem;
  */
 
 public class XMLParser {
+	
+	public static String processHtmlError(String html){
+		try{
+		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+		factory.setNamespaceAware(true);
+		XmlPullParser xpp = factory.newPullParser();
+		xpp.setInput(new StringReader(html));			
+		xpp.next();
+		String name = "";
+		String error="";
+		while (xpp.getEventType() != XmlPullParser.END_DOCUMENT){
+			switch (xpp.getEventType()) {
+			case XmlPullParser.START_DOCUMENT:
+				break;
+			case XmlPullParser.START_TAG:
+				name = xpp.getName();
+				break;
+			case XmlPullParser.END_TAG:				
+				break;
 
+			case XmlPullParser.TEXT:
+				if (name.equals("h1")) {
+					error=xpp.getText();
+				}				
+				break;
+
+			default:
+				break;
+			}
+			xpp.next();
+		}
+
+		return error;
+	} catch (XmlPullParserException e) {
+		return null;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
+	}
+		
+	
 	public static String getMenuXMLRequest() {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
