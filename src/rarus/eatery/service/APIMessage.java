@@ -13,4 +13,5 @@ public class APIMessage {
 	}
 	public int getCode(){ return operarionCode;}
 	public Object getContent(){ return messageContent;}
+	public void setContent(Object o){ messageContent=o;}
 }

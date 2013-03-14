@@ -18,7 +18,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	private ServiceRequestResult serviceResult;
 	private SharedPreferences sp;
 	private boolean successfull;
-
+	private String mError;
 	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
 		super();
 		this.serviceResult = serviceResult;
@@ -53,6 +53,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			serviceResult.onSuccessfullRequest();
 		} else{
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - unsuccessfull Request post execute");
+			result.setContent(mError);
 			serviceResult.onUnSuccessfullRequest();
 			}
 	}
@@ -80,11 +81,19 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		(request.getResult().startsWith("<html>")?request.getResult():request.getError()));
 			successfull = false;
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
-			//processError(request.getResult(), request.getError());
+			processError(request.getResult(), request.getError());
 		}
 		return menu;
 	}	
 	
+	private void processError(String result, String error){
+		if(result.startsWith("<html>")){
+			error=XMLParser.processHtmlError(result);			
+		}
+		Log.e(EateryConstants.SERVICE_LOG_TAG,
+				"[API] - error:\n"+error);
+		mError=error;		
+	}
 	private Object setOrder(){
 		return null;
 	}
