@@ -107,6 +107,7 @@ public class EateryDB {
 		db.open();
 		List<Integer> result = db.getOrdersDates();
 		db.close();
+		
 		return result;
 	}
 	

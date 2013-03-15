@@ -115,7 +115,7 @@ public class DBManager extends SQLiteOpenHelper {
 		// создаём таблицы
 		// таблица DISHES
 		query.append("CREATE TABLE ");
-		query.append(TABLE_DISHES).append(" (").append(KEY_ID).append(" INTEGER PRIMARY KEY, ");
+		query.append(TABLE_DISHES).append(" (").append(KEY_ID).append(" TEXT PRIMARY KEY, ");
 		query.append(DISHES_NAME).append(" TEXT NOT NULL, ");
 		query.append(DISHES_DESCRIPTION).append(" TEXT NOT NULL, ");
 		query.append(DISHES_PORTIONED).append(" INTEGER DEFAULT 0, ");
@@ -157,7 +157,7 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append(TABLE_ORDERS_HEADERS).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
 		query.append(ORDERS_H_EXECUTION_DATE).append(" INTEGER DEFAULT 0, ");
-		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" INTEGER DEFAULT 0);");
+		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" TEXT DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
 		Log.i(LOG_TAG, "Created database");
@@ -190,7 +190,7 @@ public class DBManager extends SQLiteOpenHelper {
 		try {
 			for (int i = 0; i < dishes.size(); i++) {
 				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
-						new String[] {Integer.toString(dishes.get(i).getDishId())},
+						new String[] {dishes.get(i).getDishId()},
 						null, null, null, null);				
 				if (c.getCount() > 0) {
 					c.close();
@@ -198,7 +198,7 @@ public class DBManager extends SQLiteOpenHelper {
 					continue;
 				}
 				
-				insertDishStmt.bindString(1, Integer.toString(dishes.get(i).getDishId()));
+				insertDishStmt.bindString(1, dishes.get(i).getDishId());
 				insertDishStmt.bindString(2, dishes.get(i).getName());
 				insertDishStmt.bindString(3, dishes.get(i).getDescription());
 				insertDishStmt.bindString(4, (dishes.get(i).isPortioned() ? "1" : "0"));
@@ -224,13 +224,13 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @param rating
 	 *     рейтинг
 	 */
-	public void setDishRating(int id, String rating) {
+	public void setDishRating(String id, String rating) {
 		ContentValues data = new ContentValues();
 		data.put(DISHES_RATING, rating);
 		
 		mDb.beginTransaction();		
 		try {
-			mDb.update(TABLE_DISHES, data, KEY_ID + " = ?", new String[] {Integer.toString(id)});	    
+			mDb.update(TABLE_DISHES, data, KEY_ID + " = ?", new String[] {id});	    
 			mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
@@ -243,15 +243,15 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @param dishId
 	 *     id блюда
 	 */
-	public void deleteDish(int dishId) {
+	public void deleteDish(String dishId) {
 		mDb.beginTransaction();
 		try {
-			mDb.delete(TABLE_DISHES, KEY_ID + " = ?", new String[] {Integer.toString(dishId)});
+			mDb.delete(TABLE_DISHES, KEY_ID + " = ?", new String[] {dishId});
 			mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted dish (id = " + Integer.toString(dishId) + ")");
+			Log.i(LOG_TAG, "Deleted dish (id = " + dishId + ")");
 		}
 	}
 	
@@ -291,7 +291,7 @@ public class DBManager extends SQLiteOpenHelper {
 			for (int i = 0; i < menu.size(); i++) {
 				insertMenuStmt.bindNull(1);
 				insertMenuStmt.bindString(2, Integer.toString(formatDate(menu.get(i).getDate())));
-				insertMenuStmt.bindString(3, Integer.toString(menu.get(i).getDishId()));
+				insertMenuStmt.bindString(3, menu.get(i).getDishId());
 				insertMenuStmt.bindString(4, Float.toString(menu.get(i).getAvailable()));
 				insertMenuStmt.bindString(5, Float.toString(menu.get(i).getAmmount()));
 				insertMenuStmt.bindString(6, (menu.get(i).isModified() ? "1" : "0"));
@@ -366,7 +366,7 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Menu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+					result.add(new Menu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
@@ -454,7 +454,6 @@ public class DBManager extends SQLiteOpenHelper {
 		SQLiteStatement insertDishStmt;
 		SQLiteStatement insertOrderHeadersStmt;
 		int orderId = 0;
-		int dishId = 0;
 		
 		query.append("INSERT INTO ").append(TABLE_ORDERS);
 		query.append(" VALUES (?, ?, ?, ?, ?)");
@@ -477,32 +476,28 @@ public class DBManager extends SQLiteOpenHelper {
 				insertOrderHeadersStmt.bindNull(1);
 				insertOrderHeadersStmt.bindString(2,
 						Integer.toString(orders.get(i).getExecutionDate()));
-				insertOrderHeadersStmt.bindString(3,
-						Integer.toString(orders.get(i).getOrderSrvNumber()));
+				insertOrderHeadersStmt.bindString(3, orders.get(i).getOrderSrvNumber());
 				orderId = (int) insertOrderHeadersStmt.executeInsert();
 				
 				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
-						new String[] {Integer.toString(orders.get(i).getDishId())},
+						new String[] {orders.get(i).getDishId()},
 						null, null, null, null);
 				
-				if (c.getCount() > 0) {
-					dishId = c.getInt(0);
-				}
-				else {
-					insertDishStmt.bindString(1, Integer.toString(orders.get(i).getDishId()));
+				if (c.getCount() == 0) {
+					insertDishStmt.bindString(1, orders.get(i).getDishId());
 					insertDishStmt.bindString(2, orders.get(i).getName());
 					insertDishStmt.bindString(3, orders.get(i).getDescription());
 					insertDishStmt.bindString(4, (orders.get(i).isPortioned() ? "1" : "0"));
 					insertDishStmt.bindString(5, Float.toString(orders.get(i).getPrice()));
 					insertDishStmt.bindString(6, orders.get(i).getRating());
 					insertDishStmt.bindString(7, (orders.get(i).isPreorder() ? "1" : "0"));
-					dishId = (int) insertDishStmt.executeInsert();
+					insertDishStmt.execute();
 				}
 				c.close();
 								
 				insertOrderStmt.bindNull(1);
 				insertOrderStmt.bindString(2, Integer.toString(orderId));
-				insertOrderStmt.bindString(3, Integer.toString(dishId));
+				insertOrderStmt.bindString(3, orders.get(i).getDishId());
 				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
 				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
 			}
@@ -576,10 +571,10 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
 							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
-							c.getFloat(10), c.getInt(11), c.getInt(12)));
+							c.getFloat(10), c.getInt(11), c.getString(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -619,10 +614,10 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Order(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+					result.add(new Order(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), c.getFloat(6),
 							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
-							c.getFloat(10), c.getInt(11), c.getInt(12)));
+							c.getFloat(10), c.getInt(11), c.getString(12)));
 				} while(c.moveToNext());
 				c.close();
 			}
@@ -657,7 +652,7 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Menu(c.getInt(0), c.getInt(1), c.getInt(2), c.getString(3),
+					result.add(new Menu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
