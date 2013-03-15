@@ -500,6 +500,7 @@ public class DBManager extends SQLiteOpenHelper {
 				insertOrderStmt.bindString(3, orders.get(i).getDishId());
 				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
 				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
+				insertOrderStmt.execute();
 			}
 			insertOrderHeadersStmt.close();
 			insertDishStmt.close();
