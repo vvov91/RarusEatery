@@ -25,6 +25,7 @@ public class Order {
 			boolean mPortioned, float mPrice, String mRating,
 			boolean mPreorder, float mAmmount, float mSum,
 			int mExecutionDate, String mOrderSrvNumber) {
+
 		this.mId = mId;
 		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;
@@ -116,6 +117,7 @@ public class Order {
 		return mOrderSrvNumber;
 	}
 	public void setOrderSrvNumber(String mOrderSrvNumber) {
+
 		this.mOrderSrvNumber = mOrderSrvNumber;
 	}
 }

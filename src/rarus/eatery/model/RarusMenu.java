@@ -6,7 +6,7 @@ package rarus.eatery.model;
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Menu {
+public class RarusMenu {
 	private int mId;					// id меню
 	private int mDate;					// дата, на которую это меню
 	private String mDishId;				// id блюда, находящегося в меню
@@ -21,7 +21,7 @@ public class Menu {
 	private boolean mModified;			// флаг состояния изменения меню
 	private int mTimestamp;				// временной штамп меню
 	
-	public Menu(int mId, int mDate, String mDishId, String mName,
+	public RarusMenu(int mId, int mDate, String mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
 			String mRating, boolean mPreorder, float mAvailable,
 			float mAmmount, boolean mModified, int mTimestamp) {

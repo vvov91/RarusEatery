@@ -13,7 +13,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import android.util.Log;
 import android.util.Xml;
 import android.view.MenuItem;
@@ -167,9 +167,9 @@ public class XMLParser {
 		}
 	}
 
-	public static List<Menu> parseXMLMenu(String xml) {
+	public static List<RarusMenu> parseXMLMenu(String xml) {
 		try {
-			List<Menu> menu = new ArrayList<Menu>();
+			List<RarusMenu> menu = new ArrayList<RarusMenu>();
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware(true);
 			XmlPullParser xpp = factory.newPullParser();
@@ -204,7 +204,7 @@ public class XMLParser {
 					break;
 				case XmlPullParser.END_TAG:
 					if (xpp.getName().equals("menu")) {
-						Menu m = new Menu(idMenu, date, dishId, dishName,
+						RarusMenu m = new RarusMenu(idMenu, date, dishId, dishName,
 								dishDescription, portioned, price, rating,
 								preorder, availableAmmount, orderedAmmount,
 								modified, timestamp);
