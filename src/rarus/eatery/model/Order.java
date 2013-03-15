@@ -9,7 +9,7 @@ package rarus.eatery.model;
 public class Order {
 	private int mId;					// служебный id
 	private int mOrderId;				// id заказа
-	private int mDishId;				// id блюда, наход€щегос€ в заказе
+	private String mDishId;				// id блюда, наход€щегос€ в заказе
 	private String mName;				// название блюда
 	private String mDescription;		// описание блюда
 	private boolean mPortioned;			// флаг порционности блюда
@@ -19,12 +19,12 @@ public class Order {
 	private float mAmmount;				// объЄм заказанного 
 	private float mSum;					// сумма по заказу
 	private int mExecutionDate;			// дата выполнени€ заказа
-	private int mOrderSrvNumber;		// номер заказа на сервере
+	private String mOrderSrvNumber;		// номер заказа на сервере
 	
-	public Order(int mId, int mOrderId, int mDishId, String mName, String mDescription,
+	public Order(int mId, int mOrderId, String mDishId, String mName, String mDescription,
 			boolean mPortioned, float mPrice, String mRating,
 			boolean mPreorder, float mAmmount, float mSum,
-			int mExecutionDate, int mOrderSrvNumber) {
+			int mExecutionDate, String mOrderSrvNumber) {
 		this.mId = mId;
 		this.mOrderId = mOrderId;
 		this.mDishId = mDishId;
@@ -52,10 +52,10 @@ public class Order {
 	public void setOrderId(int mOrderId) {
 		this.mOrderId = mOrderId;
 	}
-	public int getDishId() {
+	public String getDishId() {
 		return mDishId;
 	}
-	public void setDishId(int mDishId) {
+	public void setDishId(String mDishId) {
 		this.mDishId = mDishId;
 	}
 	public String getName() {
@@ -112,10 +112,10 @@ public class Order {
 	public void setExecutionDate(int mExecutionDate) {
 		this.mExecutionDate = mExecutionDate;
 	}
-	public int getOrderSrvNumber() {
+	public String getOrderSrvNumber() {
 		return mOrderSrvNumber;
 	}
-	public void setOrderSrvNumber(int mOrderSrvNumber) {
+	public void setOrderSrvNumber(String mOrderSrvNumber) {
 		this.mOrderSrvNumber = mOrderSrvNumber;
 	}
 }

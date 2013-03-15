@@ -9,7 +9,7 @@ package rarus.eatery.model;
 public class Menu {
 	private int mId;					// id меню
 	private int mDate;					// дата, на которую это меню
-	private int mDishId;				// id блюда, находящегося в меню
+	private String mDishId;				// id блюда, находящегося в меню
 	private String mName;				// название блюда
 	private String mDescription;		// описание блюда
 	private boolean mPortioned;			// флаг порционности блюда
@@ -21,7 +21,7 @@ public class Menu {
 	private boolean mModified;			// флаг состояния изменения меню
 	private int mTimestamp;				// временной штамп меню
 	
-	public Menu(int mId, int mDate, int mDishId, String mName,
+	public Menu(int mId, int mDate, String mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
 			String mRating, boolean mPreorder, float mAvailable,
 			float mAmmount, boolean mModified, int mTimestamp) {
@@ -53,10 +53,10 @@ public class Menu {
 	public void setDate(int mDate) {
 		this.mDate = mDate;
 	}
-	public int getDishId() {
+	public String getDishId() {
 		return mDishId;
 	}
-	public void setDishId(int mDishId) {
+	public void setDishId(String mDishId) {
 		this.mDishId = mDishId;
 	}
 	public String getName() {
