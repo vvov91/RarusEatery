@@ -19,6 +19,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	private SharedPreferences sp;
 	private boolean successfull;
 	private String mError;
+
 	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
 		super();
 		this.serviceResult = serviceResult;
@@ -27,8 +28,13 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 	@Override
 	protected APIMessage doInBackground(APIMessage... params) {
+		successfull = false;
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Do in background start");
 		APIMessage result = null;
+		if (!ping()) {
+			result = new APIMessage(EateryConstants.PING_CODE, null);
+			return result;
+		}
 		switch (params[0].getCode()) {
 		case EateryConstants.GET_MENU_CODE: {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - getMenuCode");
@@ -44,57 +50,91 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		}
 		return result;
 	}
-	
+
 	@Override
 	protected void onPostExecute(APIMessage result) {
 		super.onPostExecute(result);
 		if (successfull) {
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - successfull Request post execute");
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - successfull Request post execute");
 			serviceResult.onSuccessfullRequest();
-		} else{
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - unsuccessfull Request post execute");
+		} else {
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - unsuccessfull Request post execute");
 			result.setContent(mError);
 			serviceResult.onUnSuccessfullRequest();
-			}
+		}
 	}
+
+	private boolean ping() {
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping");
+		String xml = XMLParser.pingXml();
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping xml:\n"+xml);
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping");
+		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
+				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
+		if (!request.getResult().equals("")
+				&& !request.getResult().startsWith("<html>")) {
+			String res = XMLParser.parseXMLPing(request.getResult());
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping res \n"+ res);
+			if (res.equals("User authentication error")) {
+				mError = "User authentication error";
+				return false;
+			}
+			else
+				return true;
+
+		} else {
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - Error:\n"
+							+ (request.getResult().startsWith("<html>") ? request
+									.getResult() : request.getError()));
+			successfull = false;
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
+			processError(request.getResult(), request.getError());
+		}
+		return false;
+	}
+
 	private List<Menu> getMenu() {
-		String login = sp.getString(EateryConstants.PREF_LOGIN, "mobile");
-		String password = sp.getString(EateryConstants.PREF_PASSWORD, "mobile");
 		String xml = XMLParser.getMenuXMLRequest();
 		List<Menu> menu = null;
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login " + login);
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass " + password);
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login "
+				+ EateryConstants.SERV_LOGIN);
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass "
+				+ EateryConstants.SERV_PASSWORD);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
 		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
-				login, password, xml);
+				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getted xml");
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - getMenuRequestResult:\n" + request.getResult());
 			menu = XMLParser.parseXMLMenu(request.getResult());
-			Log.d(EateryConstants.SERVICE_LOG_TAG,
-					"[API] - result successfull");
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - result successfull");
 			successfull = true;
 		} else {
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Error:\n" + 
-		(request.getResult().startsWith("<html>")?request.getResult():request.getError()));
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - Error:\n"
+							+ (request.getResult().startsWith("<html>") ? request
+									.getResult() : request.getError()));
 			successfull = false;
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
 			processError(request.getResult(), request.getError());
 		}
 		return menu;
-	}	
-	
-	private void processError(String result, String error){
-		if(result.startsWith("<html>")){
-			error=XMLParser.processHtmlError(result);			
-		}
-		Log.e(EateryConstants.SERVICE_LOG_TAG,
-				"[API] - error:\n"+error);
-		mError=error;		
 	}
-	private Object setOrder(){
+
+	private Object setOrder() {
 		return null;
+	}
+
+	private void processError(String result, String error) {
+		if (result.startsWith("<html>")) {
+			error = XMLParser.processHtmlError(result);
+		}
+		Log.e(EateryConstants.SERVICE_LOG_TAG, "[API] - error:\n" + error);
+		mError = error;
 	}
 }
