@@ -184,7 +184,7 @@ public class XMLParser {
 			}
 			int idMenu = 0;
 			Integer date = null;
-			int dishId = 0;
+			String dishId = "";
 			String dishName = "";
 			String dishDescription = "";
 			boolean portioned = false;
@@ -224,7 +224,7 @@ public class XMLParser {
 						date = dateToUnix(xpp.getText());
 					}
 					if (name.equals("dishId")) {
-						dishId = xpp.getText().hashCode(); //Integer.parseInt(xpp.getText());
+						dishId = xpp.getText(); //Integer.parseInt(xpp.getText());
 					}
 					if (name.equals("name")) {
 						dishName = xpp.getText();
