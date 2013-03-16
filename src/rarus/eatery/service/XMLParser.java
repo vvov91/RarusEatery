@@ -14,6 +14,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.Menu;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.Xml;
 import android.view.MenuItem;
@@ -68,10 +69,10 @@ public class XMLParser {
 		}
 	}
 
-	public static String pingXml() {
+	public static String pingXml(SharedPreferences sp) {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = "000013BDBD";
+		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "-------");		
 		try {
 			sz.setOutput(writer);
 			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
@@ -139,10 +140,10 @@ public class XMLParser {
 		}
 	}
 
-	public static String getMenuXMLRequest() {
+	public static String getMenuXMLRequest(SharedPreferences sp) {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = "000013BDBD";
+		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "-------");
 		try {
 			sz.setOutput(writer);
 			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);

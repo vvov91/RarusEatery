@@ -47,6 +47,15 @@ public class MainActivity extends Activity {
 		// client.getMenu("mobile", "mobile");
 	}
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(connection);
+		unregisterReceiver(receiver);
+		Log.d(EateryConstants.GUI_LOG_TAG, "MainActivity: onDestroy()");
+		// client.getMenu("mobile", "mobile");
+	}
+	
 	private void startService() {
 		serviceIntent = new Intent(this, EateryWebService.class);
 		startService(serviceIntent);
