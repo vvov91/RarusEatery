@@ -1,5 +1,6 @@
 package rarus.eatery.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -73,11 +74,23 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
 				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.GET_MENU_CODE);
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - UnSuccessfullReturned error:\n"+ error);
 				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
 				sendBroadcast(intent);
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
+			}
+			case EateryConstants.PING_CODE: {
+				String error =(String) message.getContent();
+				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
+				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
+				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.PING_CODE);
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - UnSuccessfullReturned error:\n"+ error);
+				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				sendBroadcast(intent);
 			}
 				break;
 			}
@@ -90,7 +103,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	public IBinder onBind(Intent arg0) {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - On bind");
-		sp = PreferenceManager.getDefaultSharedPreferences(this);
+		sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		return binder;
 	}
 	
@@ -116,8 +129,20 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	}
 	
 	private void writeToDB(List<Menu> menu){
-		mDBManager=new EateryDB(this);
+		for(Menu m:menu){
+			java.util.Date date=new Date((long)m.getDate()*1000);
+			Log.d(EateryConstants.GUI_LOG_TAG,
+					"EateryWebService: Дата "+ date.toString()) ;
+		}
+		mDBManager=new EateryDB(getApplicationContext());
 		mDBManager.saveMenu(menu);	
+		List<Integer> dates= mDBManager.getMenuDates();
+		for(Integer d:dates){
+			java.util.Date date=new Date((long)d*1000);
+			Log.d(EateryConstants.GUI_LOG_TAG,
+					"MainActivity: Дата"+ date.toString()) ;
+		}
+		
 	}
 	public class EateryServiceBinder extends Binder {
 		public EateryWebService getService() {

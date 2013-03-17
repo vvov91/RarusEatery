@@ -1,5 +1,6 @@
 package rarus.eatery.service;
 
+import java.util.Date;
 import java.util.List;
 
 import rarus.eatery.model.EateryConstants;
@@ -111,7 +112,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass "
 				+ EateryConstants.SERV_PASSWORD);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
-		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL_1,
+		HTTPPostRequest request = new HTTPPostRequest(URL,
 				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getted xml");
 		if (!request.getResult().equals("")
@@ -119,6 +120,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - getMenuRequestResult:\n" + request.getResult());
 			menu = XMLParser.parseXMLMenu(request.getResult());
+			
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - result successfull");
 			successfull = true;
 		} else {

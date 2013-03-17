@@ -1,5 +1,5 @@
 <resources>
 
     <string name="app_name">Столовая</string>
-
+	<string name="cardNumber">Номер карты</string>	
 </resources>
