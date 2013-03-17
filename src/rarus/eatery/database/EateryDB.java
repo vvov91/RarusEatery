@@ -73,12 +73,8 @@ public class EateryDB {
 				
 		db.open();
 		for (int i = 0; i < menu.size(); i++) {
-			if (menu.get(i).isModified()) {
-				db.deleteMenuAtDate(menu.get(0).getDate());
-				db.addMenu(menu);
-				
-				break;
-			}
+			db.deleteMenuAtDate(menu.get(0).getDate());
+			db.addMenu(menu);
 		}
 		db.close();
 	}
