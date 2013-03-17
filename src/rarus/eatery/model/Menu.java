@@ -1,5 +1,7 @@
 package rarus.eatery.model;
 
+import java.util.Date;
+
 /**
  * Объект элемент меню
  * 
@@ -118,5 +120,9 @@ public class Menu {
 	}
 	public void setTimestamp(int mTimestamp) {
 		this.mTimestamp = mTimestamp;
+	}
+	public String toString(){
+		java.util.Date date=new Date((long)mDate*1000);
+		return ("Блюдо: "+mName +"Дата : "+date.toString());
 	}
 }

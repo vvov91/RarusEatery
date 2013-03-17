@@ -5,6 +5,7 @@ import java.util.List;
 
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
+import rarus.eatery.model.Menu;
 import rarus.eatery.service.EateryWebService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -104,9 +105,14 @@ public class MainActivity extends Activity {
 				EateryDB db=new EateryDB(getApplicationContext());
 				List<Integer> dates= db.getMenuDates();
 				for(Integer d:dates){
-					java.util.Date date=new Date(d*1000);
+					java.util.Date date=new Date((long)d*1000);
 					Log.d(EateryConstants.GUI_LOG_TAG,
 							"MainActivity: Дата"+ date.toString()) ;
+					List<Menu> menu=db.getMenu(d);
+					for(Menu m:menu ){
+						Log.i(EateryConstants.GUI_LOG_TAG,
+								"MainActivity:  меню "+ m.toString()) ;
+					}
 				}
 				
 			
@@ -131,6 +137,7 @@ public class MainActivity extends Activity {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при получении меню:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
@@ -143,6 +150,7 @@ public class MainActivity extends Activity {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				
 			}
 				break;
 			}
