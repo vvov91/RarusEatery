@@ -52,7 +52,7 @@ public class EateryDB {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<RarusMenu> getMenu(int date) {
 		db.open();
@@ -73,12 +73,8 @@ public class EateryDB {
 				
 		db.open();
 		for (int i = 0; i < menu.size(); i++) {
-			if (menu.get(i).isModified()) {
-				db.deleteMenuAtDate(menu.get(0).getDate());
-				db.addMenu(menu);
-				
-				break;
-			}
+			db.deleteMenuAtDate(menu.get(0).getDate());
+			db.addMenu(menu);
 		}
 		db.close();
 	}
@@ -101,7 +97,7 @@ public class EateryDB {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<Integer> getOrdersDates() {
 		db.open();
@@ -131,7 +127,7 @@ public class EateryDB {
 	 * Возвращает ещё не отправленные заказы
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<RarusMenu> getOrdersNotExecuted() {
 		db.open();

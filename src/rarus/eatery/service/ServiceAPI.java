@@ -1,5 +1,6 @@
 package rarus.eatery.service;
 
+import java.util.Date;
 import java.util.List;
 
 import rarus.eatery.model.EateryConstants;
@@ -9,8 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 /**
- * Класс асинхронного выполнения метов сервиса
- * 
+ * Класс асинхронного выполнения метов сервиса 
  * @author Dmitriy Bazunov <binnarywolf@gmail.com>
  */
 public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
@@ -19,7 +19,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	private SharedPreferences sp;
 	private boolean successfull;
 	private String mError;
-
+	private String URL = EateryConstants.URL_1;
 	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
 		super();
 		this.serviceResult = serviceResult;
@@ -28,10 +28,9 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 	@Override
 	protected APIMessage doInBackground(APIMessage... params) {
-		successfull = false;
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Do in background start");
+		successfull = false;		
 		APIMessage result = null;
-		if (!ping()) {
+		if (!connectionTest()) {
 			result = new APIMessage(EateryConstants.PING_CODE, null);
 			return result;
 		}
@@ -66,13 +65,22 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		}
 	}
 
-	private boolean ping() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping");
-		String xml = XMLParser.pingXml();
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping xml:\n"+xml);
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Ping");
-		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
+	private boolean connectionTest(){
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - connection test");
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - connection test URL: \n"+URL);
+		if(ping()) return true;
+		//
+		//Error process code.
+		//
+		URL=EateryConstants.URL_2;
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - connection test URL: \n"+URL);
+		return ping();		
+	}
+	private boolean ping() {		
+		String xml = XMLParser.pingXml(sp);		
+		HTTPPostRequest request = new HTTPPostRequest(URL,
 				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
+		
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
 			String res = XMLParser.parseXMLPing(request.getResult());
@@ -97,14 +105,14 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	}
 
 	private List<RarusMenu> getMenu() {
-		String xml = XMLParser.getMenuXMLRequest();
+		String xml = XMLParser.getMenuXMLRequest(sp);
 		List<RarusMenu> menu = null;
 		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login "
 				+ EateryConstants.SERV_LOGIN);
 		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass "
 				+ EateryConstants.SERV_PASSWORD);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
-		HTTPPostRequest request = new HTTPPostRequest(EateryConstants.URL,
+		HTTPPostRequest request = new HTTPPostRequest(URL,
 				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getted xml");
 		if (!request.getResult().equals("")
@@ -112,6 +120,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[API] - getMenuRequestResult:\n" + request.getResult());
 			menu = XMLParser.parseXMLMenu(request.getResult());
+			
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - result successfull");
 			successfull = true;
 		} else {

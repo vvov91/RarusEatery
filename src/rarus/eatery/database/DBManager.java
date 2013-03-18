@@ -176,7 +176,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет блюда
 	 * 
 	 * @param dishes
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public void addDish(List<RarusMenu> dishes) {
 		StringBuilder query = new StringBuilder();	
@@ -277,7 +277,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public void addMenu(List<RarusMenu> menu) {
 		StringBuilder query = new StringBuilder();
@@ -344,7 +344,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<RarusMenu> getMenuAtDate(int date) {
 		StringBuilder query = new StringBuilder();
@@ -632,7 +632,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Возвращает ещё не отправленные заказы
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<RarusMenu> getOrdersNotExecuted() {
 		StringBuilder query = new StringBuilder();

@@ -14,6 +14,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.Xml;
 import android.view.MenuItem;
@@ -68,10 +69,11 @@ public class XMLParser {
 		}
 	}
 
-	public static String pingXml() {
+	public static String pingXml(SharedPreferences sp) {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = "000013BDBD";
+		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
+		Log.i(EateryConstants.SERVICE_LOG_TAG,"XML_Parser  card number  "+ cardCode );
 		try {
 			sz.setOutput(writer);
 			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
@@ -139,10 +141,10 @@ public class XMLParser {
 		}
 	}
 
-	public static String getMenuXMLRequest() {
+	public static String getMenuXMLRequest(SharedPreferences sp) {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = "000013BDBD";
+		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
 		try {
 			sz.setOutput(writer);
 			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
@@ -203,7 +205,7 @@ public class XMLParser {
 					name = xpp.getName();
 					break;
 				case XmlPullParser.END_TAG:
-					if (xpp.getName().equals("menu")) {
+					if (xpp.getName().equals("menu")) {						
 						RarusMenu m = new RarusMenu(idMenu, date, dishId, dishName,
 								dishDescription, portioned, price, rating,
 								preorder, availableAmmount, orderedAmmount,
@@ -222,6 +224,7 @@ public class XMLParser {
 				case XmlPullParser.TEXT:
 					if (name.equals("dateTime")) {
 						date = dateToUnix(xpp.getText());
+						
 					}
 					if (name.equals("dishId")) {
 						dishId = xpp.getText(); //Integer.parseInt(xpp.getText());
@@ -262,7 +265,7 @@ public class XMLParser {
 				}
 				xpp.next();
 			}
-
+			
 			return menu;
 		} catch (XmlPullParserException e) {
 			return null;
@@ -277,6 +280,7 @@ public class XMLParser {
 		Date d = new Date(Integer.parseInt(date.substring(0, 4)) - 1900,
 				Integer.parseInt(date.substring(5, 7)) - 1,
 				Integer.parseInt(date.substring(8, 10)));
+		Log.i("Date_log", d.toString());
 		return (int) (d.getTime() / 1000);
 	}
 
