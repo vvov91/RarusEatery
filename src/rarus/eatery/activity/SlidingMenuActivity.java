@@ -10,9 +10,9 @@ import java.util.List;
 
 import rarus.eatery.R;
 import rarus.eatery.database.EateryDB;
-import rarus.eatery.model.Order;
+import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
-
+import rarus.eatery.service.EateryWebService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -38,7 +39,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	final String TAG = "Main";
 	final String LOG_TAG = "Main";
-
+	
+	Intent serviceIntent;
+	ServiceConnection connection;
+	EateryWebService client;
+	BroadcastReceiver receiver;
+	
 	EateryDB mEDB;
 	SharedPreferences sp;
 	int modeTemp, currentFragmentId = 0, previousFragmentId = 0;
@@ -50,6 +56,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		startService();
+		
 		setTitle(R.string.app_name);
 
 		setContentView(R.layout.main_content_frame);
@@ -110,7 +119,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		for (Integer date : dates) {
 			DayMenu dm = new DayMenu();
 			dm.mRarusMenu = (ArrayList<RarusMenu>) edb.getMenu(date);
-			System.out.println(dm.mRarusMenu.get(0).getAvailable());
+			//System.out.println(dm.mRarusMenu.get(0).getAvailable());
 			java.util.Date d = new Date(((long) date.intValue()) * 1000);
 			dm.mStringDate = d.toString();
 			datesString.add(dm.mStringDate);
@@ -176,8 +185,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	@Override
 	protected void onStart() {
 		super.onStart();
+		bindService(serviceIntent, connection, 0);
 		Log.d(TAG, "MainActivity: onStart()");
-		Log.d("WebServ", "MainActivity: onStart()");
 	}
 
 	@Override
@@ -185,5 +194,103 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onStop();
 		Log.d(TAG, "MainActivity: onStop()");
 	}
+	
+	public void onRefreshClick(View v){
+		client.getMenu();
+	} 
+	private void startService() {
+		serviceIntent = new Intent(this, EateryWebService.class);
+		startService(serviceIntent);
+		connection = new ServiceConnection() {
+			public void onServiceConnected(ComponentName name, IBinder binder) {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity onServiceConnected");
+				client = ((EateryWebService.EateryServiceBinder) binder)
+						.getService();
+			}
 
+			public void onServiceDisconnected(ComponentName name) {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity onServiceDisconnected");
+			}
+		};
+
+		receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				boolean result = intent.getBooleanExtra(
+						EateryConstants.SERVICE_RESULT, false);
+				recive(result, intent);
+			}
+		};
+		IntentFilter intFilt = new IntentFilter(
+				EateryConstants.BROADCAST_ACTION);
+		registerReceiver(receiver, intFilt);
+	}
+	private void recive(boolean result, Intent intent) {
+		Log.d(EateryConstants.GUI_LOG_TAG,
+				"MainActivity: Полученно сообщение от сервиса");
+		if (result) {			
+			int operationCode = intent.getIntExtra(
+					EateryConstants.SERVICE_RESULT_CODE, 0);
+			Log.d(EateryConstants.GUI_LOG_TAG,
+					"MainActivity: Запрос сервиса успешен");
+			switch (operationCode) {
+			case EateryConstants.GET_MENU_CODE: {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity: Полученно меню");
+				EateryDB db=new EateryDB(getApplicationContext());
+				List<Integer> dates= db.getMenuDates();
+				for(Integer d:dates){
+					java.util.Date date=new Date((long)d*1000);
+					Log.d(EateryConstants.GUI_LOG_TAG,
+							"MainActivity: Дата"+ date.toString()) ;
+					List<RarusMenu> menu=db.getMenu(d);
+					for(RarusMenu m:menu ){
+						Log.i(EateryConstants.GUI_LOG_TAG,
+								"MainActivity:  меню "+ m.toString()) ;
+					}
+				}
+				
+			
+			}
+				break;
+			case EateryConstants.SET_ORDER_CODE: {
+			}
+				break;
+			case EateryConstants.PING_CODE: {
+			}
+				break;
+			}
+
+		} else {
+			Log.d(EateryConstants.GUI_LOG_TAG,
+					"MainActivity: Запрос сервиса неудачен");
+			int operationCode = intent.getIntExtra(
+					EateryConstants.SERVICE_RESULT_CODE, 0);
+			String error = intent.getStringExtra(EateryConstants.SERVICE_ERROR);
+			switch (operationCode) {
+			case EateryConstants.GET_MENU_CODE: {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity: ошибка при получении меню:");
+				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				
+			}
+				break;
+			case EateryConstants.SET_ORDER_CODE: {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity: ошибка при отправке заказа:");
+				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+			}
+				break;
+			case EateryConstants.PING_CODE: {
+				Log.d(EateryConstants.GUI_LOG_TAG,
+						"MainActivity: ошибка при соединеннии с сервером:");
+				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				
+			}
+				break;
+			}
+		}
+	}
 }
