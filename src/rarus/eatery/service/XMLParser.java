@@ -250,7 +250,7 @@ public class XMLParser {
 								.getText());
 					}
 					if (name.equals("preordered")) {
-						portioned=Boolean.parseBoolean(xpp.getText());
+						preorder=Boolean.parseBoolean(xpp.getText());
 					}
 					if (name.equals("portioned")) {
 						portioned=Boolean.parseBoolean(xpp.getText());
