@@ -1,12 +1,12 @@
 package rarus.eatery.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import rarus.eatery.database.DBManager;
-import rarus.eatery.model.Dish;
+import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.MenuItem;
+import rarus.eatery.model.RarusMenu;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,7 +22,7 @@ import android.util.Log;
  */
 public class EateryWebService extends Service implements ServiceRequestResult {
 
-	private DBManager db;
+	private EateryDB mDBManager;
 	private EateryServiceBinder binder = new EateryServiceBinder();
 	private ServiceAPI api;
 	private SharedPreferences sp;
@@ -32,26 +32,24 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		Log.d(EateryConstants.SERVICE_LOG_TAG,
 				"[SERVICE] - SuccessfullReturned");
 		try {
-			Log.d(EateryConstants.SERVICE_LOG_TAG,
-					"[SERVICE] - api.get");
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - api.get");
 			APIMessage message = api.get();
-			Log.d(EateryConstants.SERVICE_LOG_TAG,
-					"[SERVICE] - code");
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - code");
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - get menu code");
-				ServiceList list=(ServiceList)message.getContent();
+				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
+				for (int i = 0; i < list.size(); i++) {
+					list.get(i).setModified(true);
+				}
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - Servicel list getted");
-				for(Dish d:list.getDishes()){
-					Log.i(EateryConstants.SERVICE_LOG_TAG,
-							"[SERVICE] - Dish -"+d.toString());
-				}
-				writeToDB(list.getMenu(),list.getDishes());
+				writeToDB(list);
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
 				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
-				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE, EateryConstants.GET_MENU_CODE);
+				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
+						EateryConstants.GET_MENU_CODE);
 				sendBroadcast(intent);
 			}
 				break;
@@ -74,9 +72,29 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			APIMessage message = api.get();
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
+				String error = (String) message.getContent();
+				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
+				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
+				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
+						EateryConstants.GET_MENU_CODE);
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
+				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				sendBroadcast(intent);
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
+			}
+			case EateryConstants.PING_CODE: {
+				String error = (String) message.getContent();
+				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
+				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
+				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
+						EateryConstants.PING_CODE);
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
+				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				sendBroadcast(intent);
 			}
 				break;
 			}
@@ -89,10 +107,11 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	public IBinder onBind(Intent arg0) {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - On bind");
-		sp = PreferenceManager.getDefaultSharedPreferences(this);
+		sp = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
 		return binder;
 	}
-	
+
 	public void onCreate() {
 		super.onCreate();
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - onCreate");
@@ -102,25 +121,47 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		super.onDestroy();
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - onDestroy");
 	}
+
 	public void getMenu() {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Get menu");
-		api = new ServiceAPI(this,PreferenceManager.getDefaultSharedPreferences(this));
+		api = new ServiceAPI(this,
+				PreferenceManager.getDefaultSharedPreferences(this));
 		api.execute(new APIMessage(EateryConstants.GET_MENU_CODE, null));
 	}
 
 	public void setOrder() {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Set order");
-		api = new ServiceAPI(this, PreferenceManager.getDefaultSharedPreferences(this));
-		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE,null));
+		api = new ServiceAPI(this,
+				PreferenceManager.getDefaultSharedPreferences(this));
+		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, null));
 	}
-	
-	private void writeToDB(List<MenuItem> menu,List<Dish> dishes){
-		db=new DBManager(this);
-		db.open();
-		db.addDish(dishes);
-		db.addMenu(menu);
-		db.close();		
+
+	private void writeToDB(List<RarusMenu> menu) {
+		Log.d(EateryConstants.SERVICE_LOG_TAG,
+				"[SERVICE]:  Блюда для загрузки в БД");
+
+		for (RarusMenu m : menu) {
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: " + m.toString());
+		}
+		mDBManager = new EateryDB(getApplicationContext());
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Запись меню в БД ");
+		mDBManager.saveMenu(menu);
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Получение дат из ДБ");
+		List<Integer> dates = mDBManager.getMenuDates();
+		for (Integer d : dates) {
+			java.util.Date date = new Date((long) d * 1000);
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[SERVICE]: Дата" + date.toString());
+			menu=mDBManager.getMenu(d);
+			for(RarusMenu m:menu ){
+				Log.i(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE]  меню "+ m.toString()) ;
+			}
+		}
+		
+
 	}
+
 	public class EateryServiceBinder extends Binder {
 		public EateryWebService getService() {
 			return EateryWebService.this;
