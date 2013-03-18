@@ -1,14 +1,12 @@
 package rarus.eatery.model;
 
-import java.util.Date;
-
 /**
  * Объект элемент меню
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class Menu {
+public class RarusMenu {
 	private int mId;					// id меню
 	private int mDate;					// дата, на которую это меню
 	private String mDishId;				// id блюда, находящегося в меню
@@ -23,7 +21,7 @@ public class Menu {
 	private boolean mModified;			// флаг состояния изменения меню
 	private int mTimestamp;				// временной штамп меню
 	
-	public Menu(int mId, int mDate, String mDishId, String mName,
+	public RarusMenu(int mId, int mDate, String mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
 			String mRating, boolean mPreorder, float mAvailable,
 			float mAmmount, boolean mModified, int mTimestamp) {
@@ -120,9 +118,5 @@ public class Menu {
 	}
 	public void setTimestamp(int mTimestamp) {
 		this.mTimestamp = mTimestamp;
-	}
-	public String toString(){
-		java.util.Date date=new Date((long)mDate*1000);
-		return ("Блюдо: "+mName +"Дата : "+date.toString());
 	}
 }

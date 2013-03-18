@@ -3,7 +3,7 @@ package rarus.eatery.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import rarus.eatery.model.Order;
 
 import android.content.ContentValues;
@@ -176,9 +176,9 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет блюда
 	 * 
 	 * @param dishes
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public void addDish(List<Menu> dishes) {
+	public void addDish(List<RarusMenu> dishes) {
 		StringBuilder query = new StringBuilder();	
 		SQLiteStatement insertDishStmt;
 		int skipped = 0;
@@ -277,9 +277,9 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Добавляет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public void addMenu(List<Menu> menu) {
+	public void addMenu(List<RarusMenu> menu) {
 		StringBuilder query = new StringBuilder();
 		SQLiteStatement insertMenuStmt;
 		
@@ -344,11 +344,11 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public List<Menu> getMenuAtDate(int date) {
+	public List<RarusMenu> getMenuAtDate(int date) {
 		StringBuilder query = new StringBuilder();
-		List<Menu> result = new ArrayList<Menu>();
+		List<RarusMenu> result = new ArrayList<RarusMenu>();
 		
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
@@ -366,7 +366,7 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Menu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
@@ -500,6 +500,7 @@ public class DBManager extends SQLiteOpenHelper {
 				insertOrderStmt.bindString(3, orders.get(i).getDishId());
 				insertOrderStmt.bindString(4, Float.toString(orders.get(i).getAmmount()));
 				insertOrderStmt.bindString(5, Float.toString(orders.get(i).getSum()));
+				insertOrderStmt.execute();
 			}
 			insertOrderHeadersStmt.close();
 			insertDishStmt.close();
@@ -631,11 +632,11 @@ public class DBManager extends SQLiteOpenHelper {
 	 * Возвращает ещё не отправленные заказы
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public List<Menu> getOrdersNotExecuted() {
+	public List<RarusMenu> getOrdersNotExecuted() {
 		StringBuilder query = new StringBuilder();
-		List<Menu> result = new ArrayList<Menu>();
+		List<RarusMenu> result = new ArrayList<RarusMenu>();
 		
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
@@ -652,7 +653,7 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new Menu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
 							c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),

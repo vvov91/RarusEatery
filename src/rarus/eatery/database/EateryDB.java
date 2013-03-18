@@ -2,7 +2,7 @@ package rarus.eatery.database;
 
 import java.util.List;
 
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import rarus.eatery.model.Order;
 
 import android.content.Context;
@@ -36,7 +36,7 @@ public class EateryDB {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<Integer> getMenuDates() {
 		db.open();
@@ -52,11 +52,11 @@ public class EateryDB {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public List<Menu> getMenu(int date) {
+	public List<RarusMenu> getMenu(int date) {
 		db.open();
-		List<Menu> result = db.getMenuAtDate(date);
+		List<RarusMenu> result = db.getMenuAtDate(date);
 		db.close();
 		
 		return result;
@@ -66,19 +66,15 @@ public class EateryDB {
 	 * Сохраняет меню
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public void saveMenu(List<Menu> menu) {
+	public void saveMenu(List<RarusMenu> menu) {
 		if (menu.size() == 0) return;
 				
 		db.open();
 		for (int i = 0; i < menu.size(); i++) {
-			if (menu.get(i).isModified()) {
-				db.deleteMenuAtDate(menu.get(0).getDate());
-				db.addMenu(menu);
-				
-				break;
-			}
+			db.deleteMenuAtDate(menu.get(0).getDate());
+			db.addMenu(menu);
 		}
 		db.close();
 	}
@@ -101,7 +97,7 @@ public class EateryDB {
 	 * @param date
 	 *     дата в Unix time формате
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
 	public List<Integer> getOrdersDates() {
 		db.open();
@@ -131,11 +127,11 @@ public class EateryDB {
 	 * Возвращает ещё не отправленные заказы
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link Menu}
+	 *     {@link List} из объектов {@link RarusMenu}
 	 */
-	public List<Menu> getOrdersNotExecuted() {
+	public List<RarusMenu> getOrdersNotExecuted() {
 		db.open();
-		List<Menu> result = db.getOrdersNotExecuted();
+		List<RarusMenu> result = db.getOrdersNotExecuted();
 		db.close();
 		
 		return result;
