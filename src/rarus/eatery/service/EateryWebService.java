@@ -40,9 +40,6 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - get menu code");
 				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
-				for (int i = 0; i < list.size(); i++) {
-					list.get(i).setModified(true);
-				}
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - Servicel list getted");
 				writeToDB(list);
