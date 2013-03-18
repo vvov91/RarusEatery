@@ -96,7 +96,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} catch (SQLiteException ex) {
 			mDb = this.getReadableDatabase();
 			
-			Log.e(LOG_TAG, "Failed to open database in read/write mode. DB is opened in read mode");
+			Log.e(LOG_TAG, "[DB] Не удалось открыть БД в режиме чтения/записи. Режим чтения.");
 		}
 	}
 	
@@ -160,7 +160,7 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" TEXT DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
-		Log.i(LOG_TAG, "Created database");
+		Log.i(LOG_TAG, "[DB] Создана БД");
 	}
 
 	// в случае если существующая БД не соответствует необходимой версии
@@ -219,8 +219,8 @@ public class DBManager extends SQLiteOpenHelper {
 						} else {
 							mDb.delete(TABLE_DISHES, KEY_ID + " = ?",
 									new String[] {cDishes.getString(0)});
-							Log.i(LOG_TAG,
-									"Deleting unused dish (ID: " + cDishes.getString(0) + ")");
+							Log.i(LOG_TAG, "[DB] Удаление неиспользуемого блюда (ID: "
+									+ cDishes.getString(0) + ")");
 							count++;
 						}
 						cOrders.close();
@@ -235,7 +235,7 @@ public class DBManager extends SQLiteOpenHelper {
 			mDb.endTransaction();
 			
 			if (count > 0)
-				Log.i(LOG_TAG, "Total dishes deleted: " + Integer.toString(count));
+				Log.i(LOG_TAG, "[DB] Всего удалено блюд: " + Integer.toString(count));
 		}
 	}
 	
@@ -296,7 +296,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Added menu (" + Integer.toString(menu.size()) + ")");
+			Log.i(LOG_TAG, "[DB] Добавлено меню (" + Integer.toString(menu.size()) + ")");
 		}
 	}
 	
@@ -412,7 +412,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted menu (date = " + Integer.toString(formatDate(date)) + ")");
+			Log.i(LOG_TAG, "[DB] Удалено меню (Дата = " + Integer.toString(formatDate(date)) + ")");
 		}
 	}
 	
@@ -427,7 +427,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted all menu");
+			Log.i(LOG_TAG, "[DB] Удалены все меню");
 		}
 	}
 	
@@ -502,7 +502,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Added orders (" + Integer.toString(orders.size()) + ")");
+			Log.i(LOG_TAG, "[DB] Добавлены заказы (" + Integer.toString(orders.size()) + ")");
 		}
 	}
 	
@@ -687,7 +687,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted orders and orders headers (" + count + ") at date ("
+			Log.i(LOG_TAG, "[DB] Удалены заказы и заголовки заказов (" + count + ") на дату ("
 					+ formatDate(date) + ")");
 		}
 	}
@@ -705,7 +705,7 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted all orders and orders headers");
+			Log.i(LOG_TAG, "[DB] Удалены все заказы и заголовки заказов");
 		}
 	}
 	
