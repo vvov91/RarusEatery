@@ -44,7 +44,7 @@ public class DishPageViewFragment extends Fragment {
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();
-				// MainActivity.changedOrderedAmount = true;
+				// DPVF.changedOrderedAmount = true;
 			}
 		});
 		btnPlus.setOnClickListener(new OnClickListener() {
@@ -67,9 +67,10 @@ public class DishPageViewFragment extends Fragment {
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();
-				// MainActivity.changedOrderedAmount = true;
+				// DPVF.changedOrderedAmount = true;
 			}
 		});
 		return v;
 	}
+	
 }
