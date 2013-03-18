@@ -148,6 +148,7 @@ public class EateryDB {
 		db.open();
 		db.deleteOrdersAll();
 		db.addOrder(orders);
+		db.deleteDishesUnused();
 		db.close();
 	}
 	
