@@ -173,50 +173,6 @@ public class DBManager extends SQLiteOpenHelper {
 	// Блюда
 	
 	/**
-	 * Добавляет блюда
-	 * 
-	 * @param dishes
-	 *     {@link List} из объектов {@link RarusMenu}
-	 */
-	public void addDish(List<RarusMenu> dishes) {
-		StringBuilder query = new StringBuilder();	
-		SQLiteStatement insertDishStmt;
-		int skipped = 0;
-				
-		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
-		insertDishStmt = mDb.compileStatement(query.toString());
-		
-		mDb.beginTransaction();
-		try {
-			for (int i = 0; i < dishes.size(); i++) {
-				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
-						new String[] {dishes.get(i).getDishId()},
-						null, null, null, null);				
-				if (c.getCount() > 0) {
-					c.close();
-					skipped++;
-					continue;
-				}
-				
-				insertDishStmt.bindString(1, dishes.get(i).getDishId());
-				insertDishStmt.bindString(2, dishes.get(i).getName());
-				insertDishStmt.bindString(3, dishes.get(i).getDescription());
-				insertDishStmt.bindString(4, (dishes.get(i).isPortioned() ? "1" : "0"));
-				insertDishStmt.bindString(5, Float.toString(dishes.get(i).getPrice()));
-				insertDishStmt.bindString(6, dishes.get(i).getRating());
-				insertDishStmt.bindString(7, (dishes.get(i).isPreorder() ? "1" : "0"));
-				insertDishStmt.execute();
-			}
-			insertDishStmt.close();
-		    mDb.setTransactionSuccessful();
-		} finally {
-			mDb.endTransaction();
-			
-			Log.i(LOG_TAG, "Added dishes (" + Integer.toString(dishes.size() - skipped) + ")");			
-		}		
-	}
-	
-	/**
 	 * Изменяет рейтинг блюда
 	 * 
 	 * @param id
@@ -238,35 +194,48 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 
 	/**
-	 * Удаляет блюдо
-	 * 
-	 * @param dishId
-	 *     id блюда
+	 * Удаляет не используемые блюда
 	 */
-	public void deleteDish(String dishId) {
+	public void deleteDishesUnused() {		
+		int count = 0;
+		
 		mDb.beginTransaction();
 		try {
-			mDb.delete(TABLE_DISHES, KEY_ID + " = ?", new String[] {dishId});
+			Cursor cDishes = mDb.query(TABLE_DISHES, new String[] {KEY_ID}, null, null, null,
+					null, null);
+			if (cDishes.moveToFirst()) {
+				do {
+					Cursor cMenu = mDb.query(TABLE_MENU,
+							new String[] {KEY_ID}, MENU_DISH_ID + " = ?",
+							new String[] {cDishes.getString(0)}, null, null, null, "1");
+					if (cMenu.getCount() > 0) {
+						continue;
+					} else {
+						Cursor cOrders = mDb.query(TABLE_ORDERS,
+								new String[] {KEY_ID}, ORDERS_DISH_ID + " = ?",
+								new String[] {cDishes.getString(0)}, null, null, null, "1");
+						if (cOrders.getCount() > 0) {
+							continue;
+						} else {
+							mDb.delete(TABLE_DISHES, KEY_ID + " = ?",
+									new String[] {cDishes.getString(0)});
+							Log.i(LOG_TAG,
+									"Deleting unused dish (ID: " + cDishes.getString(0) + ")");
+							count++;
+						}
+						cOrders.close();
+					}
+					cMenu.close();
+				} while (cDishes.moveToNext());
+			}
+			cDishes.close();
+			
 			mDb.setTransactionSuccessful();
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "Deleted dish (id = " + dishId + ")");
-		}
-	}
-	
-	/**
-	 * Удаляет все блюда
-	 */
-	public void deleteDishAll() {
-		mDb.beginTransaction();
-		try {
-			mDb.delete(TABLE_DISHES, null, null);
-			mDb.setTransactionSuccessful();
-		} finally {
-			mDb.endTransaction();
-			
-			Log.i(LOG_TAG, "Deleted all dishes");
+			if (count > 0)
+				Log.i(LOG_TAG, "Total dishes deleted: " + Integer.toString(count));
 		}
 	}
 	
@@ -281,7 +250,13 @@ public class DBManager extends SQLiteOpenHelper {
 	 */
 	public void addMenu(List<RarusMenu> menu) {
 		StringBuilder query = new StringBuilder();
+		SQLiteStatement insertDishStmt;
 		SQLiteStatement insertMenuStmt;
+		
+		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
+		insertDishStmt = mDb.compileStatement(query.toString());
+		
+		query = new StringBuilder();
 		
 		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertMenuStmt = mDb.compileStatement(query.toString());
@@ -289,6 +264,22 @@ public class DBManager extends SQLiteOpenHelper {
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < menu.size(); i++) {
+				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
+						new String[] {menu.get(i).getDishId()},
+						null, null, null, null);
+				
+				if (c.getCount() == 0) {
+					insertDishStmt.bindString(1, menu.get(i).getDishId());
+					insertDishStmt.bindString(2, menu.get(i).getName());
+					insertDishStmt.bindString(3, menu.get(i).getDescription());
+					insertDishStmt.bindString(4, (menu.get(i).isPortioned() ? "1" : "0"));
+					insertDishStmt.bindString(5, Float.toString(menu.get(i).getPrice()));
+					insertDishStmt.bindString(6, menu.get(i).getRating());
+					insertDishStmt.bindString(7, (menu.get(i).isPreorder() ? "1" : "0"));
+					insertDishStmt.execute();
+				}
+				c.close();
+				
 				insertMenuStmt.bindNull(1);
 				insertMenuStmt.bindString(2, Integer.toString(formatDate(menu.get(i).getDate())));
 				insertMenuStmt.bindString(3, menu.get(i).getDishId());
@@ -298,6 +289,7 @@ public class DBManager extends SQLiteOpenHelper {
 				insertMenuStmt.bindString(7, Integer.toString(menu.get(i).getTimestamp()));
 				insertMenuStmt.execute();
 			}
+			insertDishStmt.close();
 			insertMenuStmt.close();
 			
 		    mDb.setTransactionSuccessful();
