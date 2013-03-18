@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,7 +39,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE] - get menu code");
-				List<Menu> list = (List<Menu>) message.getContent();
+				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
 				for (int i = 0; i < list.size(); i++) {
 					list.get(i).setModified(true);
 				}
@@ -136,11 +136,11 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, null));
 	}
 
-	private void writeToDB(List<Menu> menu) {
+	private void writeToDB(List<RarusMenu> menu) {
 		Log.d(EateryConstants.SERVICE_LOG_TAG,
 				"[SERVICE]:  Блюда для загрузки в БД");
 
-		for (Menu m : menu) {
+		for (RarusMenu m : menu) {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: " + m.toString());
 		}
 		mDBManager = new EateryDB(getApplicationContext());
@@ -153,7 +153,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			Log.d(EateryConstants.SERVICE_LOG_TAG,
 					"[SERVICE]: Дата" + date.toString());
 			menu=mDBManager.getMenu(d);
-			for(Menu m:menu ){
+			for(RarusMenu m:menu ){
 				Log.i(EateryConstants.SERVICE_LOG_TAG,
 						"[SERVICE]  меню "+ m.toString()) ;
 			}

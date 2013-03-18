@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -104,9 +104,9 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		return false;
 	}
 
-	private List<Menu> getMenu() {
+	private List<RarusMenu> getMenu() {
 		String xml = XMLParser.getMenuXMLRequest(sp);
-		List<Menu> menu = null;
+		List<RarusMenu> menu = null;
 		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login "
 				+ EateryConstants.SERV_LOGIN);
 		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass "

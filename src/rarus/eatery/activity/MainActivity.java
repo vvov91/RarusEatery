@@ -5,7 +5,7 @@ import java.util.List;
 
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
-import rarus.eatery.model.Menu;
+import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -108,8 +108,8 @@ public class MainActivity extends Activity {
 					java.util.Date date=new Date((long)d*1000);
 					Log.d(EateryConstants.GUI_LOG_TAG,
 							"MainActivity: Дата"+ date.toString()) ;
-					List<Menu> menu=db.getMenu(d);
-					for(Menu m:menu ){
+					List<RarusMenu> menu=db.getMenu(d);
+					for(RarusMenu m:menu ){
 						Log.i(EateryConstants.GUI_LOG_TAG,
 								"MainActivity:  меню "+ m.toString()) ;
 					}
