@@ -241,11 +241,11 @@ public class XMLParser {
 					if (name.equals("rating")) {
 						rating = xpp.getText();
 					}
-					if (name.equals("availableAmmount")) {
+					if (name.equals("available")) {
 						availableAmmount = (float) Double.parseDouble(xpp
 								.getText());
 					}
-					if (name.equals("orderedAmmount")) {
+					if (name.equals("ordered")) {
 						orderedAmmount = (float) Double.parseDouble(xpp
 								.getText());
 					}
