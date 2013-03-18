@@ -188,6 +188,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		bindService(serviceIntent, connection, 0);
 		Log.d(TAG, "MainActivity: onStart()");
 	}
+	@Override
+	protected void onDestroy() {
+		unbindService(connection);
+		unregisterReceiver(receiver);
+		Log.d(TAG, "MainActivity: onDestroy()");
+		super.onDestroy();		
+	}
 
 	@Override
 	protected void onStop() {
