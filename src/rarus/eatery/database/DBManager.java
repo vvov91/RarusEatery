@@ -187,6 +187,7 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		mDb.beginTransaction();		
 		try {
+			// updating dish record using dish ID
 			mDb.update(TABLE_DISHES, data, KEY_ID + " = ?", new String[] {id});	    
 			mDb.setTransactionSuccessful();
 		} finally {
@@ -202,37 +203,40 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		mDb.beginTransaction();
 		try {
+			// getting all dishes id's
 			Cursor cDishes = mDb.query(TABLE_DISHES, new String[] {KEY_ID}, null, null, null,
 					null, null);
 			
-			if (cDishes.moveToFirst()) {
-				
+			if (cDishes.moveToFirst()) {				
 				do {
+					// checking if dish is in at least one menu
 					Cursor cMenu = mDb.query(TABLE_MENU,
 							new String[] {KEY_ID}, MENU_DISH_ID + " = ?",
 							new String[] {cDishes.getString(0)}, null, null, null, "1");
 					
 					if (cMenu.getCount() > 0) {
+						// if it is, continue to next dish
 						continue;
 					} else {
+						// checking if dish is in at least one order
 						Cursor cOrders = mDb.query(TABLE_ORDERS,
 								new String[] {KEY_ID}, ORDERS_DISH_ID + " = ?",
 								new String[] {cDishes.getString(0)}, null, null, null, "1");
 						
 						if (cOrders.getCount() > 0) {
+							// if it is, continue to next dish
 							continue;
 						} else {
+							// if dish is not at least in one menu or order - deleting it
 							mDb.delete(TABLE_DISHES, KEY_ID + " = ?",
 									new String[] {cDishes.getString(0)});							
 							Log.i(LOG_TAG, "[DB] Deleting unused dish (ID: "
 									+ cDishes.getString(0) + ")");							
 							count++;
 						}
-						cOrders.close();
-						
+						cOrders.close();						
 					}
-					cMenu.close();
-					
+					cMenu.close();					
 				} while (cDishes.moveToNext());
 			}
 			cDishes.close();
@@ -260,22 +264,26 @@ public class DBManager extends SQLiteOpenHelper {
 		SQLiteStatement insertDishStmt;
 		SQLiteStatement insertMenuStmt;
 		
+		// insert statement for inserting dish
 		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertDishStmt = mDb.compileStatement(query.toString());
 		
 		query = new StringBuilder();
 		
+		// insert statement for inserting menu
 		query.append("INSERT INTO ").append(TABLE_MENU).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertMenuStmt = mDb.compileStatement(query.toString());
 
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < menu.size(); i++) {
+				// checking if dish is already in DB
 				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
 						new String[] {menu.get(i).getDishId()},
 						null, null, null, null);
 				
 				if (c.getCount() == 0) {
+					// if not - adding it
 					insertDishStmt.bindString(1, menu.get(i).getDishId());
 					insertDishStmt.bindString(2, menu.get(i).getName());
 					insertDishStmt.bindString(3, menu.get(i).getDescription());
@@ -287,6 +295,7 @@ public class DBManager extends SQLiteOpenHelper {
 				}
 				c.close();
 				
+				// adding menu
 				insertMenuStmt.bindNull(1);
 				insertMenuStmt.bindString(2, Integer.toString(formatDate(menu.get(i).getDate())));
 				insertMenuStmt.bindString(3, menu.get(i).getDishId());
@@ -323,18 +332,17 @@ public class DBManager extends SQLiteOpenHelper {
 			mDb.setTransactionSuccessful();
 			
 			if (c.getCount() > 0) {
-				c.moveToFirst();
+				c.moveToFirst();				
 				do {
 					result.add(c.getInt(0));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
 		return result;
-	}
-	
+	}	
 		
 	/**
 	 * Returns the menu at a given date
@@ -348,6 +356,7 @@ public class DBManager extends SQLiteOpenHelper {
 		StringBuilder query = new StringBuilder();
 		List<RarusMenu> result = new ArrayList<RarusMenu>();
 		
+		// query joining tables Menu and Dishes by dish ID
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
 		
@@ -364,14 +373,14 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
-							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2),
+							c.getString(3), c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
 							c.getInt(12)));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
@@ -453,17 +462,20 @@ public class DBManager extends SQLiteOpenHelper {
 		SQLiteStatement insertOrderHeadersStmt;
 		int orderId = 0;
 		
+		// insert statement for inserting order
 		query.append("INSERT INTO ").append(TABLE_ORDERS);
 		query.append(" VALUES (?, ?, ?, ?, ?)");
 		insertOrderStmt = mDb.compileStatement(query.toString());
 		
 		query = new StringBuilder();
 		
+		// insert statement for inserting dish
 		query.append("INSERT INTO ").append(TABLE_DISHES).append(" VALUES (?, ?, ?, ?, ?, ?, ?)");
 		insertDishStmt = mDb.compileStatement(query.toString());
 		
 		query = new StringBuilder();
 		
+		// insert statement for inserting order headers
 		query.append("INSERT INTO ").append(TABLE_ORDERS_HEADERS);
 		query.append(" VALUES (?, ?, ?)");
 		insertOrderHeadersStmt = mDb.compileStatement(query.toString());
@@ -471,17 +483,22 @@ public class DBManager extends SQLiteOpenHelper {
 		mDb.beginTransaction();
 		try {
 			for (int i = 0; i < orders.size(); i++) {
+				// inserting order headers
 				insertOrderHeadersStmt.bindNull(1);
 				insertOrderHeadersStmt.bindString(2,
 						Integer.toString(orders.get(i).getExecutionDate()));
 				insertOrderHeadersStmt.bindString(3, orders.get(i).getOrderSrvNumber());
+				
+				// getting the order ID from the last inserted row
 				orderId = (int) insertOrderHeadersStmt.executeInsert();
 				
+				// checking if dish is already in DB
 				Cursor c = mDb.query(false, TABLE_DISHES, new String[] {KEY_ID}, KEY_ID + " = ?",
 						new String[] {orders.get(i).getDishId()},
 						null, null, null, null);
 				
 				if (c.getCount() == 0) {
+					// if not - adding it
 					insertDishStmt.bindString(1, orders.get(i).getDishId());
 					insertDishStmt.bindString(2, orders.get(i).getName());
 					insertDishStmt.bindString(3, orders.get(i).getDescription());
@@ -493,6 +510,7 @@ public class DBManager extends SQLiteOpenHelper {
 				}
 				c.close();
 								
+				// inserting order
 				insertOrderStmt.bindNull(1);
 				insertOrderStmt.bindString(2, Integer.toString(orderId));
 				insertOrderStmt.bindString(3, orders.get(i).getDishId());
@@ -523,8 +541,8 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		mDb.beginTransaction();
 		try {
-			Cursor c = mDb.query(true, TABLE_ORDERS_HEADERS, new String[] {ORDERS_H_EXECUTION_DATE},
-					null, null, null, null, ORDERS_H_EXECUTION_DATE + " ASC", null);
+			Cursor c = mDb.query(true, TABLE_ORDERS_HEADERS,
+					new String[] {ORDERS_H_EXECUTION_DATE},	null, null, null, null, null, null);
 			mDb.setTransactionSuccessful();
 			
 			if (c.getCount() > 0) {
@@ -532,8 +550,8 @@ public class DBManager extends SQLiteOpenHelper {
 				do {
 					result.add(c.getInt(0));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
@@ -550,6 +568,8 @@ public class DBManager extends SQLiteOpenHelper {
 		StringBuilder query = new StringBuilder();
 		List<Order> result = new ArrayList<Order>();
 		
+		// query joining tables Orders and Orders Headers by order ID
+		// and joining table Dishes by dish ID
 		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
 		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
 		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
@@ -574,8 +594,8 @@ public class DBManager extends SQLiteOpenHelper {
 							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
 							c.getFloat(10), c.getInt(11), c.getString(12)));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
@@ -594,6 +614,8 @@ public class DBManager extends SQLiteOpenHelper {
 		StringBuilder query = new StringBuilder();
 		List<Order> result = new ArrayList<Order>();
 		
+		// query joining tables Orders and Orders Headers by order ID
+		// and joining table Dishes by dish ID
 		query.append(TABLE_ORDERS).append(" AS OS INNER JOIN ").append(TABLE_ORDERS_HEADERS);
 		query.append(" AS OH ON OS.").append(ORDERS_ORDER_ID).append(" = OH.").append(KEY_ID);
 		query.append(" INNER JOIN ").append(TABLE_DISHES).append(" AS DS ON OS.");
@@ -617,8 +639,8 @@ public class DBManager extends SQLiteOpenHelper {
 							c.getString(7), (c.getInt(8) == 0 ? false : true), c.getFloat(9),
 							c.getFloat(10), c.getInt(11), c.getString(12)));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
@@ -631,15 +653,17 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @return
 	 *     {@link List} of {@link RarusMenu} objects
 	 */
-	public List<RarusMenu> getOrdersNotExecuted() {
+	public List<RarusMenu> getOrdersNotSent() {
 		StringBuilder query = new StringBuilder();
 		List<RarusMenu> result = new ArrayList<RarusMenu>();
 		
+		// query joining tables Menu and Dishes by dish ID
 		query.append(TABLE_MENU).append(" AS MU INNER JOIN ").append(TABLE_DISHES);
 		query.append(" AS DS ON MU.").append(MENU_DISH_ID).append(" = DS.").append(KEY_ID);
 		
 		mDb.beginTransaction();
 		try {
+			// getting dishes with modified flag on ("1" which means "true")
 			Cursor c = mDb.query(false, query.toString(),
 					new String[] {"MU." + KEY_ID, MENU_DATE, "DS." + KEY_ID, DISHES_NAME,
 						DISHES_DESCRIPTION, DISHES_PORTIONED, DISHES_PRICE,
@@ -650,14 +674,14 @@ public class DBManager extends SQLiteOpenHelper {
 			
 			if (c.moveToFirst()) {
 				do {
-					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2), c.getString(3),
-							c.getString(4), (c.getInt(5) == 0 ? false : true), 
+					result.add(new RarusMenu(c.getInt(0), c.getInt(1), c.getString(2),
+							c.getString(3), c.getString(4), (c.getInt(5) == 0 ? false : true), 
 							c.getFloat(6), c.getString(7), (c.getInt(8) == 0 ? false : true),
 							c.getFloat(9), c.getFloat(10), (c.getInt(11) == 0 ? false : true),
 							c.getInt(12)));
 				} while(c.moveToNext());
-				c.close();
 			}
+			c.close();
 		} finally {
 			mDb.endTransaction();
 		}
@@ -680,8 +704,10 @@ public class DBManager extends SQLiteOpenHelper {
 					new String[] {Integer.toString(formatDate(date))}, null, null, null);
 			
 			if (c.moveToFirst()) {
+				// deleting order 
 				mDb.delete(TABLE_ORDERS, ORDERS_ORDER_ID + " = ?",
 						new String[] {Integer.toString(c.getInt(0))});
+				// and order headers
 				mDb.delete(TABLE_ORDERS_HEADERS, KEY_ID + " = ?",
 						new String[] {Integer.toString(c.getInt(0))});
 				count++;

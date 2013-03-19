@@ -128,9 +128,9 @@ public class EateryDB {
 	 * @return
 	 *     {@link List} of {@link RarusMenu} objects
 	 */
-	public List<RarusMenu> getOrdersNotExecuted() {
+	public List<RarusMenu> getOrdersNotSent() {
 		db.open();
-		List<RarusMenu> result = db.getOrdersNotExecuted();
+		List<RarusMenu> result = db.getOrdersNotSent();
 		db.close();
 		
 		return result;
