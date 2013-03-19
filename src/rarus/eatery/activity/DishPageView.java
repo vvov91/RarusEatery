@@ -5,7 +5,6 @@ import java.util.List;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,34 +16,35 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class DishPageView extends SherlockFragmentActivity {
 	PagerAdapter mPageAdapter;
-	DayMenu mDm;
-
+	DayMenu mDayMenu;
+	int mDayId;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dish_viewpager);
 		Intent intent = getIntent();
 		int dishId = intent.getIntExtra("dishId", -1);
+		mDayId=intent.getIntExtra("dayId", -1);
 		if (savedInstanceState != null)
-			mDm = (DayMenu) getLastCustomNonConfigurationInstance();
+			mDayMenu = (DayMenu) getLastCustomNonConfigurationInstance();
 		else
-			mDm = (DayMenu) getIntent().getParcelableExtra(
+			mDayMenu = (DayMenu) getIntent().getParcelableExtra(
 					DayMenu.class.getCanonicalName());
 		List<Fragment> fragments = new ArrayList<Fragment>();
-		List<RarusMenu> menu = mDm.mRarusMenu;
+		List<RarusMenu> menu = mDayMenu.mRarusMenu;
 		for (RarusMenu m : menu) {
 			DishPageViewFragment dpvp = new DishPageViewFragment();
 			dpvp.p = m;
 			fragments.add(dpvp);
 		}
 
-		mPageAdapter = new rarus.eatery.activity.PagerAdapter(super.getSupportFragmentManager(),
-				fragments);
+		mPageAdapter = new rarus.eatery.activity.PagerAdapter(
+				super.getSupportFragmentManager(), fragments);
 		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
 		pager.setAdapter(mPageAdapter);
 		pager.setCurrentItem(dishId);
 
-		setTitle(mDm.mStringDate);
+		setTitle(mDayMenu.mStringDate);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().show();
 	}
@@ -56,7 +56,7 @@ public class DishPageView extends SherlockFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			finish();
+			onBackPressed();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -72,11 +72,21 @@ public class DishPageView extends SherlockFragmentActivity {
 
 	@Override
 	public Object onRetainCustomNonConfigurationInstance() {
-		return mDm;
+		return mDayMenu;
 	}
 
 	@Override
 	protected void onSaveInstanceState(final Bundle outState) {
 		// super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onBackPressed() {
+		// super.onBackPressed();
+		Intent intent = new Intent();
+		intent.putExtra(DayMenu.class.getCanonicalName(), mDayMenu);
+		intent.putExtra("dayId", mDayId);
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 }

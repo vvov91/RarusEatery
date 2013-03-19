@@ -25,6 +25,12 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 public class DayMenu extends Fragment implements Parcelable {
+	final String TAG = "States";
+	ArrayList<RarusMenu> mRarusMenu = new ArrayList<RarusMenu>();
+	String mStringDate;
+	Date mDate;
+	int mPos = -1;
+
 	public DayMenu() {
 	}
 
@@ -34,12 +40,6 @@ public class DayMenu extends Fragment implements Parcelable {
 		mPos = _mPos;
 	}
 
-	final String TAG = "States";
-	ArrayList<RarusMenu> mRarusMenu = new ArrayList<RarusMenu>();
-	String mStringDate;
-	Date mDate;
-	int mPos = -1;
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -47,8 +47,6 @@ public class DayMenu extends Fragment implements Parcelable {
 		if (mPos == -1 && savedInstanceState != null)
 			mPos = savedInstanceState.getInt("mPos");
 		Button btnOrder = (Button) v.findViewById(R.id.btnOrder);
-		// TextView tvDate = (TextView) v.findViewById(R.id.tvDate);
-		// tvDate.setText(mDate);
 		DishAdapter dishAdapter = new DishAdapter(v.getContext(), mRarusMenu,
 				mStringDate);
 		GridView gvMain = (GridView) v.findViewById(R.id.gvMain);

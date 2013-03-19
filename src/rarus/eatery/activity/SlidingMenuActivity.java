@@ -39,15 +39,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	final String TAG = "Main";
 	final String LOG_TAG = "Main";
-	
+
 	Intent serviceIntent;
 	ServiceConnection connection;
 	EateryWebService client;
 	BroadcastReceiver receiver;
-	
+
 	EateryDB mEDB;
 	SharedPreferences sp;
-	int modeTemp, currentFragmentId = 0, previousFragmentId = 0;
+	int mCurrentFragmentId = 0;
 	final int DIALOG_ORDER = 1;
 	List<DayMenu> fragments = new ArrayList<DayMenu>();
 	List<String> datesString = new ArrayList<String>();
@@ -56,11 +56,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		startService();
-		
 		setTitle(R.string.app_name);
-
 		setContentView(R.layout.main_content_frame);
 
 		// show home as up so we can toggle
@@ -69,12 +66,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		setBehindContentView(R.layout.sliding_menu);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		if (savedInstanceState != null)
-			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
-		else
-			mEDB = new EateryDB(getBaseContext());
-		makeFragments(mEDB);
-		switchContent(0);
 
 		// customize the SlidingMenu
 		SlidingMenu sm = getSlidingMenu();
@@ -84,11 +75,22 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		sm.setBehindScrollScale(0.25f);
 		sm.setFadeDegree(0.25f);
 
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, new FirstRunFragment()).commit();
+
+		if (savedInstanceState != null) {
+			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
+			makeFragments();
+			switchContent(mCurrentFragmentId);
+		} else {
+			// client.getMenu();
+		}
+
 	}
 
 	public void switchContent(final int possition) {
 		// смена основного фрагмента
-		fragments.get(possition);
+		mCurrentFragmentId = possition;
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, fragments.get(possition)).commit();
 		// getSupportActionBar().setTitle(datesString.get(possition));
@@ -106,20 +108,32 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageView.class);
 		intent.putExtra("dishId", dishId);
+		intent.putExtra("dayId", dayId);
 		DayMenu dm = (DayMenu) fragments.get(dayId);
 		intent.putExtra(DayMenu.class.getCanonicalName(), dm);
-		startActivity(intent);
+		startActivityForResult(intent, 1);
 	}
 
-	public void makeFragments(EateryDB edb) {
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (data == null) {
+			return;
+		}
+		DayMenu dm = (DayMenu) data.getParcelableExtra(DayMenu.class
+				.getCanonicalName());
+		int dayId = data.getIntExtra("dayId", -1);
+		fragments.set(dayId, dm);
+	}
+
+	public void makeFragments() {
 		// создание основного фрагмента
-		List<Integer> dates = edb.getMenuDates();
+		List<Integer> dates = mEDB.getMenuDates();
 		datesString = new ArrayList<String>();
 		fragments = new ArrayList<DayMenu>();
 		for (Integer date : dates) {
 			DayMenu dm = new DayMenu();
-			dm.mRarusMenu = (ArrayList<RarusMenu>) edb.getMenu(date);
-			//System.out.println(dm.mRarusMenu.get(0).getAvailable());
+			dm.mRarusMenu = (ArrayList<RarusMenu>) mEDB.getMenu(date);
+			// System.out.println(dm.mRarusMenu.get(0).getAvailable());
 			java.util.Date d = new Date(((long) date.intValue()) * 1000);
 			dm.mStringDate = d.toString();
 			datesString.add(dm.mStringDate);
@@ -156,10 +170,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		// системное меню
 		MenuItem mi = menu.add(0, 1, 0, "Настройки");
-		mi.setIntent(new Intent(this, SettingsActivity.class));
+		//mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
-		menu.add("Save").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add("Clean").setShowAsAction(
+		menu.add(0, 2, 0, "Save").setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(0, 3, 0, "Clean").setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM
 						| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
@@ -170,7 +185,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Toast.makeText(this, "Got click: " + item.toString(),
 				Toast.LENGTH_SHORT).show();
-
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			toggle();
@@ -188,12 +202,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		bindService(serviceIntent, connection, 0);
 		Log.d(TAG, "MainActivity: onStart()");
 	}
+
 	@Override
 	protected void onDestroy() {
 		unbindService(connection);
 		unregisterReceiver(receiver);
 		Log.d(TAG, "MainActivity: onDestroy()");
-		super.onDestroy();		
+		super.onDestroy();
 	}
 
 	@Override
@@ -201,10 +216,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onStop();
 		Log.d(TAG, "MainActivity: onStop()");
 	}
-	
-	public void onRefreshClick(View v){
+
+	public void onRefreshClick(View v) {
 		client.getMenu();
-	} 
+		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
+
+	}
+
 	private void startService() {
 		serviceIntent = new Intent(this, EateryWebService.class);
 		startService(serviceIntent);
@@ -214,6 +232,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity onServiceConnected");
 				client = ((EateryWebService.EateryServiceBinder) binder)
 						.getService();
+				client.getMenu();
 			}
 
 			public void onServiceDisconnected(ComponentName name) {
@@ -234,10 +253,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				EateryConstants.BROADCAST_ACTION);
 		registerReceiver(receiver, intFilt);
 	}
+
 	private void recive(boolean result, Intent intent) {
 		Log.d(EateryConstants.GUI_LOG_TAG,
 				"MainActivity: Полученно сообщение от сервиса");
-		if (result) {			
+		if (result) {
 			int operationCode = intent.getIntExtra(
 					EateryConstants.SERVICE_RESULT_CODE, 0);
 			Log.d(EateryConstants.GUI_LOG_TAG,
@@ -246,20 +266,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: Полученно меню");
-				EateryDB db=new EateryDB(getApplicationContext());
-				List<Integer> dates= db.getMenuDates();
-				for(Integer d:dates){
-					java.util.Date date=new Date((long)d*1000);
-					Log.d(EateryConstants.GUI_LOG_TAG,
-							"MainActivity: Дата"+ date.toString()) ;
-					List<RarusMenu> menu=db.getMenu(d);
-					for(RarusMenu m:menu ){
-						Log.i(EateryConstants.GUI_LOG_TAG,
-								"MainActivity:  меню "+ m.toString()) ;
-					}
+				// Обновление фрагмента
+				this.mEDB = new EateryDB(getApplicationContext());
+				if (mEDB.getMenuDates().size() != 0) {
+					makeFragments();
+					switchContent(mCurrentFragmentId);
+					Toast.makeText(getBaseContext(), "Меню обновлено.", 3)
+							.show();
 				}
-				
-			
+
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
@@ -273,6 +288,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		} else {
 			Log.d(EateryConstants.GUI_LOG_TAG,
 					"MainActivity: Запрос сервиса неудачен");
+			Toast.makeText(getBaseContext(), "Запрос сервиса неудачен.", 3)
+					.show();
+
 			int operationCode = intent.getIntExtra(
 					EateryConstants.SERVICE_RESULT_CODE, 0);
 			String error = intent.getStringExtra(EateryConstants.SERVICE_ERROR);
@@ -281,20 +299,24 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при получении меню:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				
+				Toast.makeText(getBaseContext(), "Ошибка при получении меню.",
+						3).show();
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при отправке заказа:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				Toast.makeText(getBaseContext(), "Ошибка при отправке заказа.",
+						3).show();
 			}
 				break;
 			case EateryConstants.PING_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				
+				Toast.makeText(getBaseContext(),
+						"Ошибка при соединеннии с сервером.", 3).show();
 			}
 				break;
 			}
