@@ -81,6 +81,7 @@ public class DishAdapter extends BaseAdapter {
 				else
 					orderedAmmount = 0;
 				p.setAmmount(orderedAmmount);
+				p.setModified(true);
 				notifyDataSetChanged();
 				// MainActivity.changedOrderedAmount=true;
 			}
