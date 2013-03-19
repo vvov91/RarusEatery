@@ -17,7 +17,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 /**
- * Предоставляет интерфейс для работы с БД
+ * Provides an interface to interact with the database
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
@@ -26,22 +26,22 @@ public class DBManager extends SQLiteOpenHelper {
 	private final String LOG_TAG = "rarus.eatery.db.dbmanager";
 	
 	
-	// файл БД
+	// database file
     private static final String DB_NAME = "Eatery.db";
-    // версия БД
+    // database version
     private static final int DB_VERSION = 1;
     
     
-    // таблицы 
+    // tables names
     private static final String TABLE_DISHES = "Dishes";
     private static final String TABLE_MENU = "Menu";
     private static final String TABLE_ORDERS = "Orders";
     private static final String TABLE_ORDERS_HEADERS = "OrdersHeaders";
     
-    // имя id столбца в каждой таблице
+    // _id field in every table
     public static final String KEY_ID = "_id";
     
-    // таблица DISHES
+    // Dishes table
     private static final String DISHES_NAME = "name";
     private static final String DISHES_DESCRIPTION = "description";
     private static final String DISHES_PORTIONED = "portioned";
@@ -49,7 +49,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String DISHES_RATING = "rating";
     private static final String DISHES_PREORDER = "preorder";
     
-    // таблица MENU
+    // Menu table
     private static final String MENU_DATE = "date";
     private static final String MENU_DISH_ID = "dishID";
     private static final String MENU_AVAILABLE = "available";
@@ -57,26 +57,26 @@ public class DBManager extends SQLiteOpenHelper {
     private static final String MENU_MODIFIED = "modified";
     private static final String MENU_TIMESTAMP = "timestamp";
     
-    // таблица ORDERS
+    // Orders table
     private static final String ORDERS_ORDER_ID = "orderID";
     private static final String ORDERS_DISH_ID = "dishID";
     private static final String ORDERS_AMMOUNT = "ammount";
     private static final String ORDERS_SUM = "sum";
     
-    // таблица ORDERS HEADERS
+    // Orders Headers table
     private static final String ORDERS_H_EXECUTION_DATE = "executionDate";
     private static final String ORDERS_H_ORDER_SRV_NUMBER = "orderSrvNumber";
     
     
-    // экземпляр БД
+    // database instance
     private SQLiteDatabase mDb;
 
     
 	/**
-	 * Конструктор класса
+	 * Class constructor
 	 * 
 	 * @param context
-	 *     текущий {@link Context}
+	 *     current {@link Context}
 	 */
 	public DBManager(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -84,11 +84,11 @@ public class DBManager extends SQLiteOpenHelper {
 	
 
 	/**
-	 * Открывает соединение с БД.
-	 * Если открыть базу в режиме записи невозможно, база открывается в режиме чтения.
+	 * Opens database connection.
+	 * If read/write mode not working, opens in read mode.
 	 * 
 	 * @throws SQLException
-	 *     если БД не доступна для записи и открывает её в режиме чтения.
+	 *     if DB is not writable
 	 */
 	public void open() throws SQLException {
 		try {
@@ -96,24 +96,25 @@ public class DBManager extends SQLiteOpenHelper {
 		} catch (SQLiteException ex) {
 			mDb = this.getReadableDatabase();
 			
-			Log.e(LOG_TAG, "[DB] Не удалось открыть БД в режиме чтения/записи. Режим чтения.");
+			Log.e(LOG_TAG,
+					"[DB] Can not open the database in read / write mode. Working in read mode.");
 		}
 	}
 	
 	/**
-	 * Закрывает соединение с БД
+	 * Closes database connection
 	 */
 	public void close() {
 		mDb.close();
 	}	
 	
-	// в случае если БД ещё не создана
+	// if DB is not created
 	@Override
 	public void onCreate(SQLiteDatabase _db) {
 		StringBuilder query = new StringBuilder();
 		
-		// создаём таблицы
-		// таблица DISHES
+		// creating tables
+		// Dishes table
 		query.append("CREATE TABLE ");
 		query.append(TABLE_DISHES).append(" (").append(KEY_ID).append(" TEXT PRIMARY KEY, ");
 		query.append(DISHES_NAME).append(" TEXT NOT NULL, ");
@@ -126,7 +127,7 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query = new StringBuilder();
 		
-		// таблица MENU
+		// Menu table
 		query.append("CREATE TABLE ");
 		query.append(TABLE_MENU).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
@@ -140,7 +141,7 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query = new StringBuilder();
 		
-		// таблица ORDERS
+		// Orders table
 		query.append("CREATE TABLE ");
 		query.append(TABLE_ORDERS).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
@@ -152,7 +153,7 @@ public class DBManager extends SQLiteOpenHelper {
 		
 		query = new StringBuilder();
 		
-		// таблица ORDERS HEADERS
+		// Orders Headers table
 		query.append("CREATE TABLE ");
 		query.append(TABLE_ORDERS_HEADERS).append(" (").append(KEY_ID);
 		query.append(" INTEGER PRIMARY KEY AUTOINCREMENT, ");
@@ -160,25 +161,25 @@ public class DBManager extends SQLiteOpenHelper {
 		query.append(ORDERS_H_ORDER_SRV_NUMBER).append(" TEXT DEFAULT 0);");
 		_db.execSQL(query.toString());
 		
-		Log.i(LOG_TAG, "[DB] Создана БД");
+		Log.i(LOG_TAG, "[DB] DB created");
 	}
 
-	// в случае если существующая БД не соответствует необходимой версии
-	// и нуждается в обновлении
+	// if an existing database does not match the required version and needs an update
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
 	}
 	
-	// Блюда
+	
+	// Dishes
 	
 	/**
-	 * Изменяет рейтинг блюда
+	 * Changes dish rating
 	 * 
 	 * @param id
-	 *     id блюда
+	 *     dish id
 	 * @param rating
-	 *     рейтинг
+	 *     dish rating
 	 */
 	public void setDishRating(String id, String rating) {
 		ContentValues data = new ContentValues();
@@ -194,7 +195,7 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 
 	/**
-	 * Удаляет не используемые блюда
+	 * Removes unused dishes
 	 */
 	public void deleteDishesUnused() {		
 		int count = 0;
@@ -203,29 +204,35 @@ public class DBManager extends SQLiteOpenHelper {
 		try {
 			Cursor cDishes = mDb.query(TABLE_DISHES, new String[] {KEY_ID}, null, null, null,
 					null, null);
+			
 			if (cDishes.moveToFirst()) {
+				
 				do {
 					Cursor cMenu = mDb.query(TABLE_MENU,
 							new String[] {KEY_ID}, MENU_DISH_ID + " = ?",
 							new String[] {cDishes.getString(0)}, null, null, null, "1");
+					
 					if (cMenu.getCount() > 0) {
 						continue;
 					} else {
 						Cursor cOrders = mDb.query(TABLE_ORDERS,
 								new String[] {KEY_ID}, ORDERS_DISH_ID + " = ?",
 								new String[] {cDishes.getString(0)}, null, null, null, "1");
+						
 						if (cOrders.getCount() > 0) {
 							continue;
 						} else {
 							mDb.delete(TABLE_DISHES, KEY_ID + " = ?",
-									new String[] {cDishes.getString(0)});
-							Log.i(LOG_TAG, "[DB] Удаление неиспользуемого блюда (ID: "
-									+ cDishes.getString(0) + ")");
+									new String[] {cDishes.getString(0)});							
+							Log.i(LOG_TAG, "[DB] Deleting unused dish (ID: "
+									+ cDishes.getString(0) + ")");							
 							count++;
 						}
 						cOrders.close();
+						
 					}
 					cMenu.close();
+					
 				} while (cDishes.moveToNext());
 			}
 			cDishes.close();
@@ -235,18 +242,18 @@ public class DBManager extends SQLiteOpenHelper {
 			mDb.endTransaction();
 			
 			if (count > 0)
-				Log.i(LOG_TAG, "[DB] Всего удалено блюд: " + Integer.toString(count));
+				Log.i(LOG_TAG, "[DB] Total dishes deleted: " + Integer.toString(count));
 		}
 	}
 	
 	
-	// Меню
+	// Menu
 	
 	/**
-	 * Добавляет меню
+	 * Adds menu
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public void addMenu(List<RarusMenu> menu) {
 		StringBuilder query = new StringBuilder();
@@ -296,16 +303,15 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Добавлено меню (" + Integer.toString(menu.size()) + ")");
+			Log.i(LOG_TAG, "[DB] Added menus (" + Integer.toString(menu.size()) + ")");
 		}
 	}
 	
 	/**
-	 * Возвращает список дат на которые доступно меню
+	 * Returns a list of the dates on which menu is available
 	 * 
 	 * @return
-	 *     {@link List} из {@link Integer} Unix time дат.
-	 *     Даты в Unix time формате. Отсортированы по возрастанию.
+	 *     {@link List} of {@link Integer} Unix time dates sorted in ascending order.
 	 */
 	public List<Integer> getMenuDates() {
 		List<Integer> result = new ArrayList<Integer>();
@@ -331,12 +337,12 @@ public class DBManager extends SQLiteOpenHelper {
 	
 		
 	/**
-	 * Возвращает меню на определенную дату
+	 * Returns the menu at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public List<RarusMenu> getMenuAtDate(int date) {
 		StringBuilder query = new StringBuilder();
@@ -373,12 +379,12 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Возвращает временной штамп меню на определенную дату
+	 * Returns the timestamp of the menu at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date
 	 * @return
-	 *     временной штамп
+	 *     timestamp
 	 */
 	public int getMenuTimestamp(int date) {
 		int result = 0;
@@ -398,10 +404,10 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Удаляет меню на определенную дату
+	 * Removes the menu at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date
 	 */
 	public void deleteMenuAtDate(int date) {
 		mDb.beginTransaction();
@@ -412,12 +418,12 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Удалено меню (Дата = " + Integer.toString(formatDate(date)) + ")");
+			Log.i(LOG_TAG, "[DB] Deleted menu at date " + Integer.toString(formatDate(date)));
 		}
 	}
 	
 	/**
-	 * Удаляет все меню
+	 * Removes all menus
 	 */
 	public void deleteMenuAll() {
 		mDb.beginTransaction();
@@ -427,18 +433,18 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Удалены все меню");
+			Log.i(LOG_TAG, "[DB] Deleted all menus");
 		}
 	}
 	
 	
-	// Заказы
+	// Orders
 	
 	/**
-	 * Добавляет заказы
+	 * Adds orders
 	 * 
 	 * @param orders
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} of {@link Order} objects
 	 */
 	public void addOrder(List<Order> orders) {
 		StringBuilder query = new StringBuilder();
@@ -502,16 +508,15 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Добавлены заказы (" + Integer.toString(orders.size()) + ")");
+			Log.i(LOG_TAG, "[DB] Added orders (" + Integer.toString(orders.size()) + ")");
 		}
 	}
 	
 	/**
-	 * Возвращает список дат на которые имеются заказы
+	 * Returns a list of the dates on which there are orders
 	 * 
 	 * @return
-	 *     {@link List} из {@link Integer} Unix time дат.
-	 *     Даты в Unix time формате. Отсортированы по возрастанию.
+	 *     {@link List} of {@link Integer} Unix time dates sorted in ascending order.
 	 */
 	public List<Integer> getOrdersDates() {
 		List<Integer> result = new ArrayList<Integer>();
@@ -536,10 +541,10 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Возвращает все заказы
+	 * Returns all orders
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} of {@link Order} objects
 	 */
 	public List<Order> getOrdersAll() {
 		StringBuilder query = new StringBuilder();
@@ -578,12 +583,12 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Возвращает заказы на определенную дату
+	 * Returns orders at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date
 	 * @return
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} of {@link Order} objects
 	 */
 	public List<Order> getOrdersAtDate(int date) {
 		StringBuilder query = new StringBuilder();
@@ -621,10 +626,10 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Возвращает ещё не отправленные заказы
+	 * Returns not sent orders
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public List<RarusMenu> getOrdersNotExecuted() {
 		StringBuilder query = new StringBuilder();
@@ -660,10 +665,10 @@ public class DBManager extends SQLiteOpenHelper {
 	}
 		
 	/**
-	 * Удаляет заказы на определенную дату
+	 * Removes orders at a given date
 	 *  
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date
 	 */
 	public void deleteOrdersAtDate(int date) {
 		int count = 0;
@@ -687,13 +692,13 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Удалены заказы и заголовки заказов (" + count + ") на дату ("
+			Log.i(LOG_TAG, "[DB] Deleted orders (" + count + ") at date ("
 					+ formatDate(date) + ")");
 		}
 	}
 	
 	/**
-	 * Удаляет все заказы
+	 * Removes all orders
 	 */
 	public void deleteOrdersAll() {
 		mDb.beginTransaction();
@@ -705,18 +710,18 @@ public class DBManager extends SQLiteOpenHelper {
 		} finally {
 			mDb.endTransaction();
 			
-			Log.i(LOG_TAG, "[DB] Удалены все заказы и заголовки заказов");
+			Log.i(LOG_TAG, "[DB] Deleted all orders");
 		}
 	}
 	
 	
 	/**
-	 * Округляет время указанное в Unix time до 00:00
+	 * Rounds the time specified in the Unix time format to 00:00
 	 * 
 	 * @param date
-	 *    дата в Unix time формате
+	 *   Unix time date
 	 * @return
-	 *    округлённая дата в Unix time формате
+	 *    rounded date in Unix time format
 	 */
 	private int formatDate(int date) {
 		return date = date - (date % 86400);
