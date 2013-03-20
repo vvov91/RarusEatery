@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import rarus.eatery.database.DBManager;
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
@@ -126,11 +127,13 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.GET_MENU_CODE, null));
 	}
 
-	public void setOrder() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Set order");
+	public void setMenu() {
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Set menu");
 		api = new ServiceAPI(this,
 				PreferenceManager.getDefaultSharedPreferences(this));
-		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, null));
+	    mDBManager =  new EateryDB(getApplicationContext());
+	    List<RarusMenu> orders=mDBManager.getOrdersNotExecuted();
+		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, orders));
 	}
 
 	private void writeToDB(List<RarusMenu> menu) {
