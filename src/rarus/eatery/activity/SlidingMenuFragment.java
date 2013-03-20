@@ -57,6 +57,8 @@ public class SlidingMenuFragment extends Fragment {
 			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
 			ra.switchContent(position);
 		}
+		customMenuListAdapter.setSelected(position);
+		customMenuListAdapter.notifyDataSetChanged();
 	}
 
 	// public void markListElement(int pos) {

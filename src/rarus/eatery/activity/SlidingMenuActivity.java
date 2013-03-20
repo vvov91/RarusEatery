@@ -59,12 +59,16 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
+		if (savedInstanceState != null)
+			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
+		else
+			this.mEDB = new EateryDB(getApplicationContext());
 
 		// show home as up so we can toggle
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		// getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setBehindContentView(R.layout.sliding_menu);
-		getSlidingMenu().setSlidingEnabled(true);
+		// getSlidingMenu().setSlidingEnabled(true);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 
 		// customize the SlidingMenu
@@ -75,17 +79,19 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		sm.setBehindScrollScale(0.25f);
 		sm.setFadeDegree(0.25f);
 
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, new FirstRunFragment()).commit();
+		if (mEDB.getMenuDates().size() == 0) {
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, new FirstRunFragment())
+					.commit();
+			getSlidingMenu().setSlidingEnabled(false);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-		if (savedInstanceState != null) {
-			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
+		} else {
 			makeFragments();
 			switchContent(mCurrentFragmentId);
-		} else {
-			// client.getMenu();
+			getSlidingMenu().setSlidingEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
-
 	}
 
 	public void switchContent(final int possition) {
@@ -170,7 +176,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		// системное меню
 		MenuItem mi = menu.add(0, 1, 0, "Настройки");
-		//mi.setIntent(new Intent(this, SettingsActivity.class));
+		// mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
 		menu.add(0, 2, 0, "Save").setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -232,7 +238,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity onServiceConnected");
 				client = ((EateryWebService.EateryServiceBinder) binder)
 						.getService();
-				client.getMenu();
+				// client.getMenu();
 			}
 
 			public void onServiceDisconnected(ComponentName name) {
