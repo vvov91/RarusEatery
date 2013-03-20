@@ -17,7 +17,6 @@ import rarus.eatery.model.RarusMenu;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.Xml;
-import android.view.MenuItem;
 
 /**
  * Класс с набюором статических методов для формирования XML запросов и разбора
@@ -99,6 +98,59 @@ public class XMLParser {
 		}
 	}
 
+	public static String setMenuXMLRequest(SharedPreferences sp,List<RarusMenu> orders){
+		XmlSerializer sz = Xml.newSerializer();
+		StringWriter writer = new StringWriter();
+		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
+		try {
+			sz.setOutput(writer);
+			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
+			sz.setPrefix("mob", EateryConstants.MOB_PREFIX);
+			sz.startTag(EateryConstants.SOAP_PREFIX, "Envelope");
+			sz.startTag(EateryConstants.SOAP_PREFIX, "Header");
+			sz.endTag(EateryConstants.SOAP_PREFIX, "Header");
+			sz.startTag(EateryConstants.SOAP_PREFIX, "Body");
+			sz.startTag(EateryConstants.MOB_PREFIX, "setMenu");
+			sz.startTag(EateryConstants.MOB_PREFIX, "loginStructure");
+			sz.startTag(EateryConstants.MOB_PREFIX, "cardNumber");
+			sz.text(cardCode);
+			sz.endTag(EateryConstants.MOB_PREFIX, "cardNumber");
+			sz.endTag(EateryConstants.MOB_PREFIX, "loginStructure");
+			for(RarusMenu dish:orders){
+				sz.startTag(EateryConstants.MOB_PREFIX, "orderStructure");
+				
+				sz.startTag(EateryConstants.MOB_PREFIX, "data");
+				sz.text(Integer.toString(dish.getDate()));
+				sz.endTag(EateryConstants.MOB_PREFIX, "data");
+				
+				
+				sz.startTag(EateryConstants.MOB_PREFIX, "dishId");
+				sz.text(dish.getDishId());
+				sz.endTag(EateryConstants.MOB_PREFIX, "dishId");
+				
+				sz.startTag(EateryConstants.MOB_PREFIX, "timestamp");
+				sz.text(Integer.toString(dish.getTimestamp()));
+				sz.endTag(EateryConstants.MOB_PREFIX, "timestamp");
+				
+				sz.startTag(EateryConstants.MOB_PREFIX, "ammount");
+				sz.text(Float.toString(dish.getAmmount()));
+				sz.endTag(EateryConstants.MOB_PREFIX, "ammount");				
+				
+				sz.endTag(EateryConstants.MOB_PREFIX, "orderStructure");
+			}
+			sz.endTag(EateryConstants.MOB_PREFIX, "setMenu");
+			sz.endTag(EateryConstants.SOAP_PREFIX, "Body");
+			sz.endTag(EateryConstants.SOAP_PREFIX, "Envelope");
+			sz.endDocument();
+			return writer.toString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	public static List<RarusMenu> parseXMLSetOrder(String xml){
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted setMenu response xml:\n"+ xml);
+		return null;
+	}
 	public static String parseXMLPing(String xml) {
 		try {
 			Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted ping xml:\n"+ xml);
@@ -275,7 +327,7 @@ public class XMLParser {
 			return null;
 		}
 	}
-
+	
 	private static Integer dateToUnix(String date) {
 		Date d = new Date(Integer.parseInt(date.substring(0, 4)) - 1900,
 				Integer.parseInt(date.substring(5, 7)) - 1,

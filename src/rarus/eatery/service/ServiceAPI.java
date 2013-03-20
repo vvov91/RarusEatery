@@ -30,10 +30,12 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	protected APIMessage doInBackground(APIMessage... params) {
 		successfull = false;		
 		APIMessage result = null;
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - execute start");
 		if (!connectionTest()) {
 			result = new APIMessage(EateryConstants.PING_CODE, null);
 			return result;
 		}
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - good connection");
 		switch (params[0].getCode()) {
 		case EateryConstants.GET_MENU_CODE: {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - getMenuCode");
@@ -42,7 +44,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 			break;
 		case EateryConstants.SET_ORDER_CODE: {
 			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - setOrderCode");
-			result = new APIMessage(EateryConstants.SET_ORDER_CODE, setOrder());
+			result = new APIMessage(EateryConstants.SET_ORDER_CODE, setOrder((List<RarusMenu>)params[0].getContent()));
 		}
 			break;
 
@@ -106,12 +108,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 	private List<RarusMenu> getMenu() {
 		String xml = XMLParser.getMenuXMLRequest(sp);
-		List<RarusMenu> menu = null;
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Login "
-				+ EateryConstants.SERV_LOGIN);
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - Pass "
-				+ EateryConstants.SERV_PASSWORD);
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getting xml");
+		List<RarusMenu> menu = null;		
 		HTTPPostRequest request = new HTTPPostRequest(URL,
 				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Getted xml");
@@ -135,8 +132,30 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		return menu;
 	}
 
-	private Object setOrder() {
-		return null;
+	private Object setOrder(List<RarusMenu> orders) {
+		List<RarusMenu> menu = null;
+		String xml = XMLParser.setMenuXMLRequest(sp,orders);
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[API] - setOrder xml:\n"+xml);
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - setOrder request");
+		HTTPPostRequest request = new HTTPPostRequest(URL,
+				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - setOrder request sent");
+		
+		if (!request.getResult().equals("")
+				&& !request.getResult().startsWith("<html>")) {
+			menu = XMLParser.parseXMLSetOrder(request.getResult());			
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - result successfull");
+			successfull = true;
+		} else {
+			Log.d(EateryConstants.SERVICE_LOG_TAG,
+					"[API] - Error:\n"
+							+ (request.getResult().startsWith("<html>") ? request
+									.getResult() : request.getError()));
+			successfull = false;
+			Log.d(EateryConstants.SERVICE_LOG_TAG, "[API] - Process error");
+			processError(request.getResult(), request.getError());
+		}
+		return menu;
 	}
 
 	private void processError(String result, String error) {

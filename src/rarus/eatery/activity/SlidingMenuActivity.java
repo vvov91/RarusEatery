@@ -223,9 +223,14 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	// method to display the menu (link in the layout)
 	public void onRefreshClick(View v) {
+<<<<<<< HEAD
 		client.getMenu();
 		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
 	}
+=======
+		client.update();
+		Toast.makeText(getBaseContext(), "Синхронизация с сервисом...", 3).show();
+>>>>>>> Develope
 
 	// method to display the menu (link in the layout)
 	public void onMenuClick(View v) {

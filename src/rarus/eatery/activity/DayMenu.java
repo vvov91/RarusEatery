@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import rarus.eatery.R;
+import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.RarusMenu;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -84,7 +85,9 @@ public class DayMenu extends Fragment implements Parcelable {
 	}
 
 	public void saveOrder() {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		EateryDB db = new EateryDB(getView().getContext());
+		db.saveMenu(mRarusMenu);
+		/*DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		Date dateDate = null;
 		try {
 			dateDate = df.parse(mStringDate);
@@ -98,7 +101,7 @@ public class DayMenu extends Fragment implements Parcelable {
 		// db.deleteMenuAtDate(dateInt);
 		// db.addMenu(dateInt, mRarusMenues);
 		// db.addOrder(dateInt, mRarusMenues);
-		// // MainActivity.changedOrderedAmount = false;
+		// // MainActivity.changedOrderedAmount = false;*/		
 		Toast.makeText(getView().getContext(), "заказ сохранен", 3).show();
 
 	}
