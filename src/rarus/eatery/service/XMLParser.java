@@ -147,7 +147,10 @@ public class XMLParser {
 			return null;
 		}
 	}
-	
+	public static List<RarusMenu> parseXMLSetOrder(String xml){
+		Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted setMenu response xml:\n"+ xml);
+		return null;
+	}
 	public static String parseXMLPing(String xml) {
 		try {
 			Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted ping xml:\n"+ xml);

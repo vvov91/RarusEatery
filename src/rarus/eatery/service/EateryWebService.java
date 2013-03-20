@@ -1,10 +1,8 @@
 package rarus.eatery.service;
 
-import java.util.Date;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import rarus.eatery.database.DBManager;
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
