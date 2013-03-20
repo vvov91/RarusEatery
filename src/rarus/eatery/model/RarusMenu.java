@@ -4,25 +4,25 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Объект элемент меню
+ * Menu item object
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
 public class RarusMenu implements Parcelable{
-	private int mId;					// id меню
-	private int mDate;					// дата, на которую это меню
-	private String mDishId;				// id блюда, находящегося в меню
-	private String mName;				// название блюда
-	private String mDescription;		// описание блюда
-	private boolean mPortioned;			// флаг порционности блюда
-	private float mPrice;				// цена блюда
-	private String mRating;				// рейтинг блюда
-	private boolean mPreorder;			// флаг возможности предзаказа блюда
-	private float mAvailable;			// объём доступный для заказа
-	private float mAmmount;				// объём заказанного 
-	private boolean mModified;			// флаг состояния изменения меню
-	private int mTimestamp;				// временной штамп меню
+	private int mId;					// menu id
+	private int mDate;					// menu date
+	private String mDishId;				// dish id, which is in this menu
+	private String mName;				// dish name
+	private String mDescription;		// dish description
+	private boolean mPortioned;			// portion flag
+	private float mPrice;				// dish price
+	private String mRating;				// dish rating
+	private boolean mPreorder;			// preorder flag
+	private float mAvailable;			// available to order amount of dish 
+	private float mAmmount;				// ordered amount
+	private boolean mModified;			// modified flag
+	private int mTimestamp;				// timestamp
 	
 	public RarusMenu(int mId, int mDate, String mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
@@ -66,7 +66,8 @@ public class RarusMenu implements Parcelable{
 		parcel.writeInt(mTimestamp);
 	}
 
-	public static final Parcelable.Creator<RarusMenu> CREATOR = new Parcelable.Creator<RarusMenu>() {
+	public static final Parcelable.Creator<RarusMenu> CREATOR = 
+			new Parcelable.Creator<RarusMenu>() {
 		public RarusMenu createFromParcel(Parcel in) {
 			return new RarusMenu(in);
 		}

@@ -81,6 +81,7 @@ public class DishAdapter extends BaseAdapter {
 				else
 					orderedAmmount = 0;
 				p.setAmmount(orderedAmmount);
+				p.setModified(true);
 				notifyDataSetChanged();
 				// MainActivity.changedOrderedAmount=true;
 			}
@@ -102,6 +103,7 @@ public class DishAdapter extends BaseAdapter {
 									+ Float.toString(p.getAvailable()), 3)
 							.show();
 				p.setAmmount(orderedAmmount);
+				p.setModified(true);
 				// MainActivity.changedOrderedAmount=true;
 				notifyDataSetChanged();
 			}
