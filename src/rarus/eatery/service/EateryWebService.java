@@ -140,13 +140,14 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api = new ServiceAPI(this,
 				PreferenceManager.getDefaultSharedPreferences(this));
 	    mDBManager =  new EateryDB(getApplicationContext());
-	    List<RarusMenu> orders=mDBManager.getOrdersNotExecuted();
+	    List<RarusMenu> orders=mDBManager.getOrdersNotSent();
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, orders));
 	}
 
 	private void writeToDB(List<RarusMenu> menu) {		
 		mDBManager = new EateryDB(getApplicationContext());
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Запись меню в БД ");
+		mDBManager.deleteMenu();
 		mDBManager.saveMenu(menu);	
 	}
 
