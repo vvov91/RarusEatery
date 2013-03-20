@@ -122,8 +122,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				.getParcelableArrayListExtra(DishPageView.LIST_DAY_MENU);
 		DayMenu tempDM = fragments.get(mCurrentFragmentId);
 		tempDM.mRarusMenu = tempRM;
-		Log.d("int", "curday" + mCurrentFragmentId);
-		Log.d("int", "curday" + fragments.get(mCurrentFragmentId).mStringDate);
 		tempDM.refreshAdapter();
 	}
 
@@ -136,10 +134,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			DayMenu dm = new DayMenu();
 			dm.mRarusMenu = (ArrayList<RarusMenu>) mEDB.getMenu(date);
 			java.util.Date d = new Date(((long) date.intValue()) * 1000);
-			
-			Locale locale = new Locale("ru","RU");
-			
-			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM",locale);
+
+			Locale locale = new Locale("ru", "RU");
+
+			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM", locale);
 			String reportDate = df.format(d);
 			dm.mStringDate = reportDate;
 			datesString.add(dm.mStringDate);
@@ -196,7 +194,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		case android.R.id.home:
 			toggle();
 
-		case 2:
+		case 2: {
+			Log.d("int", "" + mEDB.getOrdersNotSent().size());
+			Log.d("int", "" + mEDB.getOrdersNotSent().get(0).getDate());
+		}
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -221,16 +222,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onDestroy();
 	}
 
-	// method to display the menu (link in the layout)
+	// method for synchronizing the menu (link in the layout)
 	public void onRefreshClick(View v) {
-<<<<<<< HEAD
-		client.getMenu();
-		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
-	}
-=======
 		client.update();
-		Toast.makeText(getBaseContext(), "Синхронизация с сервисом...", 3).show();
->>>>>>> Develope
+		Toast.makeText(getBaseContext(), "Синхронизация с сервисом...", 3)
+				.show();
+	}
 
 	// method to display the menu (link in the layout)
 	public void onMenuClick(View v) {

@@ -1,8 +1,5 @@
 package rarus.eatery.activity;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -87,21 +84,6 @@ public class DayMenu extends Fragment implements Parcelable {
 	public void saveOrder() {
 		EateryDB db = new EateryDB(getView().getContext());
 		db.saveMenu(mRarusMenu);
-		/*DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateDate = null;
-		try {
-			dateDate = df.parse(mStringDate);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		// TODO EateryDBManager db = new
-		// EateryDBManager(getView().getContext());
-		// db.open();
-		// int dateInt = (int) (dateDate.getTime() / 1000) + 7200;
-		// db.deleteMenuAtDate(dateInt);
-		// db.addMenu(dateInt, mRarusMenues);
-		// db.addOrder(dateInt, mRarusMenues);
-		// // MainActivity.changedOrderedAmount = false;*/		
 		Toast.makeText(getView().getContext(), "заказ сохранен", 3).show();
 
 	}
