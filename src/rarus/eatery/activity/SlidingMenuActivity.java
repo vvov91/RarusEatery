@@ -37,9 +37,6 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		OnNavigationListener {
 
-	final String TAG = "Main";
-	final String LOG_TAG = "Main";
-
 	Intent serviceIntent;
 	ServiceConnection connection;
 	EateryWebService client;
@@ -63,14 +60,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
 		else
 			this.mEDB = new EateryDB(getApplicationContext());
-
-		// show home as up so we can toggle
-		// getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 		setBehindContentView(R.layout.sliding_menu);
-		// getSlidingMenu().setSlidingEnabled(true);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-
 		// customize the SlidingMenu
 		SlidingMenu sm = getSlidingMenu();
 		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
@@ -78,14 +69,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		sm.setShadowDrawable(R.drawable.shadow);
 		sm.setBehindScrollScale(0.25f);
 		sm.setFadeDegree(0.25f);
-
 		if (mEDB.getMenuDates().size() == 0) {
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, new FirstRunFragment())
 					.commit();
 			getSlidingMenu().setSlidingEnabled(false);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
 		} else {
 			makeFragments();
 			switchContent(mCurrentFragmentId);
@@ -112,11 +101,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void onDishPressed(int dayId, int dishId) {
+
 		Intent intent = new Intent(this, DishPageView.class);
-		intent.putExtra("dishId", dishId);
-		intent.putExtra("dayId", dayId);
+		intent.putExtra(DishPageView.DISH_ID, dishId);
+		intent.putExtra(DishPageView.DAY_ID, dayId);
 		DayMenu dm = (DayMenu) fragments.get(dayId);
-		intent.putExtra(DayMenu.class.getCanonicalName(), dm);
+		intent.putExtra(DishPageView.LIST_DAY_MENU, dm.mRarusMenu);
 		startActivityForResult(intent, 1);
 	}
 
@@ -125,10 +115,14 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		if (data == null) {
 			return;
 		}
-		DayMenu dm = (DayMenu) data.getParcelableExtra(DayMenu.class
-				.getCanonicalName());
-		int dayId = data.getIntExtra("dayId", -1);
-		fragments.set(dayId, dm);
+		int dayId = data.getIntExtra(DishPageView.DAY_ID, -1);
+		ArrayList<RarusMenu> tempRM = data
+				.getParcelableArrayListExtra(DishPageView.LIST_DAY_MENU);
+		DayMenu tempDM = fragments.get(mCurrentFragmentId);
+		tempDM.mRarusMenu = tempRM;
+		Log.d("int", "curday" + mCurrentFragmentId);
+		Log.d("int", "curday" + fragments.get(mCurrentFragmentId).mStringDate);
+		tempDM.refreshAdapter();
 	}
 
 	public void makeFragments() {
@@ -194,7 +188,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			toggle();
+
+		case 2:
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -206,21 +203,21 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	protected void onStart() {
 		super.onStart();
 		bindService(serviceIntent, connection, 0);
-		Log.d(TAG, "MainActivity: onStart()");
+		Log.d(getClass().getName(), "MainActivity: onStart()");
 	}
 
 	@Override
 	protected void onDestroy() {
 		unbindService(connection);
 		unregisterReceiver(receiver);
-		Log.d(TAG, "MainActivity: onDestroy()");
+		Log.d(getClass().getName(), "MainActivity: onDestroy()");
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		Log.d(TAG, "MainActivity: onStop()");
+		Log.d(getClass().getName(), "MainActivity: onStop()");
 	}
 
 	public void onRefreshClick(View v) {

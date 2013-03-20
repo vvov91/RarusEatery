@@ -50,7 +50,7 @@ public class DishAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
-
+	
 	// пункт списка
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

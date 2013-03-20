@@ -7,6 +7,7 @@ import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,23 +17,29 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class DishPageView extends SherlockFragmentActivity {
 	PagerAdapter mPageAdapter;
-	DayMenu mDayMenu;
+	//DayMenu mDayMenu;
 	int mDayId;
+	List<RarusMenu> mMenu;
+
+	public static final String DISH_ID = "dishId";
+	public static final String DAY_ID = "dayId";
+	public static final String LIST_DAY_MENU = "listDayMenu";
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dish_viewpager);
 		Intent intent = getIntent();
-		int dishId = intent.getIntExtra("dishId", -1);
-		mDayId=intent.getIntExtra("dayId", -1);
+		int dishId = intent.getIntExtra(DISH_ID, -1);
+		mDayId = intent.getIntExtra(DAY_ID, -1);
 		if (savedInstanceState != null)
-			mDayMenu = (DayMenu) getLastCustomNonConfigurationInstance();
+			mMenu = (List<RarusMenu>) getLastCustomNonConfigurationInstance();
 		else
-			mDayMenu = (DayMenu) getIntent().getParcelableExtra(
-					DayMenu.class.getCanonicalName());
+			mMenu = getIntent().getParcelableArrayListExtra(LIST_DAY_MENU);
 		List<Fragment> fragments = new ArrayList<Fragment>();
-		List<RarusMenu> menu = mDayMenu.mRarusMenu;
-		for (RarusMenu m : menu) {
+		//mMenu = mDayMenu.mRarusMenu;
+		for (RarusMenu m : mMenu) {
 			DishPageViewFragment dpvp = new DishPageViewFragment();
 			dpvp.p = m;
 			fragments.add(dpvp);
@@ -44,7 +51,7 @@ public class DishPageView extends SherlockFragmentActivity {
 		pager.setAdapter(mPageAdapter);
 		pager.setCurrentItem(dishId);
 
-		setTitle(mDayMenu.mStringDate);
+		//TODO setTitle(mDayMenu.mStringDate);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().show();
 	}
@@ -72,7 +79,7 @@ public class DishPageView extends SherlockFragmentActivity {
 
 	@Override
 	public Object onRetainCustomNonConfigurationInstance() {
-		return mDayMenu;
+		return mMenu;
 	}
 
 	@Override
@@ -84,8 +91,10 @@ public class DishPageView extends SherlockFragmentActivity {
 	public void onBackPressed() {
 		// super.onBackPressed();
 		Intent intent = new Intent();
-		intent.putExtra(DayMenu.class.getCanonicalName(), mDayMenu);
-		intent.putExtra("dayId", mDayId);
+		// intent.putExtra(DayMenu.class.getCanonicalName(), mDayMenu);
+		intent.putParcelableArrayListExtra(LIST_DAY_MENU, (ArrayList<? extends Parcelable>) mMenu);
+		
+		intent.putExtra(DAY_ID, mDayId);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
