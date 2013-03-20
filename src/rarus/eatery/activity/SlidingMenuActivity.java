@@ -218,8 +218,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void onRefreshClick(View v) {
-		client.getMenu();
-		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
+		client.update();
+		Toast.makeText(getBaseContext(), "Синхронизация с сервисом...", 3).show();
 
 	}
 
