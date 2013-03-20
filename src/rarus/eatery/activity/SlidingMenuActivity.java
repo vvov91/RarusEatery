@@ -42,6 +42,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	EateryWebService client;
 	BroadcastReceiver receiver;
 
+	SlidingMenuFragment mSlidingMenuFragment;
 	EateryDB mEDB;
 	SharedPreferences sp;
 	int mCurrentFragmentId = 0;
@@ -83,12 +84,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}
 	}
 
-	public void switchContent(final int possition) {
+	public void switchContent(final int position) {
 		// смена основного фрагмента
-		mCurrentFragmentId = possition;
+		mCurrentFragmentId = position;
 		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, fragments.get(possition)).commit();
-		// getSupportActionBar().setTitle(datesString.get(possition));
+				.replace(R.id.content_frame, fragments.get(position)).commit();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
@@ -96,12 +96,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				getSlidingMenu().showContent();
 			}
 		}, 50);
-		getSupportActionBar().setSelectedNavigationItem(possition);
+		getSupportActionBar().setSelectedNavigationItem(position);
 
 	}
 
 	public void onDishPressed(int dayId, int dishId) {
-
 		Intent intent = new Intent(this, DishPageView.class);
 		intent.putExtra(DishPageView.DISH_ID, dishId);
 		intent.putExtra(DishPageView.DAY_ID, dayId);
@@ -140,13 +139,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			dm.mPos = fragments.size();
 			fragments.add(dm);
 		}
-		getSupportFragmentManager()
-				.beginTransaction()
-				.replace(
-						R.id.rootlayout,
-						new SlidingMenuFragment((ArrayList<String>) datesString))
-				.commit();
-
+		mSlidingMenuFragment = new SlidingMenuFragment((ArrayList<String>) datesString);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
 		ArrayAdapter<String> list = new ArrayAdapter<String>(
 				getSupportActionBar().getThemedContext(),
@@ -161,9 +156,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		return mEDB;
 	}
 
+	//list navigation list
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// выпадающая навигация
 		switchContent(itemPosition);
+		mSlidingMenuFragment.setSelectedItem(itemPosition);
 		return true;
 	}
 
@@ -214,11 +211,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onDestroy();
 	}
 
+	// method to display the menu (link in the layout)
 	public void onRefreshClick(View v) {
 		client.getMenu();
 		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
 	}
 
+	// method to display the menu (link in the layout)
 	public void onMenuClick(View v) {
 		openOptionsMenu();
 	}
@@ -232,7 +231,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity onServiceConnected");
 				client = ((EateryWebService.EateryServiceBinder) binder)
 						.getService();
-				// client.getMenu();
 			}
 
 			public void onServiceDisconnected(ComponentName name) {

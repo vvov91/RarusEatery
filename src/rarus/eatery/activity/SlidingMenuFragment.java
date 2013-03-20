@@ -34,10 +34,8 @@ public class SlidingMenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
-
 		customMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
 				mDatesString);
-
 		slidingMenuLV = (ListView) v.findViewById(R.id.lv);
 		slidingMenuLV.setAdapter(customMenuListAdapter);
 		slidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
@@ -57,22 +55,10 @@ public class SlidingMenuFragment extends Fragment {
 			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
 			ra.switchContent(position);
 		}
+	}
+
+	public void setSelectedItem(int position) {
 		customMenuListAdapter.setSelected(position);
 		customMenuListAdapter.notifyDataSetChanged();
 	}
-
-	// public void markListElement(int pos) {
-	// // if (mPreviousPossition != -2)
-	// System.out.println("markListElement" + pos);
-	// System.out.println("slidingMenuLV.getChildCount()"
-	// + slidingMenuLV.getChildCount());
-	//
-	// for (int i = 0; i < slidingMenuLV.getChildCount(); i++) {
-	// System.out.println("for" + i);
-	//
-	// slidingMenuLV.getChildAt(i).setBackgroundColor(0xFFffffff);
-	// }
-	// slidingMenuLV.getChildAt(pos).setBackgroundColor(0xFF808080);
-	// }
-
 }
