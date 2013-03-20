@@ -214,16 +214,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onDestroy();
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		Log.d(getClass().getName(), "MainActivity: onStop()");
-	}
-
 	public void onRefreshClick(View v) {
 		client.getMenu();
 		Toast.makeText(getBaseContext(), "Обновление меню...", 3).show();
+	}
 
+	public void onMenuClick(View v) {
+		openOptionsMenu();
 	}
 
 	private void startService() {
