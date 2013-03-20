@@ -41,6 +41,7 @@ public class DishPageViewFragment extends Fragment {
 				else
 					orderedAmmount = 0;
 				p.setAmmount(orderedAmmount);
+				p.setModified(true);
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();
@@ -64,6 +65,7 @@ public class DishPageViewFragment extends Fragment {
 									+ Float.toString(p.getAvailable()), 3)
 							.show();
 				p.setAmmount(orderedAmmount);
+				p.setModified(true);
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();

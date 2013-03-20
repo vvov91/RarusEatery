@@ -1,25 +1,25 @@
 package rarus.eatery.model;
 
 /**
- * Объект элемент заказа
+ * Order item object
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
 public class Order {
-	private int mId;					// служебный id
-	private int mOrderId;				// id заказа
-	private String mDishId;				// id блюда, находящегося в заказе
-	private String mName;				// название блюда
-	private String mDescription;		// описание блюда
-	private boolean mPortioned;			// флаг порционности блюда
-	private float mPrice;				// цена блюда
-	private String mRating;				// рейтинг блюда
-	private boolean mPreorder;			// флаг возможности предзаказа блюда
-	private float mAmmount;				// объём заказанного 
-	private float mSum;					// сумма по заказу
-	private int mExecutionDate;			// дата выполнения заказа
-	private String mOrderSrvNumber;		// номер заказа на сервере
+	private int mId;					// service id
+	private int mOrderId;				// order id
+	private String mDishId;				// dish id, which is in this order
+	private String mName;				// dish name
+	private String mDescription;		// dish description
+	private boolean mPortioned;			// portion flag
+	private float mPrice;				// dish price
+	private String mRating;				// dish rating
+	private boolean mPreorder;			// preorder flag
+	private float mAmmount;				// ordered amount 
+	private float mSum;					// ordered sum
+	private int mExecutionDate;			// order execution date
+	private String mOrderSrvNumber;		// order number stored on server
 	
 	public Order(int mId, int mOrderId, String mDishId, String mName, String mDescription,
 			boolean mPortioned, float mPrice, String mRating,
@@ -117,7 +117,6 @@ public class Order {
 		return mOrderSrvNumber;
 	}
 	public void setOrderSrvNumber(String mOrderSrvNumber) {
-
 		this.mOrderSrvNumber = mOrderSrvNumber;
 	}
 }
