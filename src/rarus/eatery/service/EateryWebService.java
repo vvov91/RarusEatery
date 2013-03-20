@@ -52,6 +52,9 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
+				Log.d(EateryConstants.SERVICE_LOG_TAG,
+						"[SERVICE] - Order succssessfuly send");
+				getMenu();
 			}
 				break;
 			}
@@ -119,7 +122,12 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		super.onDestroy();
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - onDestroy");
 	}
-
+	
+	public void update(){
+		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Starting update");	
+		setMenu();		
+	}
+	
 	public void getMenu() {
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Get menu");
 		api = new ServiceAPI(this,
