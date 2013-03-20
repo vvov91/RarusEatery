@@ -136,30 +136,10 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, orders));
 	}
 
-	private void writeToDB(List<RarusMenu> menu) {
-		Log.d(EateryConstants.SERVICE_LOG_TAG,
-				"[SERVICE]:  Блюда для загрузки в БД");
-
-		for (RarusMenu m : menu) {
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: " + m.toString());
-		}
+	private void writeToDB(List<RarusMenu> menu) {		
 		mDBManager = new EateryDB(getApplicationContext());
 		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Запись меню в БД ");
-		mDBManager.saveMenu(menu);
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Получение дат из ДБ");
-		List<Integer> dates = mDBManager.getMenuDates();
-		for (Integer d : dates) {
-			java.util.Date date = new Date((long) d * 1000);
-			Log.d(EateryConstants.SERVICE_LOG_TAG,
-					"[SERVICE]: Дата" + date.toString());
-			menu=mDBManager.getMenu(d);
-			for(RarusMenu m:menu ){
-				Log.i(EateryConstants.SERVICE_LOG_TAG,
-						"[SERVICE]  меню "+ m.toString()) ;
-			}
-		}
-		
-
+		mDBManager.saveMenu(menu);	
 	}
 
 	public class EateryServiceBinder extends Binder {
