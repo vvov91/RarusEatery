@@ -5,8 +5,11 @@ package rarus.eatery.activity;
  * В нем содержится фрагмент меню на день 
  */
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import rarus.eatery.R;
 import rarus.eatery.database.EateryDB;
@@ -70,17 +73,18 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		sm.setShadowDrawable(R.drawable.shadow);
 		sm.setBehindScrollScale(0.25f);
 		sm.setFadeDegree(0.25f);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().hide();
+
 		if (mEDB.getMenuDates().size() == 0) {
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, new FirstRunFragment())
 					.commit();
 			getSlidingMenu().setSlidingEnabled(false);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 		} else {
 			makeFragments();
 			switchContent(mCurrentFragmentId);
-			getSlidingMenu().setSlidingEnabled(true);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		}
 	}
 
@@ -103,9 +107,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageView.class);
 		intent.putExtra(DishPageView.DISH_ID, dishId);
-		intent.putExtra(DishPageView.DAY_ID, dayId);
 		DayMenu dm = (DayMenu) fragments.get(dayId);
 		intent.putExtra(DishPageView.LIST_DAY_MENU, dm.mRarusMenu);
+		intent.putExtra(DishPageView.DATE, dm.mStringDate);
 		startActivityForResult(intent, 1);
 	}
 
@@ -114,7 +118,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		if (data == null) {
 			return;
 		}
-		int dayId = data.getIntExtra(DishPageView.DAY_ID, -1);
 		ArrayList<RarusMenu> tempRM = data
 				.getParcelableArrayListExtra(DishPageView.LIST_DAY_MENU);
 		DayMenu tempDM = fragments.get(mCurrentFragmentId);
@@ -132,14 +135,19 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		for (Integer date : dates) {
 			DayMenu dm = new DayMenu();
 			dm.mRarusMenu = (ArrayList<RarusMenu>) mEDB.getMenu(date);
-			// System.out.println(dm.mRarusMenu.get(0).getAvailable());
 			java.util.Date d = new Date(((long) date.intValue()) * 1000);
-			dm.mStringDate = d.toString();
+			
+			Locale locale = new Locale("ru","RU");
+			
+			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM",locale);
+			String reportDate = df.format(d);
+			dm.mStringDate = reportDate;
 			datesString.add(dm.mStringDate);
 			dm.mPos = fragments.size();
 			fragments.add(dm);
 		}
-		mSlidingMenuFragment = new SlidingMenuFragment((ArrayList<String>) datesString);
+		mSlidingMenuFragment = new SlidingMenuFragment(
+				(ArrayList<String>) datesString);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
@@ -149,6 +157,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSlidingMenu().setSlidingEnabled(true);
+		getSupportActionBar().show();
 	}
 
 	@Override
@@ -156,7 +166,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		return mEDB;
 	}
 
-	//list navigation list
+	// list navigation list
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// выпадающая навигация
 		switchContent(itemPosition);

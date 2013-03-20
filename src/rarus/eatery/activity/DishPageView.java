@@ -17,14 +17,12 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class DishPageView extends SherlockFragmentActivity {
 	PagerAdapter mPageAdapter;
-	//DayMenu mDayMenu;
 	int mDayId;
 	List<RarusMenu> mMenu;
 
 	public static final String DISH_ID = "dishId";
-	public static final String DAY_ID = "dayId";
+	public static final String DATE = "date";
 	public static final String LIST_DAY_MENU = "listDayMenu";
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -32,26 +30,22 @@ public class DishPageView extends SherlockFragmentActivity {
 		setContentView(R.layout.dish_viewpager);
 		Intent intent = getIntent();
 		int dishId = intent.getIntExtra(DISH_ID, -1);
-		mDayId = intent.getIntExtra(DAY_ID, -1);
 		if (savedInstanceState != null)
 			mMenu = (List<RarusMenu>) getLastCustomNonConfigurationInstance();
 		else
 			mMenu = getIntent().getParcelableArrayListExtra(LIST_DAY_MENU);
 		List<Fragment> fragments = new ArrayList<Fragment>();
-		//mMenu = mDayMenu.mRarusMenu;
 		for (RarusMenu m : mMenu) {
 			DishPageViewFragment dpvp = new DishPageViewFragment();
 			dpvp.p = m;
 			fragments.add(dpvp);
 		}
-
 		mPageAdapter = new rarus.eatery.activity.PagerAdapter(
 				super.getSupportFragmentManager(), fragments);
 		ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
 		pager.setAdapter(mPageAdapter);
 		pager.setCurrentItem(dishId);
-
-		//TODO setTitle(mDayMenu.mStringDate);
+		setTitle(intent.getStringExtra(DATE));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().show();
 	}
@@ -74,7 +68,6 @@ public class DishPageView extends SherlockFragmentActivity {
 		MenuItem mi = menu.add(0, 1, 0, "Настройки");
 		mi.setIntent(new Intent(this, SettingsActivity.class));
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	@Override
@@ -89,12 +82,9 @@ public class DishPageView extends SherlockFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		// super.onBackPressed();
 		Intent intent = new Intent();
-		// intent.putExtra(DayMenu.class.getCanonicalName(), mDayMenu);
-		intent.putParcelableArrayListExtra(LIST_DAY_MENU, (ArrayList<? extends Parcelable>) mMenu);
-		
-		intent.putExtra(DAY_ID, mDayId);
+		intent.putParcelableArrayListExtra(LIST_DAY_MENU,
+				(ArrayList<? extends Parcelable>) mMenu);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
