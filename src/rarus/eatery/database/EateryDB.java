@@ -72,7 +72,7 @@ public class EateryDB {
 		if (menu.size() == 0) return;
 				
 		db.open();
-		db.deleteMenuAll();
+		//db.deleteMenuAll();
 		db.addMenu(menu);
 		db.deleteDishesUnused();
 		db.close();

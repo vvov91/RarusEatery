@@ -20,20 +20,20 @@ public class FirstRunFragment extends Fragment {
 
 		final ProgressBar pb = (ProgressBar) v.findViewById(R.id.progressBar1);
 		TextView tv = (TextView) v.findViewById(R.id.tv);
-		tv.setText("Загружается меню...");
-		// pb.setVisibility(View.INVISIBLE);
+		tv.setText("");
+		pb.setVisibility(View.INVISIBLE);
 
-		// final Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
-		// btnDownload.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// pb.setVisibility(View.VISIBLE);
-		// btnDownload.setEnabled(false);
-		// btnDownload.setText("downloading...");
-		// SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
-		// ra.onRefreshClick(v);
-		// }
-		// });
+		final Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
+		btnDownload.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				pb.setVisibility(View.VISIBLE);
+				btnDownload.setEnabled(false);
+				btnDownload.setText("downloading...");
+				SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
+				ra.onRefreshClick(v);
+			}
+		});
 
 		return v;
 	}

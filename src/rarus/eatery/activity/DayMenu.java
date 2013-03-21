@@ -1,8 +1,5 @@
 package rarus.eatery.activity;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -31,6 +28,8 @@ public class DayMenu extends Fragment implements Parcelable {
 	String mStringDate;
 	Date mDate;
 	int mPos = -1;
+	DishAdapter mDishAdapter;
+	GridView mGridView;
 
 	public DayMenu() {
 	}
@@ -48,15 +47,14 @@ public class DayMenu extends Fragment implements Parcelable {
 		if (mPos == -1 && savedInstanceState != null)
 			mPos = savedInstanceState.getInt("mPos");
 		Button btnOrder = (Button) v.findViewById(R.id.btnOrder);
-		DishAdapter dishAdapter = new DishAdapter(v.getContext(), mRarusMenu,
-				mStringDate);
-		GridView gvMain = (GridView) v.findViewById(R.id.gvMain);
-		gvMain.setAdapter(dishAdapter);
+		mDishAdapter = new DishAdapter(v.getContext(), mRarusMenu, mStringDate);
+		mGridView = (GridView) v.findViewById(R.id.gvMain);
+		mGridView.setAdapter(mDishAdapter);
 		Configuration config = getResources().getConfiguration();
-		gvMain.setNumColumns(config.orientation);
-		gvMain.setVerticalSpacing(5);
-		gvMain.setHorizontalSpacing(5);
-		gvMain.setOnItemClickListener(new OnItemClickListener() {
+		mGridView.setNumColumns(config.orientation);
+		mGridView.setVerticalSpacing(5);
+		mGridView.setHorizontalSpacing(5);
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -66,7 +64,6 @@ public class DayMenu extends Fragment implements Parcelable {
 				activity.onDishPressed(mPos, position);
 			}
 		});
-
 		btnOrder.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -74,28 +71,19 @@ public class DayMenu extends Fragment implements Parcelable {
 			}
 		});
 		Log.d(TAG, "menu" + mStringDate + ": onCreate()");
-
 		return v;
+	}
+
+	public void refreshAdapter() {
+		// TODO understand why the adapter.notifyDataSetChanged() does not work
+		mDishAdapter = new DishAdapter(getView().getContext(), mRarusMenu,
+				mStringDate);
+		mGridView.setAdapter(mDishAdapter);
 	}
 
 	public void saveOrder() {
 		EateryDB db = new EateryDB(getView().getContext());
 		db.saveMenu(mRarusMenu);
-		/*DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateDate = null;
-		try {
-			dateDate = df.parse(mStringDate);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		// TODO EateryDBManager db = new
-		// EateryDBManager(getView().getContext());
-		// db.open();
-		// int dateInt = (int) (dateDate.getTime() / 1000) + 7200;
-		// db.deleteMenuAtDate(dateInt);
-		// db.addMenu(dateInt, mRarusMenues);
-		// db.addOrder(dateInt, mRarusMenues);
-		// // MainActivity.changedOrderedAmount = false;*/		
 		Toast.makeText(getView().getContext(), "заказ сохранен", 3).show();
 
 	}

@@ -14,6 +14,7 @@ public class SlidingMenuListAdapter extends BaseAdapter {
 	Context ctx;
 	LayoutInflater lInflater;
 	ArrayList<String> objects;
+	int selectedPositin = -1;
 
 	SlidingMenuListAdapter(Context context, ArrayList<String> products) {
 		ctx = context;
@@ -22,28 +23,32 @@ public class SlidingMenuListAdapter extends BaseAdapter {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
-	// кол-во элементов
+	// РєРѕР»-РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
 	@Override
 	public int getCount() {
 		return objects.size();
 	}
 
-	// элемент по позиции
+	public void setSelected(int selectedPositin) {
+		this.selectedPositin = selectedPositin;
+	}
+
+	// СЌР»РµРјРµРЅС‚ РїРѕ РїРѕР·РёС†РёРё
 	@Override
 	public Object getItem(int position) {
 		return objects.get(position);
 	}
 
-	// id по позиции
+	// id РїРѕ РїРѕР·РёС†РёРё
 	@Override
 	public long getItemId(int position) {
 		return position;
 	}
 
-	// пункт списка
+	// РїСѓРЅРєС‚ СЃРїРёСЃРєР°
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// используем созданные, но не используемые view
+		// РёСЃРїРѕР»СЊР·СѓРµРј СЃРѕР·РґР°РЅРЅС‹Рµ, РЅРѕ РЅРµ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ view
 		View view = convertView;
 		if (view == null) {
 			view = lInflater.inflate(android.R.layout.simple_list_item_1,
@@ -51,6 +56,8 @@ public class SlidingMenuListAdapter extends BaseAdapter {
 		}
 		String str = getProduct(position);
 		((TextView) view.findViewById(android.R.id.text1)).setText(str);
+		view.setBackgroundColor(Color.WHITE);
+		if ((selectedPositin!=-1)&&(selectedPositin==position)) view.setBackgroundColor(Color.DKGRAY);
 		return view;
 	}
 
