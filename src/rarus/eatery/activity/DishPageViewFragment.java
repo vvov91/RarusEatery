@@ -4,6 +4,7 @@ import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,7 +46,9 @@ public class DishPageViewFragment extends Fragment {
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();
-				// DPVF.changedOrderedAmount = true;
+				SlidingMenuActivity.changedOrderedAmount = true;
+				Log.d("int", "" + SlidingMenuActivity.changedOrderedAmount);
+
 			}
 		});
 		btnPlus.setOnClickListener(new OnClickListener() {
@@ -69,10 +72,11 @@ public class DishPageViewFragment extends Fragment {
 				// reload fragment
 				DishPageView activity = (DishPageView) getActivity();
 				activity.reloadFragmentData();
-				// DPVF.changedOrderedAmount = true;
+				SlidingMenuActivity.changedOrderedAmount = true;
+				Log.d("int", "" + SlidingMenuActivity.changedOrderedAmount);
 			}
 		});
 		return v;
 	}
-	
+
 }
