@@ -188,38 +188,39 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Toast.makeText(this, "Got click: " + item.toString(),
-				Toast.LENGTH_SHORT).show();
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			toggle();
-
-		case 2: {
-			Log.d("int", "" + mEDB.getOrdersNotSent().size());
-			Log.d("int", "" + mEDB.getOrdersNotSent().get(0).getDate());
+			break;
+		case 2:
+			onSaveClick();
+			break;
+		case 3:
+			onCleanClick();
+			break;
 		}
-		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onCleanClick() {
+		DayMenu tempDM = fragments.get(mCurrentFragmentId);
+		for (RarusMenu dmiterator : tempDM.mRarusMenu) {
+			if (dmiterator.getAmmount() != 0)
+				dmiterator.setAmmount(0);
+		}
+		tempDM.refreshAdapter();
+		Toast.makeText(this, "Заказ очищен, необходимо сохранение",
+				Toast.LENGTH_SHORT).show();
 	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
-		bindService(serviceIntent, connection, 0);
-		Log.d(getClass().getName(), "MainActivity: onStart()");
-	}
-
-	@Override
-	protected void onDestroy() {
-		unbindService(connection);
-		unregisterReceiver(receiver);
-		Log.d(getClass().getName(), "MainActivity: onDestroy()");
-		super.onDestroy();
+	public void onSaveClick() {
+		mEDB.saveMenu(fragments.get(mCurrentFragmentId).mRarusMenu);
+		Toast.makeText(getBaseContext(), "Заказ сохранен", 3).show();
+		ArrayList<RarusMenu> rm = (ArrayList<RarusMenu>) mEDB
+				.getOrdersNotSent();
+		for (RarusMenu rmiterator : rm) {
+			Log.d("int", "" + rmiterator.getAmmount());
+		}
 	}
 
 	// method for synchronizing the menu (link in the layout)
@@ -331,5 +332,24 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		bindService(serviceIntent, connection, 0);
+		Log.d(getClass().getName(), "MainActivity: onStart()");
+	}
+
+	@Override
+	protected void onDestroy() {
+		unbindService(connection);
+		unregisterReceiver(receiver);
+		Log.d(getClass().getName(), "MainActivity: onDestroy()");
+		super.onDestroy();
 	}
 }
