@@ -136,16 +136,30 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			// иконка
 			adb.setIcon(android.R.drawable.ic_dialog_info);
 			// кнопка положительного ответа
-			adb.setPositiveButton(R.string.yes, myClickListener);
+			adb.setPositiveButton(R.string.yes, switchDialog);
 			// кнопка отрицательного ответа
-			adb.setNegativeButton(R.string.no, myClickListener);
+			adb.setNegativeButton(R.string.no, switchDialog);
+			// создаем диалог
+			return adb.create();
+		} else if (id == 2) {
+			AlertDialog.Builder adb = new AlertDialog.Builder(this);
+			// заголовок
+			adb.setTitle("clean?");
+			// сообщение
+			adb.setMessage("clean?");
+			// иконка
+			adb.setIcon(android.R.drawable.ic_dialog_info);
+			// кнопка положительного ответа
+			adb.setPositiveButton(R.string.yes, cleanDialog);
+			// кнопка отрицательного ответа
+			adb.setNegativeButton(R.string.no, cleanDialog);
 			// создаем диалог
 			return adb.create();
 		}
 		return super.onCreateDialog(id);
 	}
 
-	OnClickListener myClickListener = new OnClickListener() {
+	OnClickListener switchDialog = new OnClickListener() {
 		public void onClick(DialogInterface dialog, int which) {
 			switch (which) {
 			// положительная кнопка
@@ -163,7 +177,21 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 		}
 	};
-
+	OnClickListener cleanDialog = new OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+			// положительная кнопка
+			case Dialog.BUTTON_POSITIVE:
+				onCleanClick();
+				Log.d("int", "clean");
+				break;
+			// негаитвная кнопка
+			case Dialog.BUTTON_NEGATIVE:
+				Log.d("int", "no clean");
+				break;
+			}
+		}
+	};
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageView.class);
 		intent.putExtra(DishPageView.DISH_ID, dishId);
@@ -227,13 +255,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		// системное меню
 		MenuItem mi = menu.add(0, 1, 0, "Ќастройки");
-		 mi.setIntent(new Intent(this, SettingsActivity.class));
+		mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
-		menu.add(0, 2, 0, "Save").setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(0, 3, 0, "Clean").setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM
-						| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(0, 2, 0, "Save").setIcon(R.drawable.save)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(0, 3, 0, "Clean")
+				.setIcon(R.drawable.clean)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
 
 	}
@@ -248,7 +278,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			onSaveClick();
 			break;
 		case 3:
-			onCleanClick();
+			showDialog(2);
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -271,10 +301,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void removeChanges() {
 		int date = mEDB.getMenuDates().get(mCurrentFragmentId);
-		DayMenu tempDM=fragments.get(mCurrentFragmentId);
-		tempDM.mRarusMenu=(ArrayList<RarusMenu>) mEDB.getMenu(date);
+		DayMenu tempDM = fragments.get(mCurrentFragmentId);
+		tempDM.mRarusMenu = (ArrayList<RarusMenu>) mEDB.getMenu(date);
 		tempDM.refreshAdapter();
-		changedOrderedAmount=false;
+		changedOrderedAmount = false;
 	}
 
 	public void onSaveClick() {
@@ -379,16 +409,16 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при получении меню:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "ќшибка при получении меню."+error,
-						3).show();
+				Toast.makeText(getBaseContext(),
+						"ќшибка при получении меню." + error, 3).show();
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при отправке заказа:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "ќшибка при отправке заказа."+error,
-						3).show();
+				Toast.makeText(getBaseContext(),
+						"ќшибка при отправке заказа." + error, 3).show();
 			}
 				break;
 			case EateryConstants.PING_CODE: {
@@ -396,7 +426,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						"ќшибка при соединеннии с сервером."+error, 3).show();
+						"ќшибка при соединеннии с сервером." + error, 3).show();
 			}
 				break;
 			}
