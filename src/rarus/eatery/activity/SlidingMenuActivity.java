@@ -227,7 +227,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		// системное меню
 		MenuItem mi = menu.add(0, 1, 0, "Ќастройки");
-		// mi.setIntent(new Intent(this, SettingsActivity.class));
+		 mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
 		menu.add(0, 2, 0, "Save").setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -379,7 +379,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при получении меню:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "ќшибка при получении меню.",
+				Toast.makeText(getBaseContext(), "ќшибка при получении меню."+error,
 						3).show();
 			}
 				break;
@@ -387,7 +387,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.d(EateryConstants.GUI_LOG_TAG,
 						"MainActivity: ошибка при отправке заказа:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "ќшибка при отправке заказа.",
+				Toast.makeText(getBaseContext(), "ќшибка при отправке заказа."+error,
 						3).show();
 			}
 				break;
@@ -396,7 +396,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						"ќшибка при соединеннии с сервером.", 3).show();
+						"ќшибка при соединеннии с сервером."+error, 3).show();
 			}
 				break;
 			}

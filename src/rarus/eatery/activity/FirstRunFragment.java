@@ -9,18 +9,14 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 public class FirstRunFragment extends Fragment {
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.loading, null);
 
 		final ProgressBar pb = (ProgressBar) v.findViewById(R.id.progressBar1);
-		TextView tv = (TextView) v.findViewById(R.id.tv);
-		tv.setText("");
 		pb.setVisibility(View.INVISIBLE);
 
 		final Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
@@ -34,7 +30,6 @@ public class FirstRunFragment extends Fragment {
 				ra.onRefreshClick(v);
 			}
 		});
-
 		return v;
 	}
 }
