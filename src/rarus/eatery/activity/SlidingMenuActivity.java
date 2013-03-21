@@ -293,7 +293,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	// method for synchronizing the menu (link in the layout)
 	public void onRefreshClick(View v) {
 		client.update();
-		Toast.makeText(getBaseContext(), "вЂ”РёРЅС…СЂРѕРЅРёР·Р°С†РёВ¤ СЃ СЃРµСЂРІРёСЃРѕРј...", 3)
+		Toast.makeText(getBaseContext(), "Синхронизация данных с сервером...", 3)
 				.show();
 	}
 
