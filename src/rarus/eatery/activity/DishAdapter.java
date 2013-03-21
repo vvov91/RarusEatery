@@ -3,11 +3,9 @@ package rarus.eatery.activity;
 import java.util.ArrayList;
 
 import rarus.eatery.R;
-import rarus.eatery.model.Order;
 import rarus.eatery.model.RarusMenu;
-
 import android.content.Context;
-import android.content.res.Configuration;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,7 +48,7 @@ public class DishAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
-	
+
 	// пункт списка
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -83,7 +81,9 @@ public class DishAdapter extends BaseAdapter {
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
 				notifyDataSetChanged();
-				// MainActivity.changedOrderedAmount=true;
+				SlidingMenuActivity.changedOrderedAmount = true;
+				Log.d("int",""+SlidingMenuActivity.changedOrderedAmount);
+
 			}
 		});
 		btnPlus.setOnClickListener(new OnClickListener() {
@@ -104,7 +104,8 @@ public class DishAdapter extends BaseAdapter {
 							.show();
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
-				// MainActivity.changedOrderedAmount=true;
+				SlidingMenuActivity.changedOrderedAmount = true;
+				Log.d("int",""+SlidingMenuActivity.changedOrderedAmount);
 				notifyDataSetChanged();
 			}
 		});

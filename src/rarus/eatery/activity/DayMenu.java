@@ -46,7 +46,6 @@ public class DayMenu extends Fragment implements Parcelable {
 		View v = inflater.inflate(R.layout.menu, null);
 		if (mPos == -1 && savedInstanceState != null)
 			mPos = savedInstanceState.getInt("mPos");
-		Button btnOrder = (Button) v.findViewById(R.id.btnOrder);
 		mDishAdapter = new DishAdapter(v.getContext(), mRarusMenu, mStringDate);
 		mGridView = (GridView) v.findViewById(R.id.gvMain);
 		mGridView.setAdapter(mDishAdapter);
@@ -64,12 +63,6 @@ public class DayMenu extends Fragment implements Parcelable {
 				activity.onDishPressed(mPos, position);
 			}
 		});
-		btnOrder.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				saveOrder();
-			}
-		});
 		Log.d(TAG, "menu" + mStringDate + ": onCreate()");
 		return v;
 	}
@@ -79,13 +72,6 @@ public class DayMenu extends Fragment implements Parcelable {
 		mDishAdapter = new DishAdapter(getView().getContext(), mRarusMenu,
 				mStringDate);
 		mGridView.setAdapter(mDishAdapter);
-	}
-
-	public void saveOrder() {
-		EateryDB db = new EateryDB(getView().getContext());
-		db.saveMenu(mRarusMenu);
-		Toast.makeText(getView().getContext(), "заказ сохранен", 3).show();
-
 	}
 
 	@Override
