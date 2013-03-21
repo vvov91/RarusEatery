@@ -52,8 +52,10 @@ public class SlidingMenuFragment extends Fragment {
 	// the meat of switching the above fragment
 	private void switchFragment(int position) {
 		if (getActivity() instanceof SlidingMenuActivity) {
-			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
-			ra.switchContent(position);
+			SlidingMenuActivity sma = (SlidingMenuActivity) getActivity();
+			// sma.switchContent(position);
+			sma.changeContentRequest(position);
+			
 		}
 	}
 

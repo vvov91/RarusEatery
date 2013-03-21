@@ -1,8 +1,8 @@
 package rarus.eatery.activity;
 
 /*
- * Основное окно программы
- * В нем содержится фрагмент меню на день 
+ * СњСЃРЅРѕРІРЅРѕРµ РѕРєРЅРѕ РїСЂРѕРіСЂР°РјРјС‹
+ * В¬ РЅРµРј СЃРѕРґРµСЂР¶РёС‚СЃВ¤ С„СЂР°РіРјРµРЅС‚ РјРµРЅСЋ РЅР° РґРµРЅСЊ 
  */
 import java.sql.Date;
 import java.text.DateFormat;
@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Locale;
 
 import rarus.eatery.R;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
@@ -48,7 +52,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	SlidingMenuFragment mSlidingMenuFragment;
 	EateryDB mEDB;
 	SharedPreferences sp;
-	int mCurrentFragmentId = 0;
+	int mCurrentFragmentId = 0, mNextFragmentId = 0;
 	final int DIALOG_ORDER = 1;
 	List<DayMenu> fragments = new ArrayList<DayMenu>();
 	List<String> datesString = new ArrayList<String>();
@@ -60,6 +64,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
+		Log.d("int", "" + changedOrderedAmount);
+
 		if (savedInstanceState != null)
 			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
 		else
@@ -83,16 +89,17 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			getSlidingMenu().setSlidingEnabled(false);
 		} else {
 			makeFragments();
-			switchContent(mCurrentFragmentId);
+			changeContentRequest(mCurrentFragmentId);
 
 		}
 	}
 
-	public void switchContent(final int position) {
-		// смена основного фрагмента
-		mCurrentFragmentId = position;
+	public void switchContent() {
+		// СЃРјРµРЅР° РѕСЃРЅРѕРІРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
+		mCurrentFragmentId = mNextFragmentId;
 		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, fragments.get(position)).commit();
+				.replace(R.id.content_frame, fragments.get(mNextFragmentId))
+				.commit();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
@@ -100,9 +107,62 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				getSlidingMenu().showContent();
 			}
 		}, 50);
-		getSupportActionBar().setSelectedNavigationItem(position);
-
+		getSupportActionBar().setSelectedNavigationItem(mNextFragmentId);
 	}
+
+	// list navigation(actionbar)
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// РІС‹РїР°РґР°СЋС‰Р°В¤ РЅР°РІРёРіР°С†РёВ¤
+		changeContentRequest(itemPosition);
+		mSlidingMenuFragment.setSelectedItem(itemPosition);
+		return true;
+	}
+
+	public void changeContentRequest(int newId) {
+		mNextFragmentId = newId;
+		if (changedOrderedAmount)
+			showDialog(1);
+		else
+			switchContent();
+	}
+
+	protected Dialog onCreateDialog(int id) {
+		if (id == 1) {
+			AlertDialog.Builder adb = new AlertDialog.Builder(this);
+			// Р·Р°РіРѕР»РѕРІРѕРє
+			adb.setTitle(R.string.exit);
+			// СЃРѕРѕР±С‰РµРЅРёРµ
+			adb.setMessage(R.string.save_data);
+			// РёРєРѕРЅРєР°
+			adb.setIcon(android.R.drawable.ic_dialog_info);
+			// РєРЅРѕРїРєР° РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРіРѕ РѕС‚РІРµС‚Р°
+			adb.setPositiveButton(R.string.yes, myClickListener);
+			// РєРЅРѕРїРєР° РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРіРѕ РѕС‚РІРµС‚Р°
+			adb.setNegativeButton(R.string.no, myClickListener);
+			// СЃРѕР·РґР°РµРј РґРёР°Р»РѕРі
+			return adb.create();
+		}
+		return super.onCreateDialog(id);
+	}
+
+	OnClickListener myClickListener = new OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+			// РїРѕР»РѕР¶РёС‚РµР»СЊРЅР°СЏ РєРЅРѕРїРєР°
+			case Dialog.BUTTON_POSITIVE:
+				onSaveClick();
+				switchContent();
+				Log.d("int", "save");
+				break;
+			// РЅРµРіР°РёС‚РІРЅР°СЏ РєРЅРѕРїРєР°
+			case Dialog.BUTTON_NEGATIVE:
+				removeChanges();
+				switchContent();
+				Log.d("int", "-");
+				break;
+			}
+		}
+	};
 
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageView.class);
@@ -126,7 +186,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void makeFragments() {
-		// создание основного фрагмента
+		// СЃРѕР·РґР°РЅРёРµ РѕСЃРЅРѕРІРЅРѕРіРѕ С„СЂР°РіРјРµРЅС‚Р°
 		List<Integer> dates = mEDB.getMenuDates();
 		datesString = new ArrayList<String>();
 		fragments = new ArrayList<DayMenu>();
@@ -148,7 +208,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				(ArrayList<String>) datesString);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
-		// создание выпадающей навигации
+		// СЃРѕР·РґР°РЅРёРµ РІС‹РїР°РґР°СЋС‰РµР№ РЅР°РІРёРіР°С†РёРё
 		ArrayAdapter<String> list = new ArrayAdapter<String>(
 				getSupportActionBar().getThemedContext(),
 				R.layout.sherlock_spinner_item, datesString);
@@ -164,17 +224,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		return mEDB;
 	}
 
-	// list navigation list
-	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		// выпадающая навигация
-		switchContent(itemPosition);
-		mSlidingMenuFragment.setSelectedItem(itemPosition);
-		return true;
-	}
-
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		// системное меню
-		MenuItem mi = menu.add(0, 1, 0, "Настройки");
+		// СЃРёСЃС‚РµРјРЅРѕРµ РјРµРЅСЋ
+		MenuItem mi = menu.add(0, 1, 0, "РЊР°СЃС‚СЂРѕР№РєРё");
 		// mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
 		menu.add(0, 2, 0, "Save").setShowAsAction(
@@ -188,44 +240,60 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Toast.makeText(this, "Got click: " + item.toString(),
-				Toast.LENGTH_SHORT).show();
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			toggle();
-
-		case 2: {
-			Log.d("int", "" + mEDB.getOrdersNotSent().size());
-			Log.d("int", "" + mEDB.getOrdersNotSent().get(0).getDate());
+			break;
+		case 2:
+			onSaveClick();
+			break;
+		case 3:
+			onCleanClick();
+			break;
 		}
-		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onCleanClick() {
+		DayMenu tempDM = fragments.get(mCurrentFragmentId);
+		for (RarusMenu dmiterator : tempDM.mRarusMenu) {
+			if (dmiterator.getAmmount() != 0) {
+				dmiterator.setAmmount(0);
+				changedOrderedAmount = true;
+				Log.d("int", "" + changedOrderedAmount);
+
+			}
+		}
+		tempDM.refreshAdapter();
+		Toast.makeText(this, "Р—Р°РєР°Р· РѕС‡РёС‰РµРЅ, РЅРµРѕР±С…РѕРґРёРјРѕ СЃРѕС…СЂР°РЅРµРЅРёРµ",
+				Toast.LENGTH_SHORT).show();
 	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
-		bindService(serviceIntent, connection, 0);
-		Log.d(getClass().getName(), "MainActivity: onStart()");
+	public void removeChanges() {
+		int date = mEDB.getMenuDates().get(mCurrentFragmentId);
+		DayMenu tempDM=fragments.get(mCurrentFragmentId);
+		tempDM.mRarusMenu=(ArrayList<RarusMenu>) mEDB.getMenu(date);
+		tempDM.refreshAdapter();
+		changedOrderedAmount=false;
 	}
 
-	@Override
-	protected void onDestroy() {
-		unbindService(connection);
-		unregisterReceiver(receiver);
-		Log.d(getClass().getName(), "MainActivity: onDestroy()");
-		super.onDestroy();
+	public void onSaveClick() {
+		mEDB.saveMenu(fragments.get(mCurrentFragmentId).mRarusMenu);
+		Toast.makeText(getBaseContext(), "Р—Р°РєР°Р· СЃРѕС…СЂР°РЅРµРЅ", 3).show();
+		ArrayList<RarusMenu> rm = (ArrayList<RarusMenu>) mEDB
+				.getOrdersNotSent();
+		for (RarusMenu rmiterator : rm) {
+			Log.d("int", "" + rmiterator.getAmmount());
+		}
+		changedOrderedAmount = false;
+		Log.d("int", "" + changedOrderedAmount);
+
 	}
 
 	// method for synchronizing the menu (link in the layout)
 	public void onRefreshClick(View v) {
 		client.update();
-		Toast.makeText(getBaseContext(), "Синхронизация с сервисом...", 3)
+		Toast.makeText(getBaseContext(), "вЂ”РёРЅС…СЂРѕРЅРёР·Р°С†РёВ¤ СЃ СЃРµСЂРІРёСЃРѕРј...", 3)
 				.show();
 	}
 
@@ -266,23 +334,25 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	private void recive(boolean result, Intent intent) {
 		Log.d(EateryConstants.GUI_LOG_TAG,
-				"MainActivity: Полученно сообщение от сервиса");
+				"MainActivity: С•РѕР»СѓС‡РµРЅРЅРѕ СЃРѕРѕР±С‰РµРЅРёРµ РѕС‚ СЃРµСЂРІРёСЃР°");
 		if (result) {
 			int operationCode = intent.getIntExtra(
 					EateryConstants.SERVICE_RESULT_CODE, 0);
 			Log.d(EateryConstants.GUI_LOG_TAG,
-					"MainActivity: Запрос сервиса успешен");
+					"MainActivity: В«Р°РїСЂРѕСЃ СЃРµСЂРІРёСЃР° СѓСЃРїРµС€РµРЅ");
 			switch (operationCode) {
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
-						"MainActivity: Полученно меню");
-				// Обновление фрагмента
+						"MainActivity: С•РѕР»СѓС‡РµРЅРЅРѕ РјРµРЅСЋ");
+				// СњР±РЅРѕРІР»РµРЅРёРµ С„СЂР°РіРјРµРЅС‚Р°
 				this.mEDB = new EateryDB(getApplicationContext());
 				if (mEDB.getMenuDates().size() != 0) {
 					makeFragments();
-					switchContent(mCurrentFragmentId);
-					Toast.makeText(getBaseContext(), "Меню обновлено.", 3)
+					changeContentRequest(mCurrentFragmentId);
+					Toast.makeText(getBaseContext(), "С›РµРЅСЋ РѕР±РЅРѕРІР»РµРЅРѕ.", 3)
 							.show();
+					changedOrderedAmount = false;
+					Log.d("int", "" + changedOrderedAmount);
 				}
 
 			}
@@ -297,8 +367,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 		} else {
 			Log.d(EateryConstants.GUI_LOG_TAG,
-					"MainActivity: Запрос сервиса неудачен");
-			Toast.makeText(getBaseContext(), "Запрос сервиса неудачен.", 3)
+					"MainActivity: В«Р°РїСЂРѕСЃ СЃРµСЂРІРёСЃР° РЅРµСѓРґР°С‡РµРЅ");
+			Toast.makeText(getBaseContext(), "В«Р°РїСЂРѕСЃ СЃРµСЂРІРёСЃР° РЅРµСѓРґР°С‡РµРЅ.", 3)
 					.show();
 
 			int operationCode = intent.getIntExtra(
@@ -307,29 +377,48 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			switch (operationCode) {
 			case EateryConstants.GET_MENU_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
-						"MainActivity: ошибка при получении меню:");
+						"MainActivity: РѕС€РёР±РєР° РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РјРµРЅСЋ:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "Ошибка при получении меню.",
+				Toast.makeText(getBaseContext(), "СњС€РёР±РєР° РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РјРµРЅСЋ.",
 						3).show();
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
-						"MainActivity: ошибка при отправке заказа:");
+						"MainActivity: РѕС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ Р·Р°РєР°Р·Р°:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
-				Toast.makeText(getBaseContext(), "Ошибка при отправке заказа.",
+				Toast.makeText(getBaseContext(), "СњС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ Р·Р°РєР°Р·Р°.",
 						3).show();
 			}
 				break;
 			case EateryConstants.PING_CODE: {
 				Log.d(EateryConstants.GUI_LOG_TAG,
-						"MainActivity: ошибка при соединеннии с сервером:");
+						"MainActivity: РѕС€РёР±РєР° РїСЂРё СЃРѕРµРґРёРЅРµРЅРЅРёРё СЃ СЃРµСЂРІРµСЂРѕРј:");
 				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						"Ошибка при соединеннии с сервером.", 3).show();
+						"СњС€РёР±РєР° РїСЂРё СЃРѕРµРґРёРЅРµРЅРЅРёРё СЃ СЃРµСЂРІРµСЂРѕРј.", 3).show();
 			}
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		bindService(serviceIntent, connection, 0);
+		Log.d(getClass().getName(), "MainActivity: onStart()");
+	}
+
+	@Override
+	protected void onDestroy() {
+		unbindService(connection);
+		unregisterReceiver(receiver);
+		Log.d(getClass().getName(), "MainActivity: onDestroy()");
+		super.onDestroy();
 	}
 }
