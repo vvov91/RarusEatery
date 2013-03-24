@@ -53,7 +53,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	EateryDB mEDB;
 	SharedPreferences sp;
 	int mCurrentFragmentId = 0, mNextFragmentId = 0;
-	final int DIALOG_ORDER = 1;
 	List<DayMenu> fragments = new ArrayList<DayMenu>();
 	List<String> datesString = new ArrayList<String>();
 	static Boolean changedOrderedAmount = false;
@@ -66,9 +65,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		setContentView(R.layout.main_content_frame);
 		Log.d("int", "" + changedOrderedAmount);
 
-		if (savedInstanceState != null)
+		if (savedInstanceState != null) {
 			mEDB = (EateryDB) getLastCustomNonConfigurationInstance();
-		else
+			mCurrentFragmentId = savedInstanceState
+					.getInt("mCurrentFragmentId");
+		} else
 			this.mEDB = new EateryDB(getApplicationContext());
 		setBehindContentView(R.layout.sliding_menu);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
@@ -89,8 +90,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			getSlidingMenu().setSlidingEnabled(false);
 		} else {
 			makeFragments();
+			Log.d("int", "mCurrentFragmentId changeContentRequest"
+					+ mCurrentFragmentId);
 			changeContentRequest(mCurrentFragmentId);
-
 		}
 	}
 
@@ -223,9 +225,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			DayMenu dm = new DayMenu();
 			dm.mRarusMenu = (ArrayList<RarusMenu>) mEDB.getMenu(date);
 			java.util.Date d = new Date(((long) date.intValue()) * 1000);
-
 			Locale locale = new Locale("ru", "RU");
-
 			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM", locale);
 			String reportDate = df.format(d);
 			dm.mStringDate = reportDate;
@@ -246,11 +246,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
-	}
-
-	@Override
-	public Object onRetainCustomNonConfigurationInstance() {
-		return mEDB;
 	}
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
@@ -434,7 +429,14 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	@Override
+	public Object onRetainCustomNonConfigurationInstance() {
+		return mEDB;
+	}
+
+	@Override
 	public void onSaveInstanceState(Bundle outState) {
+		// saving id of the current day
+		outState.putInt("mCurrentFragmentId", mCurrentFragmentId);
 	}
 
 	@Override
