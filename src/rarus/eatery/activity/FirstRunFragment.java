@@ -52,10 +52,17 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 	void savePreference() {
 		if (!etCardNumber.getText().toString().isEmpty())
 			ed.putString("cardNumber", etCardNumber.getText().toString());
+		else
+			ed.putString("cardNumber", null);
 		if (!etServer1.getText().toString().isEmpty())
 			ed.putString("server1", etServer1.getText().toString());
+		else
+			ed.putString("server1", null);
 		if (!etServer2.getText().toString().isEmpty())
 			ed.putString("server2", etServer2.getText().toString());
+		else
+			ed.putString("server2", null);
+
 		ed.commit();
 	}
 
