@@ -192,6 +192,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 		}
 	};
+
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageView.class);
 		intent.putExtra(DishPageView.DISH_ID, dishId);
@@ -317,7 +318,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}
 		changedOrderedAmount = false;
 		Log.d("int", "" + changedOrderedAmount);
-
 	}
 
 	// method for synchronizing the menu (link in the layout)

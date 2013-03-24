@@ -7,7 +7,10 @@
     <string name="order">Заказать</string>
     <string name="cardNumber">Номер карточки</string>
     <string name="cardNumberInfo">Введите номер карточки</string>
-
+    <string name="server1">Сервер1:</string>
+    <string name="server1Info">Адрес севера 1:</string>
+    <string name="server2">Сервер2:</string>
+    <string name="server2Info">Адрес севера 2:</string>
     <string name="exit">Смена даты</string>
     <string name="save_data">Сохранить заказ?</string>
     <string name="yes">Да</string>

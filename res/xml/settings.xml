@@ -6,5 +6,15 @@
         android:summary="@string/cardNumberInfo"
         android:title="@string/cardNumber" >
     </EditTextPreference>
+    <EditTextPreference
+        android:key="server1"
+        android:summary="@string/server1Info"
+        android:title="@string/server1" >
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="server2"
+        android:summary="@string/server2Info"
+        android:title="@string/server2" >
+    </EditTextPreference>
 
 </PreferenceScreen>
