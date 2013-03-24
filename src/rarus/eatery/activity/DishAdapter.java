@@ -81,8 +81,8 @@ public class DishAdapter extends BaseAdapter {
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
 				notifyDataSetChanged();
-				SlidingMenuActivity.changedOrderedAmount = true;
-				Log.d("int",""+SlidingMenuActivity.changedOrderedAmount);
+				SlidingMenuActivity.mChangedOrderedAmount = true;
+				Log.d("int",""+SlidingMenuActivity.mChangedOrderedAmount);
 
 			}
 		});
@@ -104,8 +104,8 @@ public class DishAdapter extends BaseAdapter {
 							.show();
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
-				SlidingMenuActivity.changedOrderedAmount = true;
-				Log.d("int",""+SlidingMenuActivity.changedOrderedAmount);
+				SlidingMenuActivity.mChangedOrderedAmount = true;
+				Log.d("int",""+SlidingMenuActivity.mChangedOrderedAmount);
 				notifyDataSetChanged();
 			}
 		});

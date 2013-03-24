@@ -22,30 +22,35 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
-public class DayMenu extends Fragment implements Parcelable {
-	final String TAG = "States";
+public class DayMenuFragment extends Fragment implements Parcelable {
 	ArrayList<RarusMenu> mRarusMenu = new ArrayList<RarusMenu>();
 	String mStringDate;
 	Date mDate;
-	int mPos = -1;
+	int mPosition = -1;
 	DishAdapter mDishAdapter;
 	GridView mGridView;
 
-	public DayMenu() {
+	public DayMenuFragment() {
 	}
 
-	public DayMenu(ArrayList<RarusMenu> _mRarusMenues, String _mDate, int _mPos) {
+	public DayMenuFragment(ArrayList<RarusMenu> _mRarusMenues, String _mDate, int _mPos) {
 		mRarusMenu = _mRarusMenues;
 		mStringDate = _mDate;
-		mPos = _mPos;
+		mPosition = _mPos;
+	}
+
+	private DayMenuFragment(Parcel parcel) {
+		parcel.readList(mRarusMenu, RarusMenu.class.getClassLoader());
+		mStringDate = parcel.readString();
+		mPosition = parcel.readInt();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.menu, null);
-		if (mPos == -1 && savedInstanceState != null)
-			mPos = savedInstanceState.getInt("mPos");
+		if (mPosition == -1 && savedInstanceState != null)
+			mPosition = savedInstanceState.getInt("mPosition");
 		mDishAdapter = new DishAdapter(v.getContext(), mRarusMenu, mStringDate);
 		mGridView = (GridView) v.findViewById(R.id.gvMain);
 		mGridView.setAdapter(mDishAdapter);
@@ -60,10 +65,9 @@ public class DayMenu extends Fragment implements Parcelable {
 				if (getActivity() == null)
 					return;
 				SlidingMenuActivity activity = (SlidingMenuActivity) getActivity();
-				activity.onDishPressed(mPos, position);
+				activity.onDishPressed(mPosition, position);
 			}
 		});
-		Log.d(TAG, "menu" + mStringDate + ": onCreate()");
 		return v;
 	}
 
@@ -77,37 +81,7 @@ public class DayMenu extends Fragment implements Parcelable {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt("mPos", mPos);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		Log.d(TAG, "menu: onStart()");
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		Log.d(TAG, "menu: onResume()");
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.d(TAG, "menu: onPause()");
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		Log.d(TAG, "menu: onStop()");
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "menu: onDestroy()");
+		outState.putInt("mPosition", mPosition);
 	}
 
 	@Override
@@ -119,24 +93,29 @@ public class DayMenu extends Fragment implements Parcelable {
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeList(mRarusMenu);
 		parcel.writeString(mStringDate);
-		parcel.writeInt(mPos);
+		parcel.writeInt(mPosition);
 	}
 
-	public static final Parcelable.Creator<DayMenu> CREATOR = new Parcelable.Creator<DayMenu>() {
+	public static final Parcelable.Creator<DayMenuFragment> CREATOR = new Parcelable.Creator<DayMenuFragment>() {
 		// распаковываем объект из Parcel
-		public DayMenu createFromParcel(Parcel in) {
-			return new DayMenu(in);
+		public DayMenuFragment createFromParcel(Parcel in) {
+			return new DayMenuFragment(in);
 		}
 
-		public DayMenu[] newArray(int size) {
-			return new DayMenu[size];
+		public DayMenuFragment[] newArray(int size) {
+			return new DayMenuFragment[size];
 		}
 	};
 
-	private DayMenu(Parcel parcel) {
-		parcel.readList(mRarusMenu, RarusMenu.class.getClassLoader());
-		mStringDate = parcel.readString();
-		mPos = parcel.readInt();
+	public void setRarusMenu(ArrayList<RarusMenu> rarusMenu) {
+		mRarusMenu = rarusMenu;
 	}
 
+	public void setStringDate(String stringDate) {
+		mStringDate = stringDate;
+	}
+
+	public void setPosition(int position) {
+		mPosition = position;
+	}
 }

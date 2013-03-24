@@ -15,7 +15,7 @@ import android.support.v4.view.ViewPager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class DishPageView extends SherlockFragmentActivity {
+public class DishPageViewActivity extends SherlockFragmentActivity {
 	PagerAdapter mPageAdapter;
 	int mDayId;
 	List<RarusMenu> mMenu;
