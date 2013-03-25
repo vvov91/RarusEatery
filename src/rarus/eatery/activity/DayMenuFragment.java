@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import rarus.eatery.R;
-import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.RarusMenu;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -14,15 +13,14 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
-public class DayMenuFragment extends Fragment implements Parcelable {
+public class DayMenuFragment extends Fragment implements Parcelable,
+		OnDishItemListener {
 	ArrayList<RarusMenu> mRarusMenu = new ArrayList<RarusMenu>();
 	String mStringDate;
 	Date mDate;
@@ -52,7 +50,8 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 		View v = inflater.inflate(R.layout.menu, null);
 		if (mPosition == -1 && savedInstanceState != null)
 			mPosition = savedInstanceState.getInt("mPosition");
-		mDishAdapter=new DishAdapter(v.getContext(),R.id.gvMain,mRarusMenu);
+		mDishAdapter = new DishAdapter(v.getContext(), R.id.gvMain, mRarusMenu,
+				this);
 		mGridView = (GridView) v.findViewById(R.id.gvMain);
 		mGridView.setAdapter(mDishAdapter);
 		Configuration config = getResources().getConfiguration();
@@ -74,7 +73,8 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 
 	public void refreshAdapter() {
 		// TODO understand why the adapter.notifyDataSetChanged() does not work
-		mDishAdapter=new DishAdapter(getView().getContext(),R.id.gvMain,mRarusMenu);
+		mDishAdapter = new DishAdapter(getView().getContext(), R.id.gvMain,
+				mRarusMenu, this);
 		mGridView.setAdapter(mDishAdapter);
 	}
 
@@ -117,5 +117,41 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 
 	public void setPosition(int position) {
 		mPosition = position;
+	}
+
+	@Override
+	public void onClickMinus(RarusMenu rarusMenu) {
+		float orderedAmmount = rarusMenu.getAmmount();
+		boolean portioned = rarusMenu.isPortioned();
+		float step = (float) (portioned ? 0.5 : 1);
+		if (orderedAmmount > step)
+			orderedAmmount -= step;
+		else
+			orderedAmmount = 0;
+		rarusMenu.setAmmount(orderedAmmount);
+		rarusMenu.setModified(true);
+		SlidingMenuActivity.mChangedOrderedAmount = true;
+		Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
+	}
+
+	@Override
+	public void onClickPlus(RarusMenu rarusMenu) {
+		float orderedAmmount = rarusMenu.getAmmount();
+		boolean portioned = rarusMenu.isPortioned();
+		float availableAmmount = rarusMenu.getAvailable();
+		float step = (float) (portioned ? 0.5 : 1);
+		if ((orderedAmmount + step <= availableAmmount)
+				|| (availableAmmount == -1))
+			orderedAmmount += step;
+		else
+			Toast.makeText(
+					getActivity().getBaseContext(),
+					"AvailableAmmount "
+							+ Float.toString(rarusMenu.getAvailable()), 3)
+					.show();
+		rarusMenu.setAmmount(orderedAmmount);
+		rarusMenu.setModified(true);
+		SlidingMenuActivity.mChangedOrderedAmount = true;
+		Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 	}
 }
