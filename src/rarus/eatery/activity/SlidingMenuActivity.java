@@ -12,21 +12,20 @@ import java.util.List;
 import java.util.Locale;
 
 import rarus.eatery.R;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -62,15 +61,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
-		Log.d("int", "" + mChangedOrderedAmount);
-		if (savedInstanceState != null) {
-			mEateryDB = (EateryDB) getLastCustomNonConfigurationInstance();
-			mCurrentFragmentId = savedInstanceState
-					.getInt("mCurrentFragmentId");
-		} else
-			this.mEateryDB = new EateryDB(getApplicationContext());
 		setBehindContentView(R.layout.sliding_menu);
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+
+		Log.d("int", "" + mChangedOrderedAmount);
+
 		// customize the SlidingMenu
 		SlidingMenu sm = getSlidingMenu();
 		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
@@ -81,16 +76,29 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().hide();
 
-		if (mEateryDB.getMenuDates().size() == 0) {
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content_frame, new FirstRunFragment())
-					.commit();
-			getSlidingMenu().setSlidingEnabled(false);
+		mEateryDB = new EateryDB(getApplicationContext());
+
+		if (savedInstanceState != null) {
+			mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
+			mCurrentFragmentId = savedInstanceState
+					.getInt("mCurrentFragmentId");
+			mDatesString = savedInstanceState
+					.getStringArrayList("mDatesString");
+			makeSlidingMenu(mDatesString);
+			mNextFragmentId = mCurrentFragmentId;
+			switchContent();
 		} else {
-			makeFragments();
-			Log.d("int", "mCurrentFragmentId changeContentRequest"
-					+ mCurrentFragmentId);
-			changeContentRequest(mCurrentFragmentId);
+			if (mEateryDB.getMenuDates().size() == 0) {
+				getSupportFragmentManager().beginTransaction()
+						.replace(R.id.content_frame, new FirstRunFragment())
+						.commit();
+				getSlidingMenu().setSlidingEnabled(false);
+			} else {
+				makeFragments();
+				Log.d("int", "mCurrentFragmentId changeContentRequest"
+						+ mCurrentFragmentId);
+				changeContentRequest(mCurrentFragmentId);
+			}
 		}
 	}
 
@@ -100,7 +108,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportFragmentManager()
 				.beginTransaction()
 				.replace(R.id.content_frame,
-						mDayMenuFragmentFragments.get(mNextFragmentId)).commit();
+						mDayMenuFragmentFragments.get(mNextFragmentId))
+				.commit();
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		Handler h = new Handler();
 		h.postDelayed(new Runnable() {
@@ -120,7 +129,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void changeContentRequest(int newId) {
 		mNextFragmentId = newId;
-		if (mChangedOrderedAmount)
+		if ((mChangedOrderedAmount)&&(mNextFragmentId!=mCurrentFragmentId))
 			showDialog(1);
 		else
 			switchContent();
@@ -190,7 +199,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageViewActivity.class);
 		intent.putExtra(DishPageViewActivity.DISH_ID, dishId);
-		DayMenuFragment dm = (DayMenuFragment) mDayMenuFragmentFragments.get(dayId);
+		DayMenuFragment dm = (DayMenuFragment) mDayMenuFragmentFragments
+				.get(dayId);
 		intent.putExtra(DishPageViewActivity.LIST_DAY_MENU, dm.mRarusMenu);
 		intent.putExtra(DishPageViewActivity.DATE, dm.mStringDate);
 		startActivityForResult(intent, 1);
@@ -203,7 +213,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}
 		ArrayList<RarusMenu> tempRM = data
 				.getParcelableArrayListExtra(DishPageViewActivity.LIST_DAY_MENU);
-		DayMenuFragment tempDM = mDayMenuFragmentFragments.get(mCurrentFragmentId);
+		DayMenuFragment tempDM = mDayMenuFragmentFragments
+				.get(mCurrentFragmentId);
 		tempDM.setRarusMenu(tempRM);
 		tempDM.refreshAdapter();
 	}
@@ -226,14 +237,19 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			tempDayMenuFragment.setPosition(mDayMenuFragmentFragments.size());
 			mDayMenuFragmentFragments.add(tempDayMenuFragment);
 		}
+		makeSlidingMenu(mDatesString);
+
+	}
+
+	public void makeSlidingMenu(List<String> dates) {
 		mSlidingMenuFragment = new SlidingMenuFragment(
-				(ArrayList<String>) mDatesString);
+				(ArrayList<String>) dates);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
 		ArrayAdapter<String> list = new ArrayAdapter<String>(
 				getSupportActionBar().getThemedContext(),
-				R.layout.sherlock_spinner_item, mDatesString);
+				R.layout.sherlock_spinner_item, dates);
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
@@ -273,7 +289,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void onCleanClick() {
-		DayMenuFragment tempDM = mDayMenuFragmentFragments.get(mCurrentFragmentId);
+		DayMenuFragment tempDM = mDayMenuFragmentFragments
+				.get(mCurrentFragmentId);
 		for (RarusMenu dmiterator : tempDM.mRarusMenu) {
 			if (dmiterator.getAmmount() != 0) {
 				dmiterator.setAmmount(0);
@@ -289,7 +306,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void removeChanges() {
 		int date = mEateryDB.getMenuDates().get(mCurrentFragmentId);
-		DayMenuFragment tempDM = mDayMenuFragmentFragments.get(mCurrentFragmentId);
+		DayMenuFragment tempDM = mDayMenuFragmentFragments
+				.get(mCurrentFragmentId);
 		tempDM.mRarusMenu = (ArrayList<RarusMenu>) mEateryDB.getMenu(date);
 		tempDM.refreshAdapter();
 		mChangedOrderedAmount = false;
@@ -366,7 +384,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				this.mEateryDB = new EateryDB(getApplicationContext());
 				if (mEateryDB.getMenuDates().size() != 0) {
 					makeFragments();
-					changeContentRequest(mCurrentFragmentId);
+					mNextFragmentId = mCurrentFragmentId;
+					switchContent();
 					Toast.makeText(getBaseContext(), "ћеню обновлено.", 3)
 							.show();
 					mChangedOrderedAmount = false;
@@ -423,13 +442,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public Object onRetainCustomNonConfigurationInstance() {
-		return mEateryDB;
+		return mDayMenuFragmentFragments;
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		// saving id of the current day
 		outState.putInt("mCurrentFragmentId", mCurrentFragmentId);
+		outState.putStringArrayList("mDatesString",
+				(ArrayList<String>) mDatesString);
 	}
 
 	@Override
