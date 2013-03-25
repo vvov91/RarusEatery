@@ -34,11 +34,10 @@ public class SlidingMenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
-		// customMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
-		// mDatesString);
 		slidingMenuLV = (ListView) v.findViewById(R.id.lv);
-		sLidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(), R.id.lv, mDatesString);
-		slidingMenuLV.setAdapter(sLidingMenuListAdapter);
+		slidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
+				R.id.lv, mDatesString);
+		slidingMenuLV.setAdapter(slidingMenuListAdapter);
 		slidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -58,7 +57,7 @@ public class SlidingMenuFragment extends Fragment {
 	}
 
 	public void setSelectedItem(int position) {
-		sLidingMenuListAdapter.setSelected(position);
-		sLidingMenuListAdapter.notifyDataSetChanged();
+		slidingMenuListAdapter.setSelected(position);
+		slidingMenuListAdapter.notifyDataSetChanged();
 	}
 }

@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+/**
+ * Adapter class to show the dates
+ */
 public class SlidingMenuListAdapter extends ArrayAdapter {
 
 	private ArrayList<String> dates;

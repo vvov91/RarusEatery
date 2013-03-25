@@ -10,106 +10,101 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DishAdapter extends BaseAdapter {
-	Context ctx;
-	LayoutInflater lInflater;
-	ArrayList<RarusMenu> mMenu;
-	Button btnMinus, btnPlus;
-	TextView tvAmount;
-	String date;
+/**
+ * Adapter class to show the dishes
+ */
+public class DishAdapter extends ArrayAdapter {
 
-	DishAdapter(Context context, ArrayList<RarusMenu> menu, String date) {
-		this.date = date;
-		ctx = context;
-		mMenu = menu;
-		lInflater = (LayoutInflater) ctx
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	private Context context;
+	private ArrayList<RarusMenu> mMenu;
+	private Button btnMinus, btnPlus;
+	private TextView tvAmount;
+
+	public DishAdapter(Context context, int textViewResourceId,
+			ArrayList<RarusMenu> menu) {
+		super(context, textViewResourceId, menu);
+		this.context = context;
+		this.mMenu = menu;
 	}
 
-	// кол-во элементов
 	@Override
-	public int getCount() {
-		return mMenu.size();
-	}
-
-	// элемент по позиции
-	@Override
-	public Object getItem(int position) {
-		return mMenu.get(position);
-	}
-
-	// id по позиции
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	// пункт списка
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// используем созданные, но не используемые view
-		View view = convertView;
-		if (view == null) {
-			view = lInflater.inflate(R.layout.dish, parent, false);
+	public View getView(int position, View v, ViewGroup parent) {
+		DishViewHolder viewHolder;
+		if (v == null) {
+			LayoutInflater li = (LayoutInflater) getContext().getSystemService(
+					Context.LAYOUT_INFLATER_SERVICE);
+			v = li.inflate(R.layout.dish, parent, false);
+			viewHolder = new DishViewHolder();
+			viewHolder.tvName = (TextView) v.findViewById(R.id.tvName);
+			viewHolder.tvPrice = (TextView) v.findViewById(R.id.tvPrice);
+			viewHolder.tvAmount = (TextView) v.findViewById(R.id.tvAmount);
+			viewHolder.btnMinus = (Button) v.findViewById(R.id.btnMinus);
+			viewHolder.btnPlus = (Button) v.findViewById(R.id.btnPlus);
+			v.setTag(viewHolder);
+		} else {
+			viewHolder = (DishViewHolder) v.getTag();
 		}
 
-		final RarusMenu p = mMenu.get(position);
-		// заполняем View в пункте списка данными из товаров: наименование, цена
-		((TextView) view.findViewById(R.id.tvName)).setText(p.getName());
-		((TextView) view.findViewById(R.id.tvPrice)).setText(p.getPrice()
-				+ " грн");
-		// ((Button) view.findViewById(R.id.btnRating)).setText(p.getRating());
-		tvAmount = (TextView) view.findViewById(R.id.tvAmount);
-		tvAmount.setText(p.getAmmount() + "");
-		btnMinus = (Button) view.findViewById(R.id.btnMinus);
-		btnPlus = (Button) view.findViewById(R.id.btnPlus);
-		btnMinus.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				float orderedAmmount = p.getAmmount();
-				boolean portioned = p.isPortioned();
-				float step = (float) (portioned ? 0.5 : 1);
-				if (orderedAmmount > step)
-					orderedAmmount -= step;
-				else
-					orderedAmmount = 0;
-				p.setAmmount(orderedAmmount);
-				p.setModified(true);
-				notifyDataSetChanged();
-				SlidingMenuActivity.mChangedOrderedAmount = true;
-				Log.d("int",""+SlidingMenuActivity.mChangedOrderedAmount);
+		final RarusMenu rarusMenu = mMenu.get(position);
+		if (rarusMenu != null) {
+			viewHolder.tvName.setText(rarusMenu.getName());
+			viewHolder.tvPrice.setText(rarusMenu.getPrice() + " грн");
+			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
+			viewHolder.btnMinus.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					float orderedAmmount = rarusMenu.getAmmount();
+					boolean portioned = rarusMenu.isPortioned();
+					float step = (float) (portioned ? 0.5 : 1);
+					if (orderedAmmount > step)
+						orderedAmmount -= step;
+					else
+						orderedAmmount = 0;
+					rarusMenu.setAmmount(orderedAmmount);
+					rarusMenu.setModified(true);
+					notifyDataSetChanged();
+					SlidingMenuActivity.mChangedOrderedAmount = true;
+					Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 
-			}
-		});
-		btnPlus.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				float orderedAmmount = p.getAmmount();
-				boolean portioned = p.isPortioned();
-				float availableAmmount = p.getAvailable();
-				float step = (float) (portioned ? 0.5 : 1);
-				if ((orderedAmmount + step <= availableAmmount)
-						|| (availableAmmount == -1))
-					orderedAmmount += step;
-				else
-					Toast.makeText(
-							ctx,
-							"AvailableAmmount "
-									+ Float.toString(p.getAvailable()), 3)
-							.show();
-				p.setAmmount(orderedAmmount);
-				p.setModified(true);
-				SlidingMenuActivity.mChangedOrderedAmount = true;
-				Log.d("int",""+SlidingMenuActivity.mChangedOrderedAmount);
-				notifyDataSetChanged();
-			}
-		});
-		return view;
+				}
+			});
+			viewHolder.btnPlus.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					float orderedAmmount = rarusMenu.getAmmount();
+					boolean portioned = rarusMenu.isPortioned();
+					float availableAmmount = rarusMenu.getAvailable();
+					float step = (float) (portioned ? 0.5 : 1);
+					if ((orderedAmmount + step <= availableAmmount)
+							|| (availableAmmount == -1))
+						orderedAmmount += step;
+					else
+						Toast.makeText(
+								context,
+								"AvailableAmmount "
+										+ Float.toString(rarusMenu
+												.getAvailable()), 3).show();
+					rarusMenu.setAmmount(orderedAmmount);
+					rarusMenu.setModified(true);
+					SlidingMenuActivity.mChangedOrderedAmount = true;
+					Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
+					notifyDataSetChanged();
+				}
+			});
+		}
+		return v;
 	}
 
+	static class DishViewHolder {
+		TextView tvAmount;
+		TextView tvName;
+		TextView tvPrice;
+		Button btnMinus;
+		Button btnPlus;
+	}
 }

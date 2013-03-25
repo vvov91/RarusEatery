@@ -33,7 +33,8 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 	public DayMenuFragment() {
 	}
 
-	public DayMenuFragment(ArrayList<RarusMenu> _mRarusMenues, String _mDate, int _mPos) {
+	public DayMenuFragment(ArrayList<RarusMenu> _mRarusMenues, String _mDate,
+			int _mPos) {
 		mRarusMenu = _mRarusMenues;
 		mStringDate = _mDate;
 		mPosition = _mPos;
@@ -51,7 +52,7 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 		View v = inflater.inflate(R.layout.menu, null);
 		if (mPosition == -1 && savedInstanceState != null)
 			mPosition = savedInstanceState.getInt("mPosition");
-		mDishAdapter = new DishAdapter(v.getContext(), mRarusMenu, mStringDate);
+		mDishAdapter=new DishAdapter(v.getContext(),R.id.gvMain,mRarusMenu);
 		mGridView = (GridView) v.findViewById(R.id.gvMain);
 		mGridView.setAdapter(mDishAdapter);
 		Configuration config = getResources().getConfiguration();
@@ -73,8 +74,7 @@ public class DayMenuFragment extends Fragment implements Parcelable {
 
 	public void refreshAdapter() {
 		// TODO understand why the adapter.notifyDataSetChanged() does not work
-		mDishAdapter = new DishAdapter(getView().getContext(), mRarusMenu,
-				mStringDate);
+		mDishAdapter=new DishAdapter(getView().getContext(),R.id.gvMain,mRarusMenu);
 		mGridView.setAdapter(mDishAdapter);
 	}
 
