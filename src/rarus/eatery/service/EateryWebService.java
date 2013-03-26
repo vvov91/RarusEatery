@@ -20,7 +20,8 @@ import android.util.Log;
  * @author Dmitriy Bazunov <binnarywolf@gmail.com>
  */
 public class EateryWebService extends Service implements ServiceRequestResult {
-
+	
+	public static final String SERVICE_LOG_TAG = "rarus.eatery.service";
 	private EateryDB mDBManager;
 	private EateryServiceBinder binder = new EateryServiceBinder();
 	private ServiceAPI api;
@@ -28,18 +29,18 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	@Override
 	public void onSuccessfullRequest() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG,
+		Log.d(this.getClass().toString(),
 				"[SERVICE] - SuccessfullReturned");
 		try {
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - api.get");
+			Log.d(this.getClass().toString(), "[SERVICE] - api.get");
 			APIMessage message = api.get();
-			Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - code");
+			Log.d(this.getClass().toString(), "[SERVICE] - code");
 			switch (message.getCode()) {
 			case EateryConstants.GET_MENU_CODE: {
-				Log.d(EateryConstants.SERVICE_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"[SERVICE] - get menu code");
 				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
-				Log.d(EateryConstants.SERVICE_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"[SERVICE] - Servicel list getted");
 				writeToDB(list);
 				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
@@ -50,11 +51,11 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			}
 				break;
 			case EateryConstants.SET_ORDER_CODE: {
-				Log.d(EateryConstants.SERVICE_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"[SERVICE] - Order succssessfuly send");
 				getMenu();
 			}
-				break;
+				break; 
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -65,7 +66,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	@Override
 	public void onUnSuccessfullRequest() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG,
+		Log.d(this.getClass().toString(),
 				"[SERVICE] - UnSuccessfullReturned");
 		try {
 			APIMessage message = api.get();
@@ -76,7 +77,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
 				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
 						EateryConstants.GET_MENU_CODE);
-				Log.d(EateryConstants.SERVICE_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
 				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
 				sendBroadcast(intent);
@@ -90,7 +91,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
 				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
 						EateryConstants.PING_CODE);
-				Log.d(EateryConstants.SERVICE_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
 				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
 				sendBroadcast(intent);
@@ -105,7 +106,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	}
 
 	public IBinder onBind(Intent arg0) {
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - On bind");
+		Log.d(this.getClass().toString(), "[SERVICE] - On bind");
 		sp = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		return binder;
@@ -113,28 +114,28 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	public void onCreate() {
 		super.onCreate();
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - onCreate");
+		Log.d(this.getClass().toString(), "[SERVICE] - onCreate");
 	}
 
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - onDestroy");
+		Log.d(this.getClass().toString(), "[SERVICE] - onDestroy");
 	}
 	
 	public void update(){
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Starting update");	
+		Log.d(this.getClass().toString(), "[SERVICE] - Starting update");	
 		setMenu();		
 	}
 	
 	public void getMenu() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Get menu");
+		Log.d(this.getClass().toString(), "[SERVICE] - Get menu");
 		api = new ServiceAPI(this,
 				PreferenceManager.getDefaultSharedPreferences(this));
 		api.execute(new APIMessage(EateryConstants.GET_MENU_CODE, null));
 	}
 
 	public void setMenu() {
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE] - Set menu");
+		Log.d(this.getClass().toString(), "[SERVICE] - Set menu");
 		api = new ServiceAPI(this,
 				PreferenceManager.getDefaultSharedPreferences(this));
 	    mDBManager =  new EateryDB(getApplicationContext());
@@ -144,7 +145,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 
 	private void writeToDB(List<RarusMenu> menu) {		
 		mDBManager = new EateryDB(getApplicationContext());
-		Log.d(EateryConstants.SERVICE_LOG_TAG, "[SERVICE]: Запись меню в БД ");
+		Log.d(this.getClass().toString(), "[SERVICE]: Запись меню в БД ");
 		mDBManager.deleteMenu();
 		mDBManager.saveMenu(menu);	
 	}

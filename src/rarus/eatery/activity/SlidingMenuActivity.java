@@ -14,6 +14,7 @@ import java.util.Locale;
 import rarus.eatery.R;
 import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.EateryConstants;
+import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
 import android.app.AlertDialog;
@@ -26,9 +27,11 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -100,6 +103,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				changeContentRequest(mCurrentFragmentId);
 			}
 		}
+		Preference.prefInit(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
 	}
 
 	public void switchContent() {

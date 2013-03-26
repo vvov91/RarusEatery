@@ -13,6 +13,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 import rarus.eatery.model.EateryConstants;
+import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -26,7 +27,8 @@ import android.util.Xml;
  */
 
 public class XMLParser {
-
+	public static final String SOAP_PREFIX = "http://schemas.xmlsoap.org/soap/envelope/";
+	public static final String MOB_PREFIX = "http://mobileEda";	
 	public static String processHtmlError(String html) {
 		try {
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -68,79 +70,79 @@ public class XMLParser {
 		}
 	}
 
-	public static String pingXml(SharedPreferences sp) {
+	public static String pingXml() {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
-		Log.i(EateryConstants.SERVICE_LOG_TAG,"XML_Parser  card number  "+ cardCode );
+		String cardCode =Preference.getCardNumber();
+		Log.i(XMLParser.class.toString(),"XML_Parser  card number  "+ cardCode );
 		try {
 			sz.setOutput(writer);
-			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
-			sz.setPrefix("mob", EateryConstants.MOB_PREFIX);
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Envelope");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.startTag(EateryConstants.MOB_PREFIX, "ping");
-			sz.startTag(EateryConstants.MOB_PREFIX, "loginStructure");
-			sz.startTag(EateryConstants.MOB_PREFIX, "cardNumber");
+			sz.setPrefix("soapenv", SOAP_PREFIX);
+			sz.setPrefix("mob", MOB_PREFIX);
+			sz.startTag(SOAP_PREFIX, "Envelope");
+			sz.startTag(SOAP_PREFIX, "Header");
+			sz.endTag(SOAP_PREFIX, "Header");
+			sz.startTag(SOAP_PREFIX, "Body");
+			sz.startTag(MOB_PREFIX, "ping");
+			sz.startTag(MOB_PREFIX, "loginStructure");
+			sz.startTag(MOB_PREFIX, "cardNumber");
 			sz.text(cardCode);
-			sz.endTag(EateryConstants.MOB_PREFIX, "cardNumber");
-			sz.endTag(EateryConstants.MOB_PREFIX, "loginStructure");
-			sz.endTag(EateryConstants.MOB_PREFIX, "ping");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Envelope");
+			sz.endTag(MOB_PREFIX, "cardNumber");
+			sz.endTag(MOB_PREFIX, "loginStructure");
+			sz.endTag(MOB_PREFIX, "ping");
+			sz.endTag(SOAP_PREFIX, "Body");
+			sz.endTag(SOAP_PREFIX, "Envelope");
 			sz.endDocument();
 			return writer.toString();
 		} catch (IOException exception) {
-			Log.e(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] IOException "+ exception.getLocalizedMessage());
+			Log.e(XMLParser.class.toString(), "[XMLParser] IOException "+ exception.getLocalizedMessage());
 			return null;
 		}
 	}
 
-	public static String setMenuXMLRequest(SharedPreferences sp,List<RarusMenu> orders){
+	public static String setMenuXMLRequest(List<RarusMenu> orders){
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
+		String cardCode=Preference.getCardNumber();
 		try {
 			sz.setOutput(writer);
-			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
-			sz.setPrefix("mob", EateryConstants.MOB_PREFIX);
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Envelope");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.startTag(EateryConstants.MOB_PREFIX, "setMenu");
-			sz.startTag(EateryConstants.MOB_PREFIX, "loginStructure");
-			sz.startTag(EateryConstants.MOB_PREFIX, "cardNumber");
+			sz.setPrefix("soapenv", SOAP_PREFIX);
+			sz.setPrefix("mob", MOB_PREFIX);
+			sz.startTag(SOAP_PREFIX, "Envelope");
+			sz.startTag(SOAP_PREFIX, "Header");
+			sz.endTag(SOAP_PREFIX, "Header");
+			sz.startTag(SOAP_PREFIX, "Body");
+			sz.startTag(MOB_PREFIX, "setMenu");
+			sz.startTag(MOB_PREFIX, "loginStructure");
+			sz.startTag(MOB_PREFIX, "cardNumber");
 			sz.text(cardCode);
-			sz.endTag(EateryConstants.MOB_PREFIX, "cardNumber");
-			sz.endTag(EateryConstants.MOB_PREFIX, "loginStructure");
+			sz.endTag(MOB_PREFIX, "cardNumber");
+			sz.endTag(MOB_PREFIX, "loginStructure");
 			for(RarusMenu dish:orders){
-				sz.startTag(EateryConstants.MOB_PREFIX, "orderStructure");
+				sz.startTag(MOB_PREFIX, "orderStructure");
 				
-				sz.startTag(EateryConstants.MOB_PREFIX, "data");
+				sz.startTag(MOB_PREFIX, "data");
 				sz.text(Integer.toString(dish.getDate()));
-				sz.endTag(EateryConstants.MOB_PREFIX, "data");
+				sz.endTag(MOB_PREFIX, "data");
 				
 				
-				sz.startTag(EateryConstants.MOB_PREFIX, "dishId");
+				sz.startTag(MOB_PREFIX, "dishId");
 				sz.text(dish.getDishId());
-				sz.endTag(EateryConstants.MOB_PREFIX, "dishId");
+				sz.endTag(MOB_PREFIX, "dishId");
 				
-				sz.startTag(EateryConstants.MOB_PREFIX, "timestamp");
+				sz.startTag(MOB_PREFIX, "timestamp");
 				sz.text(Integer.toString(dish.getTimestamp()));
-				sz.endTag(EateryConstants.MOB_PREFIX, "timestamp");
+				sz.endTag(MOB_PREFIX, "timestamp");
 				
-				sz.startTag(EateryConstants.MOB_PREFIX, "ammount");
+				sz.startTag(MOB_PREFIX, "ammount");
 				sz.text(Float.toString(dish.getAmmount()));
-				sz.endTag(EateryConstants.MOB_PREFIX, "ammount");				
+				sz.endTag(MOB_PREFIX, "ammount");				
 				
-				sz.endTag(EateryConstants.MOB_PREFIX, "orderStructure");
+				sz.endTag(MOB_PREFIX, "orderStructure");
 			}
-			sz.endTag(EateryConstants.MOB_PREFIX, "setMenu");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Envelope");
+			sz.endTag(MOB_PREFIX, "setMenu");
+			sz.endTag(SOAP_PREFIX, "Body");
+			sz.endTag(SOAP_PREFIX, "Envelope");
 			sz.endDocument();
 			return writer.toString();
 		} catch (Exception e) {
@@ -148,12 +150,12 @@ public class XMLParser {
 		}
 	}
 	public static List<RarusMenu> parseXMLSetOrder(String xml){
-		Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted setMenu response xml:\n"+ xml);
+		Log.i(XMLParser.class.toString(), "[XMLParser] getted setMenu response xml:\n"+ xml);
 		return null;
 	}
 	public static String parseXMLPing(String xml) {
 		try {
-			Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted ping xml:\n"+ xml);
+			Log.i(XMLParser.class.toString(), "[XMLParser] getted ping xml:\n"+ xml);
 			String userName = "";
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware(true);
@@ -167,12 +169,12 @@ public class XMLParser {
 					break;
 				case XmlPullParser.START_TAG:
 					name = xpp.getName();
-					Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted tag xml:  "+ name);
+					Log.i(XMLParser.class.toString(), "[XMLParser] getted tag xml:  "+ name);
 					break;
 				case XmlPullParser.END_TAG:
 				case XmlPullParser.TEXT:
 					if (name.equals("enName")) {
-						Log.i(EateryConstants.SERVICE_LOG_TAG, "[XMLParser] getted tag text:  "+xpp.getText());
+						Log.i(XMLParser.class.toString(), "[XMLParser] getted tag text:  "+xpp.getText());
 						userName = xpp.getText();
 						name="";
 					}
@@ -193,27 +195,27 @@ public class XMLParser {
 		}
 	}
 
-	public static String getMenuXMLRequest(SharedPreferences sp) {
+	public static String getMenuXMLRequest() {
 		XmlSerializer sz = Xml.newSerializer();
 		StringWriter writer = new StringWriter();
-		String cardCode = sp.getString(EateryConstants.PREF_CARD_NUMBER, "000013BDBD");
+		String cardCode=Preference.getCardNumber();
 		try {
 			sz.setOutput(writer);
-			sz.setPrefix("soapenv", EateryConstants.SOAP_PREFIX);
-			sz.setPrefix("mob", EateryConstants.MOB_PREFIX);
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Envelope");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Header");
-			sz.startTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.startTag(EateryConstants.MOB_PREFIX, "getMenu");
-			sz.startTag(EateryConstants.MOB_PREFIX, "loginStructure");
-			sz.startTag(EateryConstants.MOB_PREFIX, "cardNumber");
+			sz.setPrefix("soapenv", SOAP_PREFIX);
+			sz.setPrefix("mob", MOB_PREFIX);
+			sz.startTag(SOAP_PREFIX, "Envelope");
+			sz.startTag(SOAP_PREFIX, "Header");
+			sz.endTag(SOAP_PREFIX, "Header");
+			sz.startTag(SOAP_PREFIX, "Body");
+			sz.startTag(MOB_PREFIX, "getMenu");
+			sz.startTag(MOB_PREFIX, "loginStructure");
+			sz.startTag(MOB_PREFIX, "cardNumber");
 			sz.text(cardCode);
-			sz.endTag(EateryConstants.MOB_PREFIX, "cardNumber");
-			sz.endTag(EateryConstants.MOB_PREFIX, "loginStructure");
-			sz.endTag(EateryConstants.MOB_PREFIX, "getMenu");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Body");
-			sz.endTag(EateryConstants.SOAP_PREFIX, "Envelope");
+			sz.endTag(MOB_PREFIX, "cardNumber");
+			sz.endTag(MOB_PREFIX, "loginStructure");
+			sz.endTag(MOB_PREFIX, "getMenu");
+			sz.endTag(SOAP_PREFIX, "Body");
+			sz.endTag(SOAP_PREFIX, "Envelope");
 			sz.endDocument();
 			return writer.toString();
 		} catch (Exception e) {
