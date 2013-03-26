@@ -28,9 +28,9 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	public static final int GET_MENU_CODE = 1;
 	public static final int SET_ORDER_CODE = 2;	
 	public static final String SERVICE_LOG_TAG = "rarus.eatery.service";
-	private EateryDB mDBManager;
+	
 	private EateryServiceBinder binder = new EateryServiceBinder();
-	private ServiceAPI api;
+	private ServiceAPI_Async api;
 	private SharedPreferences sp;
 
 	@Override
@@ -48,7 +48,6 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - Servicel list getted");
-				writeToDB(list);
 				Intent intent = new Intent( BROADCAST_ACTION);
 				intent.putExtra( SERVICE_RESULT, true);
 				intent.putExtra( SERVICE_RESULT_CODE,
@@ -135,26 +134,17 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	
 	public void getMenu() {
 		Log.d(this.getClass().toString(), "[SERVICE] - Get menu");
-		api = new ServiceAPI(this,
-				PreferenceManager.getDefaultSharedPreferences(this));
+		api = new ServiceAPI_Async(this,getApplicationContext());
 		api.execute(new APIMessage( GET_MENU_CODE, null));
 	}
 
 	public void setMenu() {
 		Log.d(this.getClass().toString(), "[SERVICE] - Set menu");
-		api = new ServiceAPI(this,
-				PreferenceManager.getDefaultSharedPreferences(this));
-	    mDBManager =  new EateryDB(getApplicationContext());
-	    List<RarusMenu> orders=mDBManager.getOrdersNotSent();
-		api.execute(new APIMessage( SET_ORDER_CODE, orders));
+		api = new ServiceAPI_Async(this,getApplicationContext());
+		api.execute(new APIMessage( SET_ORDER_CODE, null));
 	}
 
-	private void writeToDB(List<RarusMenu> menu) {		
-		mDBManager = new EateryDB(getApplicationContext());
-		Log.d(this.getClass().toString(), "[SERVICE]: Запись меню в БД ");
-		mDBManager.deleteMenu();
-		mDBManager.saveMenu(menu);	
-	}
+
 
 	public class EateryServiceBinder extends Binder {
 		public EateryWebService getService() {
