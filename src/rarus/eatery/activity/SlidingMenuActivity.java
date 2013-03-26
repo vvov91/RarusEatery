@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -61,6 +62,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
@@ -77,6 +79,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		sm.setBehindScrollScale(0.25f);
 		sm.setFadeDegree(0.25f);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		getSupportActionBar().hide();
 
 		mEateryDB = new EateryDB(getApplicationContext());
@@ -250,6 +253,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
+		setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
@@ -324,6 +328,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onRefreshClick(View v) {
 		client.update();
 		Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
+        setSupportProgressBarIndeterminateVisibility(true);
 	}
 
 	// method to display the menu (link in the layout)
