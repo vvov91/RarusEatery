@@ -1,8 +1,11 @@
 package rarus.eatery.service;
 
 import java.util.List;
+
+import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,17 +15,19 @@ import android.util.Log;
  * 
  * @author Dmitriy Bazunov <binnarywolf@gmail.com>
  */
-public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
+public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> {
 	public static final String SERV_LOGIN = "mobileUser";
 	public static final String SERV_PASSWORD = "mobileUser";
 	private ServiceRequestResult serviceResult;
+	private EateryDB mDBManager;
 	private boolean successfull;
 	private String mError;
 	private String URL;
 
-	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
+	public ServiceAPI_Async(ServiceRequestResult serviceResult, Context context) {
 		super();
 		this.serviceResult = serviceResult;
+		mDBManager=new EateryDB(context);
 	}
 
 	@Override
@@ -44,7 +49,7 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		case EateryWebService.SET_ORDER_CODE: {
 			Log.d(this.getClass().toString(), "[API] - setOrderCode");
 			result = new APIMessage(EateryWebService.SET_ORDER_CODE,
-					setOrder((List<RarusMenu>) params[0].getContent()));
+					setOrder());
 		}
 			break;
 
@@ -130,6 +135,9 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
+			Log.d(this.getClass().toString(),
+					"[API] - writing to DB");
+			writeToDB(menu);
 		} else {
 			Log.d(this.getClass().toString(),
 					"[API] - Error:\n"
@@ -142,7 +150,8 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		return menu;
 	}
 
-	private Object setOrder(List<RarusMenu> orders) {
+	private Object setOrder() {
+		List<RarusMenu> orders=mDBManager.getOrdersNotSent();
 		List<RarusMenu> menu = null;
 		String xml = XMLParser.setMenuXMLRequest(orders);
 		Log.i(this.getClass().toString(), "[API] - setOrder xml:\n" + xml);
@@ -174,5 +183,11 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		}
 		Log.e(this.getClass().toString(), "[API] - error:\n" + error);
 		mError = error;
+	}
+	
+	private void writeToDB(List<RarusMenu> menu) {
+		Log.d(this.getClass().toString(), "[SERVICE]: Запись меню в БД ");
+		mDBManager.deleteMenu();
+		mDBManager.saveMenu(menu);	
 	}
 }
