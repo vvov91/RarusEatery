@@ -85,7 +85,7 @@ public class HTTPPostRequest {
 			httpClient.getConnectionManager().shutdown();
 
 		} catch (ConnectTimeoutException cte) {
-			String msg = "Timeout exception";
+			String msg = "Timeout Exception";
 			Log.e(getClass().getName(), msg);
 			_error = msg;
 		} catch (Exception e) {

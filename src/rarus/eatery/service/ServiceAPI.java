@@ -68,16 +68,21 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	}
 
 	private boolean connectionTest() {
-		URL = Preference.getFirstURL();
+		URL = Preference.getSecondURL();
 		Log.d(this.getClass().toString(), "[API] - connection test");
 		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
 				+ URL);
 		if (ping())
 			return true;
+		Log.d(this.getClass().toString(), "[API] - mError :"+ mError);
+		
+		if(!mError.equals("Timeout Exception")){
+			return false;
+		}
 		//
 		// Error process code.
 		//
-		URL = Preference.getSecondURL();
+		URL = Preference.getFirstURL();
 		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
 				+ URL);
 		return ping();
@@ -92,12 +97,13 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 				&& !request.getResult().startsWith("<html>")) {
 			String res = XMLParser.parseXMLPing(request.getResult());
 			Log.d(this.getClass().toString(), "[API] - Ping res \n" + res);
-			if (res.equals("User authentication error")) {
-				mError = "User authentication error";
-				return false;
-			} else
+			if (res.equals("OK")) {
+				mError = "";
 				return true;
-
+			} else{
+				mError=res;
+				return false;
+			}
 		} else {
 			Log.d(this.getClass().toString(),
 					"[API] - Error:\n"
