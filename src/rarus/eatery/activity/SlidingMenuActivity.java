@@ -61,6 +61,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	List<DayMenuFragment> mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 	List<String> mDatesString = new ArrayList<String>();
 	static Boolean mChangedOrderedAmount = false;
+	FirstRunFragment mFirstRunFragment = new FirstRunFragment();
 
 
 	@Override
@@ -98,7 +99,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		} else {
 			if (mEateryDB.getMenuDates().size() == 0) {
 				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.content_frame, new FirstRunFragment())
+						.replace(R.id.content_frame, mFirstRunFragment)
 						.commit();
 				getSlidingMenu().setSlidingEnabled(false);
 			} else {
@@ -140,7 +141,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void changeContentRequest(int newId) {
 		mNextFragmentId = newId;
-		if ((mChangedOrderedAmount)&&(mNextFragmentId!=mCurrentFragmentId))
+		if ((mChangedOrderedAmount) && (mNextFragmentId != mCurrentFragmentId))
 			showDialog(1);
 		else
 			switchContent();
@@ -435,6 +436,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при получении меню." + error, 3).show();
+				mFirstRunFragment.setButtonEnabled(true);
 			}
 				break;
 			case EateryWebService.SET_ORDER_CODE: {
@@ -443,6 +445,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при отправке заказа." + error, 3).show();
+				mFirstRunFragment.setButtonEnabled(true);
+
 			}
 				break;
 			case EateryWebService.PING_CODE: {
@@ -451,6 +455,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при соединеннии с сервером." + error, 3).show();
+				mFirstRunFragment.setButtonEnabled(true);
+
 			}
 				break;
 			}
