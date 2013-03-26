@@ -13,7 +13,6 @@ import java.util.Locale;
 
 import rarus.eatery.R;
 import rarus.eatery.database.EateryDB;
-import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;

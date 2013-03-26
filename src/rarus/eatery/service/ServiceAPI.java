@@ -1,7 +1,6 @@
 package rarus.eatery.service;
 
 import java.util.List;
-import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import android.content.SharedPreferences;

@@ -4,7 +4,6 @@ package rarus.eatery.service;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import rarus.eatery.database.EateryDB;
-import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.RarusMenu;
 import android.app.Service;
 import android.content.Intent;

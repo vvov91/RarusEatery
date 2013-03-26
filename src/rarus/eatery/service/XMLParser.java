@@ -12,7 +12,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import android.content.SharedPreferences;
