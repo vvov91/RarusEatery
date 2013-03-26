@@ -7,62 +7,55 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class SlidingMenuListAdapter extends BaseAdapter {
-	Context ctx;
-	LayoutInflater lInflater;
-	ArrayList<String> objects;
-	int selectedPositin = -1;
+/**
+ * Adapter class to show the dates
+ */
+public class SlidingMenuListAdapter extends ArrayAdapter {
 
-	SlidingMenuListAdapter(Context context, ArrayList<String> products) {
-		ctx = context;
-		objects = products;
-		lInflater = (LayoutInflater) ctx
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	private ArrayList<String> dates;
+	private int selectedPosition = -1;
+	private Context context;
+
+	public SlidingMenuListAdapter(Context context, int textViewResourceId,
+			ArrayList<String> objects) {
+		super(context, textViewResourceId, objects);
+		this.context = context;
+		this.dates = objects;
 	}
 
-	// кол-во элементов
 	@Override
-	public int getCount() {
-		return objects.size();
-	}
+	public View getView(int position, View v, ViewGroup parent) {
+		MenuListViewHolder viewHolder;
 
-	public void setSelected(int selectedPositin) {
-		this.selectedPositin = selectedPositin;
-	}
+		if (v == null) {
+			LayoutInflater li = (LayoutInflater) getContext().getSystemService(
+					Context.LAYOUT_INFLATER_SERVICE);
+			v = li.inflate(android.R.layout.simple_list_item_1, parent, false);
 
-	// элемент по позиции
-	@Override
-	public Object getItem(int position) {
-		return objects.get(position);
-	}
-
-	// id по позиции
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	// пункт списка
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// используем созданные, но не используемые view
-		View view = convertView;
-		if (view == null) {
-			view = lInflater.inflate(android.R.layout.simple_list_item_1,
-					parent, false);
+			viewHolder = new MenuListViewHolder();
+			viewHolder.text1 = (TextView) v.findViewById(android.R.id.text1);
+			v.setTag(viewHolder);
+		} else {
+			viewHolder = (MenuListViewHolder) v.getTag();
 		}
-		String str = getProduct(position);
-		((TextView) view.findViewById(android.R.id.text1)).setText(str);
-		view.setBackgroundColor(Color.WHITE);
-		if ((selectedPositin!=-1)&&(selectedPositin==position)) view.setBackgroundColor(Color.DKGRAY);
-		return view;
+		String str = dates.get(position);
+		viewHolder.text1.setText(str);
+		if ((selectedPosition != -1) && (selectedPosition == position))
+			v.setBackgroundColor(Color.DKGRAY);
+		else
+			v.setBackgroundColor(Color.WHITE);
+
+		return v;
 	}
 
-	String getProduct(int position) {
-		return ((String) getItem(position));
+	public void setSelected(int selectedPosition) {
+		this.selectedPosition = selectedPosition;
 	}
 
+	static class MenuListViewHolder {
+		TextView text1;
+	}
 }
