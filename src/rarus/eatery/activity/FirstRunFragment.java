@@ -21,11 +21,12 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 	EditText etCardNumber, etServer1, etServer2;
 	SharedPreferences sp;
 	Editor ed;
+	View v;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.first_run_frame, null);
+		v = inflater.inflate(R.layout.first_run_frame, null);
 		sp = PreferenceManager.getDefaultSharedPreferences(getActivity()
 				.getBaseContext());
 		ed = sp.edit();
@@ -64,6 +65,15 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 			ed.putString("server2", null);
 
 		ed.commit();
+	}
+
+	void setButtonEnabled(boolean visible) {
+		if (!visible)
+			pb.setVisibility(View.VISIBLE);
+		else
+			pb.setVisibility(View.INVISIBLE);
+		btnDownload.setEnabled(visible);
+
 	}
 
 	void loadPreference() {
