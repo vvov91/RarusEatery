@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Eda v0.1</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Eda v0.2</string>
     <string name="menu_settings">Настройки</string>
-    <string name="order">Заказать</string>
     <string name="cardNumber">Номер карточки</string>
     <string name="cardNumberInfo">Введите номер карточки</string>
     <string name="server1">Сервер1:</string>
     <string name="server1Info">Адрес севера 1:</string>
     <string name="server2">Сервер2:</string>
     <string name="server2Info">Адрес севера 2:</string>
-    <string name="exit">Смена даты</string>
-    <string name="save_data">Сохранить заказ?</string>
+    <string name="date_change">Смена даты</string>
+    <string name="save_menu">Сохранить заказ?</string>
+    <string name="clear_menu">Очистить меню</string>
+    <string name="clear_menu_info">Очистить меню на день?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="save">Сохранить</string>
+    <string name="clean">Очистить</string>
+    <string name="cleaned">Заказ очищен, необходимо сохранение</string>
     <string name="saved">Заказ сохранен.</string>
+    <string name="synchronization">Синхронизация с сервером...</string>
+    <string name="updated_menu">Меню обновлено</string>
+    <string name="error_request">Запрос сервиса неудачен</string>
+    <string name="error_getting">Ошибка при получении меню</string>
+    <string name="error_sending">Ошибка при отправке заказа</string>
+    <string name="error_connecting">Ошибка при отправке заказа</string>
 
 </resources>

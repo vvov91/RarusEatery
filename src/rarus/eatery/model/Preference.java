@@ -10,12 +10,12 @@ public class Preference {
 		
 	}
 	public static String getFirstURL(){
-		return preference.getString("server1", "-----------");
+		return preference.getString("server1", "http://192.168.38.252:8095/DiningRoomTest/ws/mobileEda");
 	}
 	public static String getSecondURL(){
-		return preference.getString("server2", "-----------");
+		return preference.getString("server2", "http://178.219.241.102:8095/DiningRoomTest/ws/mobileEda");
 	}
 	public static String getCardNumber(){
-		return preference.getString("cardNumber", "-----------");
+		return preference.getString("cardNumber", "000013BDBD");
 	}
 }
