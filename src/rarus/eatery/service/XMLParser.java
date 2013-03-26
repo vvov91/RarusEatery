@@ -117,14 +117,20 @@ public class XMLParser {
 			sz.text(cardCode);
 			sz.endTag(MOB_PREFIX, "cardNumber");
 			sz.endTag(MOB_PREFIX, "loginStructure");
+			Integer date=0;
+			boolean first=true;
 			for(RarusMenu dish:orders){
-				sz.startTag(MOB_PREFIX, "orderStructure");
-				
-				sz.startTag(MOB_PREFIX, "data");
-				sz.text(Integer.toString(dish.getDate()));
-				sz.endTag(MOB_PREFIX, "data");
-				
-				
+				if(date!=dish.getDate()){
+					if(!first)
+						sz.endTag(MOB_PREFIX, "orderStructure");
+					date=dish.getDate();
+					sz.startTag(MOB_PREFIX, "orderStructure");
+					sz.startTag(MOB_PREFIX, "data");
+					sz.text(Integer.toString(date));
+					sz.endTag(MOB_PREFIX, "data");
+					first=false;
+				}
+				sz.startTag(MOB_PREFIX, "dish");
 				sz.startTag(MOB_PREFIX, "dishId");
 				sz.text(dish.getDishId());
 				sz.endTag(MOB_PREFIX, "dishId");
@@ -136,15 +142,17 @@ public class XMLParser {
 				sz.startTag(MOB_PREFIX, "ammount");
 				sz.text(Float.toString(dish.getAmmount()));
 				sz.endTag(MOB_PREFIX, "ammount");				
+				sz.endTag(MOB_PREFIX, "dish");
 				
-				sz.endTag(MOB_PREFIX, "orderStructure");
 			}
+			sz.endTag(MOB_PREFIX, "orderStructure");
 			sz.endTag(MOB_PREFIX, "setMenu");
 			sz.endTag(SOAP_PREFIX, "Body");
 			sz.endTag(SOAP_PREFIX, "Envelope");
 			sz.endDocument();
 			return writer.toString();
 		} catch (Exception e) {
+			Log.e(XMLParser.class.toString(), e.getMessage());
 			return null;
 		}
 	}
