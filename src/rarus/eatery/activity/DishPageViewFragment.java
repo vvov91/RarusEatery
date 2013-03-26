@@ -44,10 +44,10 @@ public class DishPageViewFragment extends Fragment {
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
 				// reload fragment
-				DishPageView activity = (DishPageView) getActivity();
+				DishPageViewActivity activity = (DishPageViewActivity) getActivity();
 				activity.reloadFragmentData();
-				SlidingMenuActivity.changedOrderedAmount = true;
-				Log.d("int", "" + SlidingMenuActivity.changedOrderedAmount);
+				SlidingMenuActivity.mChangedOrderedAmount = true;
+				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 
 			}
 		});
@@ -70,10 +70,10 @@ public class DishPageViewFragment extends Fragment {
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
 				// reload fragment
-				DishPageView activity = (DishPageView) getActivity();
+				DishPageViewActivity activity = (DishPageViewActivity) getActivity();
 				activity.reloadFragmentData();
-				SlidingMenuActivity.changedOrderedAmount = true;
-				Log.d("int", "" + SlidingMenuActivity.changedOrderedAmount);
+				SlidingMenuActivity.mChangedOrderedAmount = true;
+				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 			}
 		});
 		return v;

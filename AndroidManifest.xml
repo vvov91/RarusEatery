@@ -24,7 +24,7 @@
         <service android:name=".service.EateryWebService"></service>
         <activity android:name=".activity.SettingsActivity" >
         </activity>
-         <activity android:name=".activity.DishPageView" >
+         <activity android:name=".activity.DishPageViewActivity" >
         </activity>
     </application>
 

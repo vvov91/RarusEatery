@@ -750,6 +750,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 *    rounded date in Unix time format
 	 */
 	private int formatDate(int date) {
-		return date = date - (date % 86400);
+		//return date = date - (date % 86400); TODO: Fix this code!!!
+		return date;
 	}
 }
