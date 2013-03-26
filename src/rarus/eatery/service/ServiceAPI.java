@@ -1,8 +1,6 @@
 package rarus.eatery.service;
 
-import java.util.Date;
 import java.util.List;
-
 import rarus.eatery.model.EateryConstants;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
@@ -11,15 +9,18 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 /**
- * Класс асинхронного выполнения метов сервиса 
+ * Класс асинхронного выполнения метов сервиса
+ * 
  * @author Dmitriy Bazunov <binnarywolf@gmail.com>
  */
 public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
-
+	public static final String SERV_LOGIN = "mobileUser";
+	public static final String SERV_PASSWORD = "mobileUser";
 	private ServiceRequestResult serviceResult;
 	private boolean successfull;
 	private String mError;
 	private String URL;
+
 	public ServiceAPI(ServiceRequestResult serviceResult, SharedPreferences sp) {
 		super();
 		this.serviceResult = serviceResult;
@@ -27,23 +28,24 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 	@Override
 	protected APIMessage doInBackground(APIMessage... params) {
-		successfull = false;		
+		successfull = false;
 		APIMessage result = null;
 		Log.d(this.getClass().toString(), "[API] - execute start");
 		if (!connectionTest()) {
-			result = new APIMessage(EateryConstants.PING_CODE, null);
+			result = new APIMessage(EateryWebService.PING_CODE, null);
 			return result;
 		}
 		Log.d(this.getClass().toString(), "[API] - good connection");
 		switch (params[0].getCode()) {
-		case EateryConstants.GET_MENU_CODE: {
+		case EateryWebService.GET_MENU_CODE: {
 			Log.d(this.getClass().toString(), "[API] - getMenuCode");
-			result = new APIMessage(EateryConstants.GET_MENU_CODE, getMenu());
+			result = new APIMessage(EateryWebService.GET_MENU_CODE, getMenu());
 		}
 			break;
-		case EateryConstants.SET_ORDER_CODE: {
+		case EateryWebService.SET_ORDER_CODE: {
 			Log.d(this.getClass().toString(), "[API] - setOrderCode");
-			result = new APIMessage(EateryConstants.SET_ORDER_CODE, setOrder((List<RarusMenu>)params[0].getContent()));
+			result = new APIMessage(EateryWebService.SET_ORDER_CODE,
+					setOrder((List<RarusMenu>) params[0].getContent()));
 		}
 			break;
 
@@ -66,32 +68,35 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 		}
 	}
 
-	private boolean connectionTest(){
-		URL=Preference.getFirstURL();
+	private boolean connectionTest() {
+		URL = Preference.getFirstURL();
 		Log.d(this.getClass().toString(), "[API] - connection test");
-		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"+URL);
-		if(ping()) return true;
+		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
+				+ URL);
+		if (ping())
+			return true;
 		//
-		//Error process code.
+		// Error process code.
 		//
-		URL=Preference.getSecondURL();
-		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"+URL);
-		return ping();		
+		URL = Preference.getSecondURL();
+		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
+				+ URL);
+		return ping();
 	}
-	private boolean ping() {		
-		String xml = XMLParser.pingXml();		
-		HTTPPostRequest request = new HTTPPostRequest(URL,
-				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
-		
+
+	private boolean ping() {
+		String xml = XMLParser.pingXml();
+		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
+				SERV_PASSWORD, xml);
+
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
 			String res = XMLParser.parseXMLPing(request.getResult());
-			Log.d(this.getClass().toString(), "[API] - Ping res \n"+ res);
+			Log.d(this.getClass().toString(), "[API] - Ping res \n" + res);
 			if (res.equals("User authentication error")) {
 				mError = "User authentication error";
 				return false;
-			}
-			else
+			} else
 				return true;
 
 		} else {
@@ -108,16 +113,16 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 
 	private List<RarusMenu> getMenu() {
 		String xml = XMLParser.getMenuXMLRequest();
-		List<RarusMenu> menu = null;		
-		HTTPPostRequest request = new HTTPPostRequest(URL,
-				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
+		List<RarusMenu> menu = null;
+		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
+				SERV_PASSWORD, xml);
 		Log.d(this.getClass().toString(), "[API] - Getted xml");
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
-			Log.d(this.getClass().toString(),
-					"[API] - getMenuRequestResult:\n" + request.getResult());
+			Log.d(this.getClass().toString(), "[API] - getMenuRequestResult:\n"
+					+ request.getResult());
 			menu = XMLParser.parseXMLMenu(request.getResult());
-			
+
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
 		} else {
@@ -135,15 +140,15 @@ public class ServiceAPI extends AsyncTask<APIMessage, Object, APIMessage> {
 	private Object setOrder(List<RarusMenu> orders) {
 		List<RarusMenu> menu = null;
 		String xml = XMLParser.setMenuXMLRequest(orders);
-		Log.i(this.getClass().toString(), "[API] - setOrder xml:\n"+xml);
+		Log.i(this.getClass().toString(), "[API] - setOrder xml:\n" + xml);
 		Log.d(this.getClass().toString(), "[API] - setOrder request");
 		HTTPPostRequest request = new HTTPPostRequest(URL,
-				EateryConstants.SERV_LOGIN, EateryConstants.SERV_PASSWORD, xml);
+				SERV_LOGIN, SERV_PASSWORD, xml);
 		Log.d(this.getClass().toString(), "[API] - setOrder request sent");
-		
+
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
-			menu = XMLParser.parseXMLSetOrder(request.getResult());			
+			menu = XMLParser.parseXMLSetOrder(request.getResult());
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
 		} else {

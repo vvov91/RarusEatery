@@ -21,6 +21,13 @@ import android.util.Log;
  */
 public class EateryWebService extends Service implements ServiceRequestResult {
 	
+	public static final String SERVICE_RESULT = "rarus.eatery.service.result";
+	public static final String SERVICE_RESULT_CODE = "rarus.eatery.service.resultcode";
+	public static final String SERVICE_ERROR = "rarus.eatery.service.error";
+	public static final String BROADCAST_ACTION = "rarus.eatery.service.broadcast";
+	public static final int PING_CODE = 0;
+	public static final int GET_MENU_CODE = 1;
+	public static final int SET_ORDER_CODE = 2;	
 	public static final String SERVICE_LOG_TAG = "rarus.eatery.service";
 	private EateryDB mDBManager;
 	private EateryServiceBinder binder = new EateryServiceBinder();
@@ -36,21 +43,21 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 			APIMessage message = api.get();
 			Log.d(this.getClass().toString(), "[SERVICE] - code");
 			switch (message.getCode()) {
-			case EateryConstants.GET_MENU_CODE: {
+			case GET_MENU_CODE: {
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - get menu code");
 				List<RarusMenu> list = (List<RarusMenu>) message.getContent();
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - Servicel list getted");
 				writeToDB(list);
-				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
-				intent.putExtra(EateryConstants.SERVICE_RESULT, true);
-				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
-						EateryConstants.GET_MENU_CODE);
+				Intent intent = new Intent( BROADCAST_ACTION);
+				intent.putExtra( SERVICE_RESULT, true);
+				intent.putExtra( SERVICE_RESULT_CODE,
+						 GET_MENU_CODE);
 				sendBroadcast(intent);
 			}
 				break;
-			case EateryConstants.SET_ORDER_CODE: {
+			case  SET_ORDER_CODE: {
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - Order succssessfuly send");
 				getMenu();
@@ -71,29 +78,29 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		try {
 			APIMessage message = api.get();
 			switch (message.getCode()) {
-			case EateryConstants.GET_MENU_CODE: {
+			case  GET_MENU_CODE: {
 				String error = (String) message.getContent();
-				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
-				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
-				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
-						EateryConstants.GET_MENU_CODE);
+				Intent intent = new Intent( BROADCAST_ACTION);
+				intent.putExtra( SERVICE_RESULT, false);
+				intent.putExtra( SERVICE_RESULT_CODE,
+						 GET_MENU_CODE);
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
-				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				intent.putExtra( SERVICE_ERROR, error);
 				sendBroadcast(intent);
 			}
 				break;
-			case EateryConstants.SET_ORDER_CODE: {
+			case  SET_ORDER_CODE: {
 			}
-			case EateryConstants.PING_CODE: {
+			case  PING_CODE: {
 				String error = (String) message.getContent();
-				Intent intent = new Intent(EateryConstants.BROADCAST_ACTION);
-				intent.putExtra(EateryConstants.SERVICE_RESULT, false);
-				intent.putExtra(EateryConstants.SERVICE_RESULT_CODE,
-						EateryConstants.PING_CODE);
+				Intent intent = new Intent( BROADCAST_ACTION);
+				intent.putExtra( SERVICE_RESULT, false);
+				intent.putExtra( SERVICE_RESULT_CODE,
+						 PING_CODE);
 				Log.d(this.getClass().toString(),
 						"[SERVICE] - UnSuccessfullReturned error:\n" + error);
-				intent.putExtra(EateryConstants.SERVICE_ERROR, error);
+				intent.putExtra( SERVICE_ERROR, error);
 				sendBroadcast(intent);
 			}
 				break;
@@ -131,7 +138,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		Log.d(this.getClass().toString(), "[SERVICE] - Get menu");
 		api = new ServiceAPI(this,
 				PreferenceManager.getDefaultSharedPreferences(this));
-		api.execute(new APIMessage(EateryConstants.GET_MENU_CODE, null));
+		api.execute(new APIMessage( GET_MENU_CODE, null));
 	}
 
 	public void setMenu() {
@@ -140,7 +147,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 				PreferenceManager.getDefaultSharedPreferences(this));
 	    mDBManager =  new EateryDB(getApplicationContext());
 	    List<RarusMenu> orders=mDBManager.getOrdersNotSent();
-		api.execute(new APIMessage(EateryConstants.SET_ORDER_CODE, orders));
+		api.execute(new APIMessage( SET_ORDER_CODE, orders));
 	}
 
 	private void writeToDB(List<RarusMenu> menu) {		

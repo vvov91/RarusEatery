@@ -347,14 +347,14 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		startService(serviceIntent);
 		connection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder binder) {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"MainActivity onServiceConnected");
 				client = ((EateryWebService.EateryServiceBinder) binder)
 						.getService();
 			}
 
 			public void onServiceDisconnected(ComponentName name) {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+				Log.d(this.getClass().toString(),
 						"MainActivity onServiceDisconnected");
 			}
 		};
@@ -363,26 +363,26 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				boolean result = intent.getBooleanExtra(
-						EateryConstants.SERVICE_RESULT, false);
+						EateryWebService.SERVICE_RESULT, false);
 				recive(result, intent);
 			}
 		};
 		IntentFilter intFilt = new IntentFilter(
-				EateryConstants.BROADCAST_ACTION);
+				EateryWebService.BROADCAST_ACTION);
 		registerReceiver(receiver, intFilt);
 	}
 
 	private void recive(boolean result, Intent intent) {
-		Log.d(EateryConstants.GUI_LOG_TAG,
+		Log.d(this.getClass().toString(),
 				"MainActivity: ѕолученно сообщение от сервиса");
 		if (result) {
 			int operationCode = intent.getIntExtra(
-					EateryConstants.SERVICE_RESULT_CODE, 0);
-			Log.d(EateryConstants.GUI_LOG_TAG,
+					EateryWebService.SERVICE_RESULT_CODE, 0);
+			Log.d(this.getClass().toString(),
 					"MainActivity: «апрос сервиса успешен");
 			switch (operationCode) {
-			case EateryConstants.GET_MENU_CODE: {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+			case EateryWebService.GET_MENU_CODE: {
+				Log.d(this.getClass().toString(),
 						"MainActivity: ѕолученно меню");
 				// ќбновление фрагмента
 				this.mEateryDB = new EateryDB(getApplicationContext());
@@ -398,44 +398,44 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 			}
 				break;
-			case EateryConstants.SET_ORDER_CODE: {
+			case EateryWebService.SET_ORDER_CODE: {
 			}
 				break;
-			case EateryConstants.PING_CODE: {
+			case EateryWebService.PING_CODE: {
 			}
 				break;
 			}
 
 		} else {
-			Log.d(EateryConstants.GUI_LOG_TAG,
+			Log.d(this.getClass().toString(),
 					"MainActivity: «апрос сервиса неудачен");
 			Toast.makeText(getBaseContext(), "«апрос сервиса неудачен.", 3)
 					.show();
 
 			int operationCode = intent.getIntExtra(
-					EateryConstants.SERVICE_RESULT_CODE, 0);
-			String error = intent.getStringExtra(EateryConstants.SERVICE_ERROR);
+					EateryWebService.SERVICE_RESULT_CODE, 0);
+			String error = intent.getStringExtra(EateryWebService.SERVICE_ERROR);
 			switch (operationCode) {
-			case EateryConstants.GET_MENU_CODE: {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+			case EateryWebService.GET_MENU_CODE: {
+				Log.d(this.getClass().toString(),
 						"MainActivity: ошибка при получении меню:");
-				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при получении меню." + error, 3).show();
 			}
 				break;
-			case EateryConstants.SET_ORDER_CODE: {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+			case EateryWebService.SET_ORDER_CODE: {
+				Log.d(this.getClass().toString(),
 						"MainActivity: ошибка при отправке заказа:");
-				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при отправке заказа." + error, 3).show();
 			}
 				break;
-			case EateryConstants.PING_CODE: {
-				Log.d(EateryConstants.GUI_LOG_TAG,
+			case EateryWebService.PING_CODE: {
+				Log.d(this.getClass().toString(),
 						"MainActivity: ошибка при соединеннии с сервером:");
-				Log.e(EateryConstants.GUI_LOG_TAG, "MainActivity: " + error);
+				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
 						"ќшибка при соединеннии с сервером." + error, 3).show();
 			}
