@@ -17,7 +17,7 @@ public class SlidingMenuFragment extends Fragment {
 
 	ArrayList<String> mDatesString;
 	ListView slidingMenuLV;
-	SlidingMenuListAdapter customMenuListAdapter;
+	SlidingMenuListAdapter slidingMenuListAdapter;
 
 	public SlidingMenuFragment() {
 	}
@@ -34,12 +34,10 @@ public class SlidingMenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
-
-		customMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
-				mDatesString);
-
 		slidingMenuLV = (ListView) v.findViewById(R.id.lv);
-		slidingMenuLV.setAdapter(customMenuListAdapter);
+		slidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
+				R.id.lv, mDatesString);
+		slidingMenuLV.setAdapter(slidingMenuListAdapter);
 		slidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -51,26 +49,15 @@ public class SlidingMenuFragment extends Fragment {
 		return v;
 	}
 
-	// the meat of switching the above fragment
 	private void switchFragment(int position) {
 		if (getActivity() instanceof SlidingMenuActivity) {
-			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
-			ra.switchContent(position);
+			SlidingMenuActivity sma = (SlidingMenuActivity) getActivity();
+			sma.changeContentRequest(position);
 		}
 	}
 
-	// public void markListElement(int pos) {
-	// // if (mPreviousPossition != -2)
-	// System.out.println("markListElement" + pos);
-	// System.out.println("slidingMenuLV.getChildCount()"
-	// + slidingMenuLV.getChildCount());
-	//
-	// for (int i = 0; i < slidingMenuLV.getChildCount(); i++) {
-	// System.out.println("for" + i);
-	//
-	// slidingMenuLV.getChildAt(i).setBackgroundColor(0xFFffffff);
-	// }
-	// slidingMenuLV.getChildAt(pos).setBackgroundColor(0xFF808080);
-	// }
-
+	public void setSelectedItem(int position) {
+		slidingMenuListAdapter.setSelected(position);
+		slidingMenuListAdapter.notifyDataSetChanged();
+	}
 }

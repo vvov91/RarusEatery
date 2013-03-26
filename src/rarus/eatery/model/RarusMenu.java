@@ -1,25 +1,28 @@
 package rarus.eatery.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * Объект элемент меню
+ * Menu item object
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
-public class RarusMenu {
-	private int mId;					// id меню
-	private int mDate;					// дата, на которую это меню
-	private String mDishId;				// id блюда, находящегося в меню
-	private String mName;				// название блюда
-	private String mDescription;		// описание блюда
-	private boolean mPortioned;			// флаг порционности блюда
-	private float mPrice;				// цена блюда
-	private String mRating;				// рейтинг блюда
-	private boolean mPreorder;			// флаг возможности предзаказа блюда
-	private float mAvailable;			// объём доступный для заказа
-	private float mAmmount;				// объём заказанного 
-	private boolean mModified;			// флаг состояния изменения меню
-	private int mTimestamp;				// временной штамп меню
+public class RarusMenu implements Parcelable{
+	private int mId;					// menu id
+	private int mDate;					// menu date
+	private String mDishId;				// dish id, which is in this menu
+	private String mName;				// dish name
+	private String mDescription;		// dish description
+	private boolean mPortioned;			// portion flag
+	private float mPrice;				// dish price
+	private String mRating;				// dish rating
+	private boolean mPreorder;			// preorder flag
+	private float mAvailable;			// available to order amount of dish 
+	private float mAmmount;				// ordered amount
+	private boolean mModified;			// modified flag
+	private int mTimestamp;				// timestamp
 	
 	public RarusMenu(int mId, int mDate, String mDishId, String mName,
 			String mDescription, boolean mPortioned, float mPrice,
@@ -40,7 +43,55 @@ public class RarusMenu {
 		this.mModified = mModified;
 		this.mTimestamp = mTimestamp;
 	}
-	
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel parcel, int flags) {
+		parcel.writeInt(mId);
+		parcel.writeInt(mDate);
+		parcel.writeString(mDishId);
+		parcel.writeString(mName);
+		parcel.writeString(mDescription);
+		parcel.writeByte((byte) (mPortioned ? 1 : 0));
+		parcel.writeFloat(mPrice);
+		parcel.writeString(mRating);
+		parcel.writeByte((byte) (mPreorder ? 1 : 0));
+		parcel.writeFloat(mAvailable);
+		parcel.writeFloat(mAmmount);
+		parcel.writeByte((byte) (mModified ? 1 : 0));
+		parcel.writeInt(mTimestamp);
+	}
+
+	public static final Parcelable.Creator<RarusMenu> CREATOR = 
+			new Parcelable.Creator<RarusMenu>() {
+		public RarusMenu createFromParcel(Parcel in) {
+			return new RarusMenu(in);
+		}
+
+		public RarusMenu[] newArray(int size) {
+			return new RarusMenu[size];
+		}
+	};
+
+	private RarusMenu(Parcel parcel) {
+		this.mId = parcel.readInt();
+		this.mDate = parcel.readInt();
+		this.mDishId = parcel.readString();
+		this.mName = parcel.readString();
+		this.mDescription = parcel.readString();
+		this.mPortioned = parcel.readByte() == 1;
+		this.mPrice = parcel.readFloat();
+		this.mRating = parcel.readString();
+		this.mPreorder = parcel.readByte() == 1;
+		this.mAvailable = parcel.readFloat();
+		this.mAmmount = parcel.readFloat();
+		this.mModified = parcel.readByte() == 1;
+		this.mTimestamp = parcel.readInt();
+	}
 	public int getId() {
 		return mId;
 	}

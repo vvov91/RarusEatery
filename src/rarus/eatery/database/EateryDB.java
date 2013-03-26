@@ -8,35 +8,35 @@ import rarus.eatery.model.Order;
 import android.content.Context;
 
 /**
- * Предоставляет оболочку интерфейса для работы с БД
+ * Provides a wrapper interface to interact with the database
  * 
  * @author Victor Vovchenko <v.vovchenko91@gmail.com>
  *
  */
 public class EateryDB {	
-	// экземпляр интерфейса для работы с БД
+	// instance of an interface for working with database
 	private final DBManager db; 
 	
 	/**
-	 * Конструктор класса
+	 * Class constructor
 	 * 
 	 * @param context
-	 *     текущий {@link Context}
+	 *     current {@link Context}
 	 */
 	public EateryDB(Context context) {
 		this.db = new DBManager(context);
 	}
 	
 	
-	// Меню
+	// Menus
 	
 	/**
-	 * Возвращает список дат на которые доступно меню
+	 * Returns a list of the dates on which menu is available
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date 
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public List<Integer> getMenuDates() {
 		db.open();
@@ -47,12 +47,12 @@ public class EateryDB {
 	}
 	
 	/**
-	 * Возвращает меню на определенную дату
+	 * Returns the menu at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date 
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public List<RarusMenu> getMenu(int date) {
 		db.open();
@@ -63,23 +63,24 @@ public class EateryDB {
 	}	
 	
 	/**
-	 * Сохраняет меню
+	 * Saves the menu
 	 * 
 	 * @param menu
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public void saveMenu(List<RarusMenu> menu) {
 		if (menu.size() == 0) return;
 				
 		db.open();
-		db.deleteMenuAll();
+		//db.deleteMenuAll();
+		db.deleteMenuAtDate(menu.get(0).getDate());
 		db.addMenu(menu);
 		db.deleteDishesUnused();
 		db.close();
 	}
 	
 	/**
-	 * Удаляет все имеющиеся меню
+	 * Removes all menus
 	 */
 	public void deleteMenu() {
 		db.open();
@@ -88,15 +89,15 @@ public class EateryDB {
 	}
 	
 	
-	// Заказы
+	// Orders
 	
 	/**
-	 * Возвращает список дат на которые имеются заказы
+	 * Returns a list of the dates on which there are orders
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date 
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public List<Integer> getOrdersDates() {
 		db.open();
@@ -107,12 +108,12 @@ public class EateryDB {
 	}
 	
 	/**
-	 * Возвращает заказы на определенную дату
+	 * Returns orders at a given date
 	 * 
 	 * @param date
-	 *     дата в Unix time формате
+	 *     Unix time date 
 	 * @return
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} of {@link Order} objects
 	 */
 	public List<Order> getOrders(int date) {
 		db.open();
@@ -123,24 +124,24 @@ public class EateryDB {
 	}
 	
 	/**
-	 * Возвращает ещё не отправленные заказы
+	 * Returns not sent orders
 	 * 
 	 * @return
-	 *     {@link List} из объектов {@link RarusMenu}
+	 *     {@link List} of {@link RarusMenu} objects
 	 */
-	public List<RarusMenu> getOrdersNotExecuted() {
+	public List<RarusMenu> getOrdersNotSent() {
 		db.open();
-		List<RarusMenu> result = db.getOrdersNotExecuted();
+		List<RarusMenu> result = db.getOrdersNotSent();
 		db.close();
 		
 		return result;
 	}
 		
 	/**
-	 * Сохраняет заказы
+	 * Saves the orders
 	 * 
 	 * @param orders
-	 *     {@link List} из объектов {@link Order}
+	 *     {@link List} of {@link Order} objects
 	 */
 	public void saveOrders(List<Order> orders) {
 		if (orders.size() == 0) return;
@@ -153,7 +154,7 @@ public class EateryDB {
 	}
 	
 	/**
-	 * Удаляет все имеющиеся заказы
+	 * Removes all orders
 	 */
 	public void deleteOrders() {
 		db.open();

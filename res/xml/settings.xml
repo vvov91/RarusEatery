@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <EditTextPreference
-        android:key="servAdress"
-        android:summary="@string/serverAdr"
-        android:title="Адрес" >
-    </EditTextPreference>
-    <EditTextPreference
-        android:key="servLogin"
-        android:summary="@string/serverLogin"
-        android:title="Логин" >
-    </EditTextPreference>
-    <EditTextPreference
-        android:key="servPass"
-        android:summary="@string/serverPass"
-        android:title="Пароль" >
-    </EditTextPreference>
 
+    <EditTextPreference
+        android:key="cardNumber"
+        android:summary="@string/cardNumberInfo"
+        android:title="@string/cardNumber" >
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="server1"
+        android:summary="@string/server1Info"
+        android:title="@string/server1" >
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="server2"
+        android:summary="@string/server2Info"
+        android:title="@string/server2" >
+    </EditTextPreference>
 
 </PreferenceScreen>
