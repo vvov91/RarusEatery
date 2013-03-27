@@ -3,14 +3,11 @@ package rarus.eatery.service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.RarusMenu;
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -134,7 +131,11 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 		api = new ServiceAPI_Async(this,getApplicationContext());
 		api.execute(new APIMessage( GET_MENU_CODE, null));
 	}
-
+	public void cancel(){
+		if(api!=null){
+			api.cancel(true);
+		}
+	}
 	public void setMenu() {
 		Log.d(this.getClass().toString(), "[SERVICE] - Set menu");
 		api = new ServiceAPI_Async(this,getApplicationContext());
