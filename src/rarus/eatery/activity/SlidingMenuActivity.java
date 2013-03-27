@@ -49,7 +49,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	ServiceConnection connection;
 	EateryWebService client;
 	BroadcastReceiver receiver;
-
 	SlidingMenuFragment mSlidingMenuFragment;
 
 	EateryDB mEateryDB;
@@ -84,21 +83,20 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 		mEateryDB = new EateryDB(getApplicationContext());
 
-		if (savedInstanceState != null) {
-			mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
-			mCurrentFragmentId = savedInstanceState
-					.getInt("mCurrentFragmentId");
-			mDatesString = savedInstanceState
-					.getStringArrayList("mDatesString");
-			makeSlidingMenu(mDatesString);
-			mNextFragmentId = mCurrentFragmentId;
-			switchContent();
+		if (mEateryDB.getMenuDates().size() == 0) {
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, mFirstRunFragment).commit();
+			getSlidingMenu().setSlidingEnabled(false);
 		} else {
-			if (mEateryDB.getMenuDates().size() == 0) {
-				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.content_frame, mFirstRunFragment)
-						.commit();
-				getSlidingMenu().setSlidingEnabled(false);
+			if (savedInstanceState != null) {
+				mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
+				mCurrentFragmentId = savedInstanceState
+						.getInt("mCurrentFragmentId");
+				mDatesString = savedInstanceState
+						.getStringArrayList("mDatesString");
+				makeSlidingMenu(mDatesString);
+				mNextFragmentId = mCurrentFragmentId;
+				switchContent();
 			} else {
 				makeFragments();
 				Log.d("int", "mCurrentFragmentId changeContentRequest"
@@ -328,7 +326,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onRefreshClick(View v) {
 		client.update();
 		Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
-        setSupportProgressBarIndeterminateVisibility(true);
+		setSupportProgressBarIndeterminateVisibility(true);
 	}
 
 	// method to display the menu (link in the layout)
