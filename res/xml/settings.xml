@@ -15,9 +15,7 @@
         android:key="server2"
         android:summary="@string/server2Info"
         android:title="@string/server2" >
-    </EditTextPreference>Caused by: java.lang.NullPointerException
-03-27 06:58:33.343: E/AndroidRuntime(14470): 	at rarus.eatery.activity.FirstRunFragment.setButtonEnabled(FirstRunFragment.java:74)Caused by: java.lang.NullPointerException
-03-27 06:58:33.343: E/AndroidRuntime(14470): 	at rarus.eatery.activity.FirstRunFragment.setButtonEnabled(FirstRunFragment.java:74)
+    </EditTextPreference>
     <CheckBoxPreference android:summaryOff="@string/anyConnection" android:summaryOn="@string/onlyWIFI" android:key="onlyWI-FI" android:title="@string/WI_FI"/>
 
 

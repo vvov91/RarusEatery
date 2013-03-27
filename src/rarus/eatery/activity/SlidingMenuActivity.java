@@ -439,7 +439,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 				break;
 			}
-			mFirstRunFragment.setButtonEnabled(true);
+			//mFirstRunFragment.setButtonEnabled(true);
 
 		}
 	}

@@ -73,6 +73,20 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	}
 
 	private boolean connectionTest() {
+		if(Preference.getWi_FiFlag()){
+			Log.d(this.getClass().toString(), "[API] - only Wi-Fi");
+			if(!Utility.hasWiFiConnection()){
+				mError="No avaliable Wi-Fi connections";
+				return false;
+			}
+		}
+		else{
+			Log.d(this.getClass().toString(), "[API] - any Connection");
+			if(!Utility.hasInternetConnection()){
+				mError="No avaliable connections";
+				return false;
+			}
+		}
 		Utility.hasInternetConnection();
 		URL = Preference.getSecondURL();
 		Log.d(this.getClass().toString(), "[API] - connection test");
