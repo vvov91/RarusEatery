@@ -327,10 +327,19 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	// method for synchronizing the menu (link in the layout)
+	boolean updating;
 	public void onRefreshClick(View v) {
-		client.update();
-		Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
-        setSupportProgressBarIndeterminateVisibility(true);
+		if(updating){
+			client.cancel();
+			Toast.makeText(getBaseContext(), "Canceled", 3).show();
+			updating=false;
+		}
+		else{
+			client.update();
+			Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
+			setSupportProgressBarIndeterminateVisibility(true);
+			updating=true;
+		}
 	}
 
 	// method to display the menu (link in the layout)
