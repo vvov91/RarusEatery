@@ -16,5 +16,7 @@
         android:summary="@string/server2Info"
         android:title="@string/server2" >
     </EditTextPreference>
+    <CheckBoxPreference android:summaryOff="@string/anyConnection" android:summaryOn="@string/onlyWIFI" android:key="onlyWI-FI" android:title="@string/WI_FI"/>
+
 
 </PreferenceScreen>

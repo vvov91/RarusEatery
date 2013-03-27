@@ -31,7 +31,6 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	
 	private EateryServiceBinder binder = new EateryServiceBinder();
 	private ServiceAPI_Async api;
-	private SharedPreferences sp;
 
 	@Override
 	public void onSuccessfullRequest() {
@@ -111,9 +110,7 @@ public class EateryWebService extends Service implements ServiceRequestResult {
 	}
 
 	public IBinder onBind(Intent arg0) {
-		Log.d(this.getClass().toString(), "[SERVICE] - On bind");
-		sp = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+		Log.d(this.getClass().toString(), "[SERVICE] - On bind");	
 		return binder;
 	}
 

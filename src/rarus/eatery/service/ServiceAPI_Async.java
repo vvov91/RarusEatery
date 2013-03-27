@@ -73,6 +73,21 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	}
 
 	private boolean connectionTest() {
+		if(Preference.getWi_FiFlag()){
+			Log.d(this.getClass().toString(), "[API] - only Wi-Fi");
+			if(!Utility.hasWiFiConnection()){
+				mError="No avaliable Wi-Fi connections";
+				return false;
+			}
+		}
+		else{
+			Log.d(this.getClass().toString(), "[API] - any Connection");
+			if(!Utility.hasInternetConnection()){
+				mError="No avaliable connections";
+				return false;
+			}
+		}
+		Utility.hasInternetConnection();
 		URL = Preference.getSecondURL();
 		Log.d(this.getClass().toString(), "[API] - connection test");
 		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
@@ -95,12 +110,17 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 
 	private boolean ping() {
 		String xml = XMLParser.pingXml();
+		long start=System.currentTimeMillis();
 		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
 				SERV_PASSWORD, xml);
-
+		long stop=System.currentTimeMillis();
+		Log.d(this.getClass().toString(), "[API] - Request time" + (start-stop));
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
+			start=System.currentTimeMillis();
 			String res = XMLParser.parseXMLPing(request.getResult());
+			stop=System.currentTimeMillis();
+			Log.d(this.getClass().toString(), "[API] - Parse getMenu time" + (start-stop));
 			Log.d(this.getClass().toString(), "[API] - Ping res \n" + res);
 			if (res.equals("OK")) {
 				mError = "";
@@ -124,15 +144,20 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	private List<RarusMenu> getMenu() {
 		String xml = XMLParser.getMenuXMLRequest();
 		List<RarusMenu> menu = null;
+		long start=System.currentTimeMillis();
 		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
 				SERV_PASSWORD, xml);
+		long stop=System.currentTimeMillis();
+		Log.d(this.getClass().toString(), "[API] - Request getMenu time" + (start-stop));
 		Log.d(this.getClass().toString(), "[API] - Getted xml");
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
 			Log.d(this.getClass().toString(), "[API] - getMenuRequestResult:\n"
 					+ request.getResult());
+			start=System.currentTimeMillis();
 			menu = XMLParser.parseXMLMenu(request.getResult());
-
+			stop=System.currentTimeMillis();
+			Log.d(this.getClass().toString(), "[API] - Parse getMenu time" + (start-stop));
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
 			Log.d(this.getClass().toString(),

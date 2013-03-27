@@ -16,6 +16,7 @@ import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
+import rarus.eatery.service.Utility;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -108,6 +109,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}
 		Preference.prefInit(PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext()));
+		Utility.initUtility(this);
 	}
 
 	public void switchContent() {
@@ -437,7 +439,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 				break;
 			}
-			mFirstRunFragment.setButtonEnabled(true);
+			//mFirstRunFragment.setButtonEnabled(true);
 
 		}
 	}

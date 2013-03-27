@@ -18,4 +18,7 @@ public class Preference {
 	public static String getCardNumber(){
 		return preference.getString("cardNumber", "000013BDBD");
 	}
+	public static boolean getWi_FiFlag(){
+		return preference.getBoolean("onlyWI-FI", true);
+	}
 }
