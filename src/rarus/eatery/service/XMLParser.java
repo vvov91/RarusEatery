@@ -145,7 +145,8 @@ public class XMLParser {
 				sz.endTag(MOB_PREFIX, "dish");
 				
 			}
-			sz.endTag(MOB_PREFIX, "orderStructure");
+			if(!first)
+				sz.endTag(MOB_PREFIX, "orderStructure");
 			sz.endTag(MOB_PREFIX, "setMenu");
 			sz.endTag(SOAP_PREFIX, "Body");
 			sz.endTag(SOAP_PREFIX, "Envelope");
