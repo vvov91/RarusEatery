@@ -37,6 +37,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		pb.setVisibility(View.INVISIBLE);
 		btnDownload = (Button) v.findViewById(R.id.btnDownload);
 		btnDownload.setOnClickListener(this);
+		setDefaultPreferences();
 		return v;
 	}
 
@@ -63,7 +64,6 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 			ed.putString("server2", etServer2.getText().toString());
 		else
 			ed.putString("server2", null);
-
 		ed.commit();
 	}
 
@@ -73,10 +73,17 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		else
 			pb.setVisibility(View.INVISIBLE);
 		btnDownload.setEnabled(visible);
-
 	}
 
-	void loadPreference() {
+	public void setDefaultPreferences() {
+		ed.putString("server1",
+				"http://192.168.38.252:8095/DiningRoomTest/ws/mobileEda");
+		ed.putString("server2",
+				"http://178.219.241.102:8095/DiningRoomTest/ws/mobileEda");
+		ed.putString("cardNumber", "000013BDBD");
+	}
+
+	public void loadPreference() {
 		etCardNumber.setText(sp.getString("cardNumber", ""));
 		etServer1.setText(sp.getString("server1", ""));
 		etServer2.setText(sp.getString("server2", ""));
