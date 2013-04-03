@@ -32,14 +32,15 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 
 	@Override
 	protected APIMessage doInBackground(APIMessage... params) {
+		Log.d(this.getClass().toString(), "[API] - Do in background start");
 		successfull = false;
-		APIMessage result = null;
-		Log.d(this.getClass().toString(), "[API] - execute start");
+		APIMessage result = null;		
 		if (!connectionTest()) {
 			result = new APIMessage(EateryWebService.PING_CODE, null);
 			return result;
 		}
 		Log.d(this.getClass().toString(), "[API] - good connection");
+		if(isCancelled()) return null;
 		switch (params[0].getCode()) {
 		case EateryWebService.GET_MENU_CODE: {
 			Log.d(this.getClass().toString(), "[API] - getMenuCode");
@@ -71,14 +72,37 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 			serviceResult.onUnSuccessfullRequest();
 		}
 	}
+	@Override
+    protected void onCancelled() {
+      super.onCancelled();
+      Log.d(this.getClass().toString(), "Cancel");
 
+    }
 	private boolean connectionTest() {
+		if(isCancelled()) return false;
+		if(Preference.getWi_FiFlag()){
+			Log.d(this.getClass().toString(), "[API] - only Wi-Fi");
+			if(!Utility.hasWiFiConnection()){
+				mError="No avaliable Wi-Fi connections";
+				return false;
+			}
+		}
+		else{
+			Log.d(this.getClass().toString(), "[API] - any Connection");
+			if(!Utility.hasInternetConnection()){
+				mError="No avaliable connections";
+				return false;
+			}
+		}
+		Utility.hasInternetConnection();
 		URL = Preference.getSecondURL();
 		Log.d(this.getClass().toString(), "[API] - connection test");
 		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
 				+ URL);
+		if(isCancelled()) return false;
 		if (ping())
 			return true;
+		if(isCancelled()) return false;
 		Log.d(this.getClass().toString(), "[API] - mError :"+ mError);
 		
 		if(!mError.equals("Timeout Exception")){
@@ -90,17 +114,27 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 		URL = Preference.getFirstURL();
 		Log.d(this.getClass().toString(), "[API] - connection test URL: \n"
 				+ URL);
+		if(isCancelled()) return false;
 		return ping();
 	}
 
 	private boolean ping() {
 		String xml = XMLParser.pingXml();
+		long start=System.currentTimeMillis();
+		if(isCancelled()) return false;
 		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
 				SERV_PASSWORD, xml);
-
+		if(isCancelled()) return false;
+		long stop=System.currentTimeMillis();
+		Log.d(this.getClass().toString(), "[API] - Request time" + (start-stop));
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
+			if(isCancelled()) return false;
+			start=System.currentTimeMillis();
 			String res = XMLParser.parseXMLPing(request.getResult());
+			stop=System.currentTimeMillis();
+			if(isCancelled()) return false;
+			Log.d(this.getClass().toString(), "[API] - Parse getMenu time" + (start-stop));
 			Log.d(this.getClass().toString(), "[API] - Ping res \n" + res);
 			if (res.equals("OK")) {
 				mError = "";
@@ -124,21 +158,31 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	private List<RarusMenu> getMenu() {
 		String xml = XMLParser.getMenuXMLRequest();
 		List<RarusMenu> menu = null;
+		if(isCancelled()) return null;
+		long start=System.currentTimeMillis();
 		HTTPPostRequest request = new HTTPPostRequest(URL, SERV_LOGIN,
 				SERV_PASSWORD, xml);
+		long stop=System.currentTimeMillis();
+		if(isCancelled()) return null;
+		Log.d(this.getClass().toString(), "[API] - Request getMenu time" + (start-stop));
 		Log.d(this.getClass().toString(), "[API] - Getted xml");
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
 			Log.d(this.getClass().toString(), "[API] - getMenuRequestResult:\n"
 					+ request.getResult());
+			if(isCancelled()) return null;
+			start=System.currentTimeMillis();
 			menu = XMLParser.parseXMLMenu(request.getResult());
-
+			stop=System.currentTimeMillis();
+			if(isCancelled()) return null;
+			Log.d(this.getClass().toString(), "[API] - Parse getMenu time" + (start-stop));
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
 			Log.d(this.getClass().toString(),
 					"[API] - writing to DB");
 			writeToDB(menu);
 		} else {
+			if(isCancelled()) return null;
 			Log.d(this.getClass().toString(),
 					"[API] - Error:\n"
 							+ (request.getResult().startsWith("<html>") ? request
@@ -156,16 +200,21 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 		String xml = XMLParser.setMenuXMLRequest(orders);
 		Log.i(this.getClass().toString(), "[API] - setOrder xml:\n" + xml);
 		Log.d(this.getClass().toString(), "[API] - setOrder request");
+		if(isCancelled()) return null;
 		HTTPPostRequest request = new HTTPPostRequest(URL,
 				SERV_LOGIN, SERV_PASSWORD, xml);
+		if(isCancelled()) return null;
 		Log.d(this.getClass().toString(), "[API] - setOrder request sent");
 
 		if (!request.getResult().equals("")
 				&& !request.getResult().startsWith("<html>")) {
+			if(isCancelled()) return null;
 			menu = XMLParser.parseXMLSetOrder(request.getResult());
+			if(isCancelled()) return null;
 			Log.d(this.getClass().toString(), "[API] - result successfull");
 			successfull = true;
 		} else {
+			if(isCancelled()) return null;
 			Log.d(this.getClass().toString(),
 					"[API] - Error:\n"
 							+ (request.getResult().startsWith("<html>") ? request
@@ -186,6 +235,7 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	}
 	
 	private void writeToDB(List<RarusMenu> menu) {
+		if(isCancelled()) return;
 		Log.d(this.getClass().toString(), "[SERVICE]: Запись меню в БД ");
 		mDBManager.deleteMenu();
 		mDBManager.saveMenu(menu);	

@@ -16,6 +16,7 @@ import rarus.eatery.database.EateryDB;
 import rarus.eatery.model.Preference;
 import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
+import rarus.eatery.service.Utility;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -112,6 +113,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}
 		Preference.prefInit(PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext()));
+		Utility.initUtility(this);
 	}
 
 	public void switchContent() {
@@ -152,13 +154,16 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		if (waiting) {
 			pd = new ProgressDialog(this);
 			pd.setTitle(R.string.synchronization);
-			pd.setMessage(""+R.string.download);
+			pd.setMessage("" + R.string.download);
 			pd.show();
 			pd.setOnCancelListener(new OnCancelListener() {
 
 				@Override
 				public void onCancel(DialogInterface dialog) {
-					Log.d("int", " back key");
+					client.cancel();
+					Toast.makeText(getApplicationContext(), R.string.cancel,
+							Toast.LENGTH_SHORT).show();
+
 				}
 			});
 		}
@@ -333,7 +338,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onSaveClick() {
 		mEateryDB
 				.saveMenu(mDayMenuFragmentFragments.get(mCurrentFragmentId).mRarusMenu);
-		Toast.makeText(getBaseContext(), R.string.saved, 3).show();
+		Toast.makeText(getBaseContext(), R.string.saved, Toast.LENGTH_SHORT)
+				.show();
 		ArrayList<RarusMenu> rm = (ArrayList<RarusMenu>) mEateryDB
 				.getOrdersNotSent();
 		for (RarusMenu rmiterator : rm) {
@@ -346,7 +352,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	// method for synchronizing the menu (link in the layout)
 	public void onRefreshClick(View v) {
 		client.update();
-		Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
+		Toast.makeText(getBaseContext(), R.string.synchronization,
+				Toast.LENGTH_SHORT).show();
 		showDownloadDialog(true);
 		mWaiting = true;
 	}
@@ -390,6 +397,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 		Log.d(this.getClass().toString(),
 				"MainActivity: ѕолученно сообщение от сервиса");
+		pd.dismiss();
+		mWaiting = false;
 		if (result) {
 			int operationCode = intent.getIntExtra(
 					EateryWebService.SERVICE_RESULT_CODE, 0);
@@ -405,8 +414,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 					makeFragments();
 					mNextFragmentId = mCurrentFragmentId;
 					switchContent();
-					Toast.makeText(getBaseContext(), R.string.updated_menu, 3)
-							.show();
+					Toast.makeText(getBaseContext(), R.string.updated_menu,
+							Toast.LENGTH_SHORT).show();
 					mChangedOrderedAmount = false;
 					Log.d("int", "" + mChangedOrderedAmount);
 				}
@@ -425,7 +434,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 			Log.d(this.getClass().toString(),
 					"MainActivity: «апрос сервиса неудачен");
-			Toast.makeText(getBaseContext(), R.string.error_request, 3).show();
+			Toast.makeText(getBaseContext(), R.string.error_request,
+					Toast.LENGTH_SHORT).show();
 
 			int operationCode = intent.getIntExtra(
 					EateryWebService.SERVICE_RESULT_CODE, 0);
@@ -437,7 +447,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при получении меню:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_getting + error, 3).show();
+						R.string.error_getting + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			case EateryWebService.SET_ORDER_CODE: {
@@ -445,7 +456,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при отправке заказа:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_sending + error, 3).show();
+						R.string.error_sending + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			case EateryWebService.PING_CODE: {
@@ -453,14 +465,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_connecting + error, 3).show();
+						R.string.error_connecting + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			}
 		}
-		pd.hide();
-		mWaiting = false;
-
 	}
 
 	@Override
@@ -482,6 +492,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onStart();
 		bindService(serviceIntent, connection, 0);
 		Log.d(getClass().getName(), "MainActivity: onStart()");
+	}
+
+	@Override
+	protected void onPause() {
+		pd.dismiss();
+		super.onPause();
 	}
 
 	@Override
