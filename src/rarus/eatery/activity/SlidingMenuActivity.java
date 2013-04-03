@@ -18,10 +18,12 @@ import rarus.eatery.model.RarusMenu;
 import rarus.eatery.service.EateryWebService;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -38,7 +40,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -50,18 +51,19 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	EateryWebService client;
 	BroadcastReceiver receiver;
 	SlidingMenuFragment mSlidingMenuFragment;
+	ProgressDialog pd;
 
 	EateryDB mEateryDB;
 	int mCurrentFragmentId = 0, mNextFragmentId = 0;
 	List<DayMenuFragment> mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 	List<String> mDatesString = new ArrayList<String>();
 	static Boolean mChangedOrderedAmount = false;
-	FirstRunFragment mFirstRunFragment = new FirstRunFragment();
+	FirstRunFragment mFirstRunFragment;
+	Boolean mWaiting = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
@@ -82,8 +84,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().hide();
 
 		mEateryDB = new EateryDB(getApplicationContext());
-
+		if (savedInstanceState != null) {
+			mWaiting = savedInstanceState.getBoolean("mWaiting");
+			showDownloadDialog(mWaiting);
+		}
 		if (mEateryDB.getMenuDates().size() == 0) {
+			mFirstRunFragment = new FirstRunFragment();
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, mFirstRunFragment).commit();
 			getSlidingMenu().setSlidingEnabled(false);
@@ -140,6 +146,22 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			showDialog(1);
 		else
 			switchContent();
+	}
+
+	public void showDownloadDialog(boolean waiting) {
+		if (waiting) {
+			pd = new ProgressDialog(this);
+			pd.setTitle(R.string.synchronization);
+			pd.setMessage(""+R.string.download);
+			pd.show();
+			pd.setOnCancelListener(new OnCancelListener() {
+
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					Log.d("int", " back key");
+				}
+			});
+		}
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -251,7 +273,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
-		setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
@@ -326,7 +347,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onRefreshClick(View v) {
 		client.update();
 		Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
-		setSupportProgressBarIndeterminateVisibility(true);
+		showDownloadDialog(true);
+		mWaiting = true;
 	}
 
 	// method to display the menu (link in the layout)
@@ -435,9 +457,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 				break;
 			}
-			mFirstRunFragment.setButtonEnabled(true);
-
 		}
+		pd.hide();
+		mWaiting = false;
+
 	}
 
 	@Override
@@ -451,6 +474,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		outState.putInt("mCurrentFragmentId", mCurrentFragmentId);
 		outState.putStringArrayList("mDatesString",
 				(ArrayList<String>) mDatesString);
+		outState.putBoolean("mWaiting", mWaiting);
 	}
 
 	@Override

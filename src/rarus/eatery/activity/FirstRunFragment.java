@@ -6,36 +6,29 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 
 public class FirstRunFragment extends Fragment implements OnClickListener {
-	ProgressBar pb;
-	Button btnDownload;
 	EditText etCardNumber, etServer1, etServer2;
 	SharedPreferences sp;
 	Editor ed;
-	View v;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		v = inflater.inflate(R.layout.first_run_frame, null);
+		View v = inflater.inflate(R.layout.first_run_frame, null);
 		sp = PreferenceManager.getDefaultSharedPreferences(getActivity()
 				.getBaseContext());
 		ed = sp.edit();
 		etCardNumber = (EditText) v.findViewById(R.id.etCardNumber);
 		etServer1 = (EditText) v.findViewById(R.id.etServer1);
 		etServer2 = (EditText) v.findViewById(R.id.etServer2);
-		pb = (ProgressBar) v.findViewById(R.id.progressBar1);
-		pb.setVisibility(View.INVISIBLE);
-		btnDownload = (Button) v.findViewById(R.id.btnDownload);
+		Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
 		btnDownload.setOnClickListener(this);
 		setDefaultPreferences();
 		return v;
@@ -44,9 +37,6 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		savePreference();
-		pb.setVisibility(View.VISIBLE);
-		btnDownload.setEnabled(false);
-		btnDownload.setText("downloading...");
 		SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
 		ra.onRefreshClick(v);
 	}
@@ -67,20 +57,13 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		ed.commit();
 	}
 
-	void setButtonEnabled(boolean visible) {
-		if (!visible)
-			pb.setVisibility(View.VISIBLE);
-		else
-			pb.setVisibility(View.INVISIBLE);
-		btnDownload.setEnabled(visible);
-	}
-
 	public void setDefaultPreferences() {
 		ed.putString("server1",
 				"http://192.168.38.252:8095/DiningRoomTest/ws/mobileEda");
 		ed.putString("server2",
 				"http://178.219.241.102:8095/DiningRoomTest/ws/mobileEda");
 		ed.putString("cardNumber", "000013BDBD");
+		ed.commit();
 	}
 
 	public void loadPreference() {

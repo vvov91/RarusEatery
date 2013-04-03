@@ -25,5 +25,7 @@
     <string name="error_getting">Ошибка при получении меню</string>
     <string name="error_sending">Ошибка при отправке заказа</string>
     <string name="error_connecting">Ошибка при отправке заказа</string>
+    <string name="synchronization">Синхронизация</string>
+    <string name="download">Идет загрузка</string>
 
 </resources>
