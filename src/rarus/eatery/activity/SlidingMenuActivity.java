@@ -154,7 +154,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		if (waiting) {
 			pd = new ProgressDialog(this);
 			pd.setTitle(R.string.synchronization);
-			pd.setMessage("" + R.string.download);
+			pd.setMessage(getString(R.string.download));
 			pd.show();
 			pd.setOnCancelListener(new OnCancelListener() {
 

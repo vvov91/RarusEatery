@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 public class FirstRunFragment extends Fragment implements OnClickListener {
 	EditText etCardNumber, etServer1, etServer2;
+	CheckBox chWifi;
 	SharedPreferences sp;
 	Editor ed;
 
@@ -28,6 +30,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		etCardNumber = (EditText) v.findViewById(R.id.etCardNumber);
 		etServer1 = (EditText) v.findViewById(R.id.etServer1);
 		etServer2 = (EditText) v.findViewById(R.id.etServer2);
+		chWifi = (CheckBox) v.findViewById(R.id.cbWifi);
 		Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
 		btnDownload.setOnClickListener(this);
 		setDefaultPreferences();
@@ -54,6 +57,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 			ed.putString("server2", etServer2.getText().toString());
 		else
 			ed.putString("server2", null);
+		ed.putBoolean("onlyWI-FI", chWifi.isChecked());
 		ed.commit();
 	}
 
@@ -63,6 +67,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		ed.putString("server2",
 				"http://178.219.241.102:8095/DiningRoomTest/ws/mobileEda");
 		ed.putString("cardNumber", "000013BDBD");
+		ed.putBoolean("onlyWI-FI", false);
 		ed.commit();
 	}
 
@@ -70,6 +75,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		etCardNumber.setText(sp.getString("cardNumber", ""));
 		etServer1.setText(sp.getString("server1", ""));
 		etServer2.setText(sp.getString("server2", ""));
+		chWifi.setChecked(sp.getBoolean("onlyWI-FI", false));
 	}
 
 	public void onResume() {
