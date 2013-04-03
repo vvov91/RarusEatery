@@ -285,8 +285,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		MenuItem mi = menu.add(0, 1, 0, R.string.menu_settings);
 		mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
-		menu.add(0, 2, 0, R.string.save).setIcon(R.drawable.save)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(0, 2, 0, R.string.save)
+				.setIcon(R.drawable.save)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		menu.add(0, 3, 0, R.string.clean)
 				.setIcon(R.drawable.clean)
 				.setShowAsAction(
@@ -419,7 +422,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 					mChangedOrderedAmount = false;
 					Log.d("int", "" + mChangedOrderedAmount);
 				}
-
 			}
 				break;
 			case EateryWebService.SET_ORDER_CODE: {
@@ -496,7 +498,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	@Override
 	protected void onPause() {
-		pd.dismiss();
+		if (mWaiting)
+			pd.dismiss();
 		super.onPause();
 	}
 
