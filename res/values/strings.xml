@@ -25,8 +25,12 @@
     <string name="error_getting">Ошибка при получении меню</string>
     <string name="error_sending">Ошибка при отправке заказа</string>
     <string name="error_connecting">Ошибка при отправке заказа</string>
-    
-	<string name="onlyWIFI">Загрузка данных только по Wi-Fi</string>
+    <string name="synchronization">Синхронизация</string>
+    <string name="download">Идет загрузка</string>
+    <string name="onlyWIFI">Загрузка данных только по Wi-Fi</string>
     <string name="anyConnection">Загрузка данных при любом подключении</string>
     <string name="WI_FI">Настройки соеденения</string>
+        <string name="cancel">Загрузка отменена</string>
+    
+
 </resources>

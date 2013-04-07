@@ -43,16 +43,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <CheckBox
+        android:id="@+id/cbWifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Синхронизация только по WI-FI" />
+
     <Button
         android:id="@+id/btnDownload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Download menu" />
-
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </LinearLayout>
