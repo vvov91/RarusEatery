@@ -19,10 +19,12 @@ import rarus.eatery.service.EateryWebService;
 import rarus.eatery.service.Utility;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -39,7 +41,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -50,20 +51,20 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	ServiceConnection connection;
 	EateryWebService client;
 	BroadcastReceiver receiver;
-
 	SlidingMenuFragment mSlidingMenuFragment;
+	ProgressDialog pd;
 
 	EateryDB mEateryDB;
 	int mCurrentFragmentId = 0, mNextFragmentId = 0;
 	List<DayMenuFragment> mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 	List<String> mDatesString = new ArrayList<String>();
 	static Boolean mChangedOrderedAmount = false;
-	FirstRunFragment mFirstRunFragment = new FirstRunFragment();
+	FirstRunFragment mFirstRunFragment;
+	Boolean mWaiting = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		startService();
 		setTitle(R.string.app_name);
 		setContentView(R.layout.main_content_frame);
@@ -84,22 +85,25 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().hide();
 
 		mEateryDB = new EateryDB(getApplicationContext());
-
 		if (savedInstanceState != null) {
-			mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
-			mCurrentFragmentId = savedInstanceState
-					.getInt("mCurrentFragmentId");
-			mDatesString = savedInstanceState
-					.getStringArrayList("mDatesString");
-			makeSlidingMenu(mDatesString);
-			mNextFragmentId = mCurrentFragmentId;
-			switchContent();
+			mWaiting = savedInstanceState.getBoolean("mWaiting");
+			showDownloadDialog(mWaiting);
+		}
+		if (mEateryDB.getMenuDates().size() == 0) {
+			mFirstRunFragment = new FirstRunFragment();
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content_frame, mFirstRunFragment).commit();
+			getSlidingMenu().setSlidingEnabled(false);
 		} else {
-			if (mEateryDB.getMenuDates().size() == 0) {
-				getSupportFragmentManager().beginTransaction()
-						.replace(R.id.content_frame, mFirstRunFragment)
-						.commit();
-				getSlidingMenu().setSlidingEnabled(false);
+			if (savedInstanceState != null) {
+				mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
+				mCurrentFragmentId = savedInstanceState
+						.getInt("mCurrentFragmentId");
+				mDatesString = savedInstanceState
+						.getStringArrayList("mDatesString");
+				makeSlidingMenu(mDatesString);
+				mNextFragmentId = mCurrentFragmentId;
+				switchContent();
 			} else {
 				makeFragments();
 				Log.d("int", "mCurrentFragmentId changeContentRequest"
@@ -144,6 +148,25 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			showDialog(1);
 		else
 			switchContent();
+	}
+
+	public void showDownloadDialog(boolean waiting) {
+		if (waiting) {
+			pd = new ProgressDialog(this);
+			pd.setTitle(R.string.synchronization);
+			pd.setMessage(getString(R.string.download));
+			pd.show();
+			pd.setOnCancelListener(new OnCancelListener() {
+
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					client.cancel();
+					Toast.makeText(getApplicationContext(), R.string.cancel,
+							Toast.LENGTH_SHORT).show();
+
+				}
+			});
+		}
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -255,7 +278,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
-		setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
@@ -263,8 +285,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		MenuItem mi = menu.add(0, 1, 0, R.string.menu_settings);
 		mi.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
-		menu.add(0, 2, 0, R.string.save).setIcon(R.drawable.save)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(0, 2, 0, R.string.save)
+				.setIcon(R.drawable.save)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		menu.add(0, 3, 0, R.string.clean)
 				.setIcon(R.drawable.clean)
 				.setShowAsAction(
@@ -316,7 +341,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void onSaveClick() {
 		mEateryDB
 				.saveMenu(mDayMenuFragmentFragments.get(mCurrentFragmentId).mRarusMenu);
-		Toast.makeText(getBaseContext(), R.string.saved, 3).show();
+		Toast.makeText(getBaseContext(), R.string.saved, Toast.LENGTH_SHORT)
+				.show();
 		ArrayList<RarusMenu> rm = (ArrayList<RarusMenu>) mEateryDB
 				.getOrdersNotSent();
 		for (RarusMenu rmiterator : rm) {
@@ -327,19 +353,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	// method for synchronizing the menu (link in the layout)
-	boolean updating;
 	public void onRefreshClick(View v) {
-		if(updating){
-			client.cancel();
-			Toast.makeText(getBaseContext(), "Canceled", 3).show();
-			updating=false;
-		}
-		else{
-			client.update();
-			Toast.makeText(getBaseContext(), R.string.synchronization, 3).show();
-			setSupportProgressBarIndeterminateVisibility(true);
-			updating=true;
-		}
+		client.update();
+		Toast.makeText(getBaseContext(), R.string.synchronization,
+				Toast.LENGTH_SHORT).show();
+		showDownloadDialog(true);
+		mWaiting = true;
 	}
 
 	// method to display the menu (link in the layout)
@@ -381,6 +400,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 		Log.d(this.getClass().toString(),
 				"MainActivity: ѕолученно сообщение от сервиса");
+		pd.dismiss();
+		mWaiting = false;
 		if (result) {
 			int operationCode = intent.getIntExtra(
 					EateryWebService.SERVICE_RESULT_CODE, 0);
@@ -396,12 +417,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 					makeFragments();
 					mNextFragmentId = mCurrentFragmentId;
 					switchContent();
-					Toast.makeText(getBaseContext(), R.string.updated_menu, 3)
-							.show();
+					Toast.makeText(getBaseContext(), R.string.updated_menu,
+							Toast.LENGTH_SHORT).show();
 					mChangedOrderedAmount = false;
 					Log.d("int", "" + mChangedOrderedAmount);
 				}
-
 			}
 				break;
 			case EateryWebService.SET_ORDER_CODE: {
@@ -416,7 +436,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 			Log.d(this.getClass().toString(),
 					"MainActivity: «апрос сервиса неудачен");
-			Toast.makeText(getBaseContext(), R.string.error_request, 3).show();
+			Toast.makeText(getBaseContext(), R.string.error_request,
+					Toast.LENGTH_SHORT).show();
 
 			int operationCode = intent.getIntExtra(
 					EateryWebService.SERVICE_RESULT_CODE, 0);
@@ -428,7 +449,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при получении меню:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_getting + error, 3).show();
+						R.string.error_getting + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			case EateryWebService.SET_ORDER_CODE: {
@@ -436,7 +458,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при отправке заказа:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_sending + error, 3).show();
+						R.string.error_sending + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			case EateryWebService.PING_CODE: {
@@ -444,12 +467,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						"MainActivity: ошибка при соединеннии с сервером:");
 				Log.e(this.getClass().toString(), "MainActivity: " + error);
 				Toast.makeText(getBaseContext(),
-						R.string.error_connecting + error, 3).show();
+						R.string.error_connecting + error, Toast.LENGTH_SHORT)
+						.show();
 			}
 				break;
 			}
-			//mFirstRunFragment.setButtonEnabled(true);
-
 		}
 	}
 
@@ -464,6 +486,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		outState.putInt("mCurrentFragmentId", mCurrentFragmentId);
 		outState.putStringArrayList("mDatesString",
 				(ArrayList<String>) mDatesString);
+		outState.putBoolean("mWaiting", mWaiting);
 	}
 
 	@Override
@@ -471,6 +494,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onStart();
 		bindService(serviceIntent, connection, 0);
 		Log.d(getClass().getName(), "MainActivity: onStart()");
+	}
+
+	@Override
+	protected void onPause() {
+		if (mWaiting)
+			pd.dismiss();
+		super.onPause();
 	}
 
 	@Override
