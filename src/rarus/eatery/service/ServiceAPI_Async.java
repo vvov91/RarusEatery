@@ -197,6 +197,11 @@ public class ServiceAPI_Async extends AsyncTask<APIMessage, Object, APIMessage> 
 	private Object setOrder() {
 		List<RarusMenu> orders=mDBManager.getOrdersNotSent();
 		List<RarusMenu> menu = null;
+		if(orders.size()<1){
+			Log.d(this.getClass().toString(), "[setOrder] - nothing to send");
+			successfull=true;
+			return null;
+		}
 		String xml = XMLParser.setMenuXMLRequest(orders);
 		Log.i(this.getClass().toString(), "[API] - setOrder xml:\n" + xml);
 		Log.d(this.getClass().toString(), "[API] - setOrder request");
