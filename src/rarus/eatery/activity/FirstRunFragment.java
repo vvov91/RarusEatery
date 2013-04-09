@@ -63,7 +63,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 
 	public void setDefaultPreferences() {
 		ed.putString("server1",
-				"http://192.168.38.252:8095/DiningRoomTest/ws/mobileEda");
+				"http://192.168.38.252/DiningRoomTest/ws/mobileEda");
 		ed.putString("server2",
 				"http://178.219.241.102:8095/DiningRoomTest/ws/mobileEda");
 		ed.putString("cardNumber", "000013BDBD");
