@@ -332,7 +332,7 @@ public class XMLParser {
 		Log.i("Date_log", d.toString());
 		String year=Integer.toString(d.getYear()+1900);
 		String month=Integer.toString(d.getMonth()+1);
-		String day=Integer.toString(d.getMonth()+1);
+		String day=Integer.toString(d.getDate());
 		if(month.length()<2){
 			month="0"+month;
 		}
