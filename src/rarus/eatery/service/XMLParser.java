@@ -119,34 +119,24 @@ public class XMLParser {
 			sz.endTag(MOB_PREFIX, "loginStructure");
 			Integer date=0;
 			boolean first=true;
+			sz.startTag(MOB_PREFIX, "setMenuData");
 			for(RarusMenu dish:orders){
-				if(date!=dish.getDate()){
-					if(!first)
-						sz.endTag(MOB_PREFIX, "orderStructure");
-					date=dish.getDate();
-					sz.startTag(MOB_PREFIX, "orderStructure");
-					sz.startTag(MOB_PREFIX, "data");
-					sz.text(Integer.toString(date));
-					sz.endTag(MOB_PREFIX, "data");
-					first=false;
-				}
-				sz.startTag(MOB_PREFIX, "dish");
+				sz.startTag(MOB_PREFIX, "menuItems");
+				sz.startTag(MOB_PREFIX, "dateTime");
+				sz.text(dateFromUnix(dish.getDate()));
+				sz.endTag(MOB_PREFIX, "dateTime");
 				sz.startTag(MOB_PREFIX, "dishId");
 				sz.text(dish.getDishId());
 				sz.endTag(MOB_PREFIX, "dishId");
-				
-				sz.startTag(MOB_PREFIX, "timestamp");
-				sz.text(Integer.toString(dish.getTimestamp()));
-				sz.endTag(MOB_PREFIX, "timestamp");
-				
 				sz.startTag(MOB_PREFIX, "ammount");
 				sz.text(Float.toString(dish.getAmmount()));
-				sz.endTag(MOB_PREFIX, "ammount");				
-				sz.endTag(MOB_PREFIX, "dish");
-				
+				sz.endTag(MOB_PREFIX, "ammount");
+				sz.endTag(MOB_PREFIX,"menuItems");
 			}
-			if(!first)
-				sz.endTag(MOB_PREFIX, "orderStructure");
+			sz.startTag(MOB_PREFIX,"timestamp");
+			sz.text(dateFromUnix(orders.get(0).getTimestamp()));
+			sz.endTag(MOB_PREFIX,"timestamp");
+			sz.endTag(MOB_PREFIX, "setMenuData");
 			sz.endTag(MOB_PREFIX, "setMenu");
 			sz.endTag(SOAP_PREFIX, "Body");
 			sz.endTag(SOAP_PREFIX, "Envelope");
@@ -177,7 +167,6 @@ public class XMLParser {
 					break;
 				case XmlPullParser.START_TAG:
 					name = xpp.getName();
-					Log.i(XMLParser.class.toString(), "[XMLParser] getted tag xml:  "+ name);
 					break;
 				case XmlPullParser.END_TAG:
 				case XmlPullParser.TEXT:
@@ -307,9 +296,10 @@ public class XMLParser {
 						availableAmmount = (float) Double.parseDouble(xpp
 								.getText());
 					}
-					if (name.equals("ordered")) {
+					if (name.equals("ammount")) {
 						orderedAmmount = (float) Double.parseDouble(xpp
 								.getText());
+						Log.d("ammount","ammount:"+orderedAmmount);
 					}
 					if (name.equals("preordered")) {
 						preorder=Boolean.parseBoolean(xpp.getText());
@@ -338,7 +328,24 @@ public class XMLParser {
 		}
 	}
 	
+	private static String dateFromUnix(Integer date) {
+		Date d=new Date((long)date*1000);
+		Log.i("Date_log", d.toString());
+		String year=Integer.toString(d.getYear()+1900);
+		String month=Integer.toString(d.getMonth()+1);
+		String day=Integer.toString(d.getDate());
+		if(month.length()<2){
+			month="0"+month;
+		}
+		if(day.length()<2){
+			day="0"+day;
+		}
+		String stringDate=year+"-"+month+"-"+day+"T00:00:00";
+		Log.i("Date_log", stringDate);
+		return stringDate;
+	}
 	private static Integer dateToUnix(String date) {
+		Log.i("Date_log", date);
 		Date d = new Date(Integer.parseInt(date.substring(0, 4)) - 1900,
 				Integer.parseInt(date.substring(5, 7)) - 1,
 				Integer.parseInt(date.substring(8, 10)));
