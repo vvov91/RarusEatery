@@ -296,9 +296,10 @@ public class XMLParser {
 						availableAmmount = (float) Double.parseDouble(xpp
 								.getText());
 					}
-					if (name.equals("ordered")) {
+					if (name.equals("ammount")) {
 						orderedAmmount = (float) Double.parseDouble(xpp
 								.getText());
+						Log.d("ammount","ammount:"+orderedAmmount);
 					}
 					if (name.equals("preordered")) {
 						preorder=Boolean.parseBoolean(xpp.getText());
