@@ -3,9 +3,9 @@ package rarus.eatery.activity;
 import java.util.ArrayList;
 
 import rarus.eatery.R;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,12 +52,17 @@ public class SlidingMenuFragment extends Fragment {
 	private void switchFragment(int position) {
 		if (getActivity() instanceof SlidingMenuActivity) {
 			SlidingMenuActivity sma = (SlidingMenuActivity) getActivity();
-			sma.changeContentRequest(position);
+			sma.getSupportActionBar().setSelectedNavigationItem(position);
 		}
 	}
 
 	public void setSelectedItem(int position) {
+		Log.d("int","position"+position);
+		try {
 		slidingMenuListAdapter.setSelected(position);
-		slidingMenuListAdapter.notifyDataSetChanged();
+		slidingMenuListAdapter.notifyDataSetChanged();}
+		catch (Exception e) {
+			Log.d("int","Exception "+e.toString());
+		}
 	}
 }

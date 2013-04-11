@@ -53,6 +53,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	BroadcastReceiver receiver;
 	SlidingMenuFragment mSlidingMenuFragment;
 	ProgressDialog pd;
+	SlidingMenu mSlidingMenu;
 
 	EateryDB mEateryDB;
 	int mCurrentFragmentId = 0, mNextFragmentId = 0;
@@ -61,6 +62,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	static Boolean mChangedOrderedAmount = false;
 	FirstRunFragment mFirstRunFragment;
 	Boolean mWaiting = false;
+	final int DIALOG_EXIT = 3,DIALOG_CLEAR=2,DIALOG_SAVE=1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -74,14 +76,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		Log.d("int", "" + mChangedOrderedAmount);
 
 		// customize the SlidingMenu
-		SlidingMenu sm = getSlidingMenu();
-		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		sm.setShadowWidthRes(R.dimen.shadow_width);
-		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindScrollScale(0.25f);
-		sm.setFadeDegree(0.25f);
+		mSlidingMenu = getSlidingMenu();
+		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		mSlidingMenu.setShadowDrawable(R.drawable.shadow);
+		mSlidingMenu.setBehindScrollScale(0.25f);
+		mSlidingMenu.setFadeDegree(0.25f);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 		getSupportActionBar().hide();
 
 		mEateryDB = new EateryDB(getApplicationContext());
@@ -95,7 +96,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 					.replace(R.id.content_frame, mFirstRunFragment).commit();
 			getSlidingMenu().setSlidingEnabled(false);
 		} else {
-			if (savedInstanceState != null) {
+			if ((savedInstanceState != null)
+					|| (!mDayMenuFragmentFragments.isEmpty())) {
 				mDayMenuFragmentFragments = (List<DayMenuFragment>) getLastCustomNonConfigurationInstance();
 				mCurrentFragmentId = savedInstanceState
 						.getInt("mCurrentFragmentId");
@@ -103,12 +105,17 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						.getStringArrayList("mDatesString");
 				makeSlidingMenu(mDatesString);
 				mNextFragmentId = mCurrentFragmentId;
-				switchContent();
+				getSupportActionBar().setSelectedNavigationItem(
+						mCurrentFragmentId);
+				Log.d("int", "mCurrentFragmentId=" + mCurrentFragmentId
+						+ "mNextFragmentId=" + mNextFragmentId);
 			} else {
 				makeFragments();
-				Log.d("int", "mCurrentFragmentId changeContentRequest"
-						+ mCurrentFragmentId);
-				changeContentRequest(mCurrentFragmentId);
+				Log.d("int", "makeFragments ---mCurrentFragmentId="
+						+ mCurrentFragmentId + "mNextFragmentId="
+						+ mNextFragmentId);
+				getSupportActionBar().setSelectedNavigationItem(
+						mCurrentFragmentId);
 			}
 		}
 		Preference.prefInit(PreferenceManager
@@ -117,9 +124,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void switchContent() {
+		if (mDayMenuFragmentFragments.isEmpty())
+			return;
 		// смена основного фрагмента
 		mCurrentFragmentId = mNextFragmentId;
-
 		getSupportFragmentManager()
 				.beginTransaction()
 				.replace(R.id.content_frame,
@@ -132,22 +140,21 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				getSlidingMenu().showContent();
 			}
 		}, 50);
-		getSupportActionBar().setSelectedNavigationItem(mNextFragmentId);
+		Log.d("int", "mNextFragmentId=" + mNextFragmentId);
+		mSlidingMenuFragment.setSelectedItem(mNextFragmentId);
 	}
 
+	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// list navigation(actionbar)
-		changeContentRequest(itemPosition);
-		mSlidingMenuFragment.setSelectedItem(itemPosition);
-		return true;
-	}
+		Log.d("int", "itemPosition" + itemPosition);
 
-	public void changeContentRequest(int newId) {
-		mNextFragmentId = newId;
+		mNextFragmentId = itemPosition;
 		if ((mChangedOrderedAmount) && (mNextFragmentId != mCurrentFragmentId))
 			showDialog(1);
 		else
 			switchContent();
+		return true;
 	}
 
 	public void showDownloadDialog(boolean waiting) {
@@ -170,21 +177,32 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	protected Dialog onCreateDialog(int id) {
-		if (id == 1) {
+		if (id == DIALOG_SAVE) {
 			AlertDialog.Builder adb = new AlertDialog.Builder(this);
 			adb.setTitle(R.string.date_change);
 			adb.setMessage(R.string.save_menu);
 			adb.setIcon(android.R.drawable.ic_dialog_info);
 			adb.setPositiveButton(R.string.yes, saveDialog);
 			adb.setNegativeButton(R.string.no, saveDialog);
+			adb.setCancelable(false);
 			return adb.create();
-		} else if (id == 2) {
+		} else if (id == DIALOG_CLEAR) {
 			AlertDialog.Builder adb = new AlertDialog.Builder(this);
 			adb.setTitle(R.string.clear_menu);
 			adb.setMessage(R.string.clear_menu_info);
 			adb.setIcon(android.R.drawable.ic_dialog_info);
 			adb.setPositiveButton(R.string.yes, cleanDialog);
 			adb.setNegativeButton(R.string.no, cleanDialog);
+			adb.setCancelable(false);
+			return adb.create();
+		} else if (id == DIALOG_EXIT) {
+			AlertDialog.Builder adb = new AlertDialog.Builder(this);
+			adb.setTitle(R.string.exit);
+			adb.setMessage(R.string.exit_info);
+			adb.setIcon(android.R.drawable.ic_dialog_info);
+			adb.setPositiveButton(R.string.yes, exitDialog);
+			adb.setNegativeButton(R.string.no, exitDialog);
+			adb.setCancelable(false);
 			return adb.create();
 		}
 		return super.onCreateDialog(id);
@@ -217,7 +235,18 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 		}
 	};
-
+	OnClickListener exitDialog = new OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+			case Dialog.BUTTON_POSITIVE:
+				finish();
+				break;
+			case Dialog.BUTTON_NEGATIVE:
+				dialog.dismiss();
+				break;
+			}
+		}
+	};
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageViewActivity.class);
 		intent.putExtra(DishPageViewActivity.DISH_ID, dishId);
@@ -416,7 +445,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				if (mEateryDB.getMenuDates().size() != 0) {
 					makeFragments();
 					mNextFragmentId = mCurrentFragmentId;
-					switchContent();
+					getSupportActionBar().setSelectedNavigationItem(
+							mNextFragmentId);
 					Toast.makeText(getBaseContext(), R.string.updated_menu,
 							Toast.LENGTH_SHORT).show();
 					mChangedOrderedAmount = false;
@@ -487,6 +517,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		outState.putStringArrayList("mDatesString",
 				(ArrayList<String>) mDatesString);
 		outState.putBoolean("mWaiting", mWaiting);
+	}
+
+	public void onBackPressed() {
+		if (mSlidingMenu.isShown())
+			showDialog(DIALOG_EXIT);
 	}
 
 	@Override

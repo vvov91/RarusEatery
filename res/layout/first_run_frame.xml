@@ -8,7 +8,7 @@
         android:id="@+id/tvCardNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CardNumber:"
+        android:text="@string/cardNumber"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -24,7 +24,7 @@
         android:id="@+id/tvServer1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Server1:"
+        android:text="@string/server1"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -37,7 +37,7 @@
         android:id="@+id/tvServer2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Server2:"
+        android:text="@string/server2"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -56,6 +56,12 @@
         android:id="@+id/btnDownload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Download menu" />
+        android:text="@string/download_menu" />
+
+    <Button
+        android:id="@+id/btnDemo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/demo" />
 
 </LinearLayout>
