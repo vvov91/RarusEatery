@@ -19,7 +19,7 @@ import android.util.Log;
 import android.util.Xml;
 
 /**
- * Класс с набюором статических методов для формирования XML запросов и разбора
+ * Класс с набором статических методов для формирования XML запросов и разбора
  * XML ответов вебсервера 1-С
  * 
  * @author Dmitriy Bazunov <binnarywolf@gmail.com>
@@ -117,25 +117,38 @@ public class XMLParser {
 			sz.text(cardCode);
 			sz.endTag(MOB_PREFIX, "cardNumber");
 			sz.endTag(MOB_PREFIX, "loginStructure");
-			Integer date=0;
+			Integer date=orders.get(0).getDate();
 			boolean first=true;
 			sz.startTag(MOB_PREFIX, "setMenuData");
+			sz.startTag(MOB_PREFIX, "menuItems");
+			sz.startTag(MOB_PREFIX, "dateTime");
+			sz.text(dateFromUnix(date));
+			sz.endTag(MOB_PREFIX, "dateTime");
+			sz.startTag(MOB_PREFIX,"timeStamp");
+			sz.text(dateFromUnix(orders.get(0).getTimestamp()));
+			sz.endTag(MOB_PREFIX,"timeStamp");			
 			for(RarusMenu dish:orders){
-				sz.startTag(MOB_PREFIX, "menuItems");
-				sz.startTag(MOB_PREFIX, "dateTime");
-				sz.text(dateFromUnix(dish.getDate()));
-				sz.endTag(MOB_PREFIX, "dateTime");
+				if(date!=dish.getDate()){
+					sz.endTag(MOB_PREFIX, "menuItems");
+					date=dish.getDate();
+					sz.startTag(MOB_PREFIX, "menuItems");
+					sz.startTag(MOB_PREFIX, "dateTime");
+					sz.text(dateFromUnix(date));
+					sz.endTag(MOB_PREFIX, "dateTime");
+					sz.startTag(MOB_PREFIX,"timeStamp");
+					sz.text(dateFromUnix(dish.getTimestamp()));
+					sz.endTag(MOB_PREFIX,"timeStamp");					
+				}
+				sz.startTag(MOB_PREFIX, "OrderItems");				
 				sz.startTag(MOB_PREFIX, "dishId");
 				sz.text(dish.getDishId());
 				sz.endTag(MOB_PREFIX, "dishId");
 				sz.startTag(MOB_PREFIX, "ammount");
 				sz.text(Float.toString(dish.getAmmount()));
 				sz.endTag(MOB_PREFIX, "ammount");
-				sz.endTag(MOB_PREFIX,"menuItems");
+				sz.endTag(MOB_PREFIX,"OrderItems");
 			}
-			sz.startTag(MOB_PREFIX,"timestamp");
-			sz.text(dateFromUnix(orders.get(0).getTimestamp()));
-			sz.endTag(MOB_PREFIX,"timestamp");
+			sz.endTag(MOB_PREFIX, "menuItems");
 			sz.endTag(MOB_PREFIX, "setMenuData");
 			sz.endTag(MOB_PREFIX, "setMenu");
 			sz.endTag(SOAP_PREFIX, "Body");
@@ -223,6 +236,7 @@ public class XMLParser {
 	public static List<RarusMenu> parseXMLMenu(String xml) {
 		try {
 			List<RarusMenu> menu = new ArrayList<RarusMenu>();
+			List<RarusMenu> temp = new ArrayList<RarusMenu>();
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			factory.setNamespaceAware(true);
 			XmlPullParser xpp = factory.newPullParser();
@@ -261,14 +275,19 @@ public class XMLParser {
 								dishDescription, portioned, price, rating,
 								preorder, availableAmmount, orderedAmmount,
 								modified, timestamp);
-						menu.add(m);
+						temp.add(m);
+						//menu.add(m);
 						idMenu++;
 						Log.i("Dish_log", m.toString());
 
 					}
 					if (xpp.getName().equals("menuItems")) {
+						for(RarusMenu dish:temp){
+							dish.setTimestamp(timestamp);
+						}
+						menu.addAll(temp);
+						temp=new ArrayList<RarusMenu>();
 					}
-
 					name = "";
 					break;
 
@@ -307,8 +326,8 @@ public class XMLParser {
 					if (name.equals("portioned")) {
 						portioned=Boolean.parseBoolean(xpp.getText());
 					}
-					if (name.equals("timestamp")) {
-						// to do timestamp
+					if (name.equals("timeStamp")) {
+						timestamp=dateToUnix(xpp.getText());
 					}
 					break;
 
@@ -317,7 +336,9 @@ public class XMLParser {
 				}
 				xpp.next();
 			}
-			
+			for(RarusMenu dish:menu){
+				Log.i("timestamp", "timestamp="+dateFromUnix(dish.getTimestamp()));
+			}
 			return menu;
 		} catch (XmlPullParserException e) {
 			return null;
