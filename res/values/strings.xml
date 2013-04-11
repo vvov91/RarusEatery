@@ -33,7 +33,7 @@
     <string name="cancel">Загрузка отменена</string>
     <string name="exit_info">Действительно хотите выйти?</string>
     <string name="exit">Выход</string>
-    <string name="download_menu">Загрузить</string>
+    <string name="download_menu">Загрузить меню</string>
     <string name="demo">Демо</string>
 
 </resources>
