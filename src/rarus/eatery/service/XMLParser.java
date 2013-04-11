@@ -355,13 +355,25 @@ public class XMLParser {
 		String year=Integer.toString(d.getYear()+1900);
 		String month=Integer.toString(d.getMonth()+1);
 		String day=Integer.toString(d.getDate());
+		String hours=Integer.toString(d.getHours());
+		String minutes=Integer.toString(d.getMinutes());
+		String seconds=Integer.toString(d.getSeconds());
 		if(month.length()<2){
 			month="0"+month;
 		}
 		if(day.length()<2){
 			day="0"+day;
 		}
-		String stringDate=year+"-"+month+"-"+day+"T00:00:00";
+		if(hours.length()<2){
+			hours="0"+hours;
+		}
+		if(minutes.length()<2){
+			minutes="0"+minutes;
+		}
+		if(seconds.length()<2){
+			seconds="0"+seconds;
+		}
+		String stringDate=year+"-"+month+"-"+day+"T"+hours+":"+minutes+":"+seconds;
 		Log.i("Date_log", stringDate);
 		return stringDate;
 	}
@@ -370,7 +382,13 @@ public class XMLParser {
 		Date d = new Date(Integer.parseInt(date.substring(0, 4)) - 1900,
 				Integer.parseInt(date.substring(5, 7)) - 1,
 				Integer.parseInt(date.substring(8, 10)));
-		Log.i("Date_log", d.toString());
+		Log.i("Date_log", "Day:"+d.toString());
+		d.setHours(Integer.parseInt(date.substring(11, 13)));
+		Log.i("Date_log", "Hour:"+d.toString());
+		d.setMinutes(Integer.parseInt(date.substring(14, 16)));
+		Log.i("Date_log", "min:"+d.toString());
+		d.setSeconds(Integer.parseInt(date.substring(17, 19)));
+		Log.i("Date_log", "Sec:"+d.toString());
 		return (int) (d.getTime() / 1000);
 	}
 

@@ -30,7 +30,6 @@
 
     <EditText
         android:id="@+id/etServer1"
-        android:singleLine="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="true" />
@@ -44,7 +43,6 @@
 
     <EditText
         android:id="@+id/etServer2"
-        android:singleLine="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="true" />
