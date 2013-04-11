@@ -19,6 +19,7 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 	CheckBox chWifi;
 	SharedPreferences sp;
 	Editor ed;
+	Button btnDownload, btnDemo;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,17 +32,27 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		etServer1 = (EditText) v.findViewById(R.id.etServer1);
 		etServer2 = (EditText) v.findViewById(R.id.etServer2);
 		chWifi = (CheckBox) v.findViewById(R.id.cbWifi);
-		Button btnDownload = (Button) v.findViewById(R.id.btnDownload);
+		btnDownload = (Button) v.findViewById(R.id.btnDownload);
 		btnDownload.setOnClickListener(this);
-		setDefaultPreferences();
+		btnDemo = (Button) v.findViewById(R.id.btnDemo);
+		btnDemo.setOnClickListener(this);
 		return v;
 	}
 
 	@Override
 	public void onClick(View v) {
-		savePreference();
-		SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
-		ra.onRefreshClick(v);
+
+		switch (v.getId()) {
+		case R.id.btnDownload:
+			savePreference();
+			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
+			ra.onRefreshClick(v);
+			break;
+		case R.id.btnDemo:
+			setDefaultPreferences();
+			loadPreference();
+			break;
+		}
 	}
 
 	void savePreference() {

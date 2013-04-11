@@ -30,7 +30,10 @@
     <string name="onlyWIFI">Загрузка данных только по Wi-Fi</string>
     <string name="anyConnection">Загрузка данных при любом подключении</string>
     <string name="WI_FI">Настройки соеденения</string>
-        <string name="cancel">Загрузка отменена</string>
-    
+    <string name="cancel">Загрузка отменена</string>
+    <string name="exit_info">Действительно хотите выйти?</string>
+    <string name="exit">Выход</string>
+    <string name="download_menu">Загрузить</string>
+    <string name="demo">Демо</string>
 
 </resources>
