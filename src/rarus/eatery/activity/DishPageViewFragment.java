@@ -76,6 +76,12 @@ public class DishPageViewFragment extends Fragment {
 				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 			}
 		});
+		long currentUnixTime = System.currentTimeMillis() / 1000L;
+		int menuUnixTime = p.getDate() - DishAdapter.HOURS_7;
+		if (currentUnixTime > menuUnixTime) {
+			btnPlus.setEnabled(false);
+			btnMinus.setEnabled(false);
+		}
 		return v;
 	}
 
