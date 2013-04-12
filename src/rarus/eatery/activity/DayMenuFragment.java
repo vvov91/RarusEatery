@@ -23,7 +23,6 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		OnDishItemListener {
 	ArrayList<RarusMenu> mRarusMenu = new ArrayList<RarusMenu>();
 	String mStringDate;
-	Date mDate;
 	int mPosition = -1;
 	DishAdapter mDishAdapter;
 	GridView mGridView;
@@ -117,6 +116,10 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 
 	public void setPosition(int position) {
 		mPosition = position;
+	}
+
+	public int getDate(int position) {
+		return mRarusMenu.get(position).getDate();
 	}
 
 	@Override

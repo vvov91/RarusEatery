@@ -1,10 +1,12 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +23,7 @@ public class DishAdapter extends ArrayAdapter {
 	private Context context;
 	private ArrayList<RarusMenu> mMenu;
 	private OnDishItemListener changeAmount;
+	public static final int HOURS_7 = 25200;
 
 	public DishAdapter(Context context, int textViewResourceId,
 			ArrayList<RarusMenu> menu, OnDishItemListener changeAmount) {
@@ -67,6 +70,12 @@ public class DishAdapter extends ArrayAdapter {
 					notifyDataSetChanged();
 				}
 			});
+			long currentUnixTime = System.currentTimeMillis() / 1000L;
+			int menuUnixTime = rarusMenu.getDate() - HOURS_7;
+			if (currentUnixTime > menuUnixTime) {
+				viewHolder.btnPlus.setEnabled(false);
+				viewHolder.btnMinus.setEnabled(false);
+			}
 		}
 		return v;
 	}

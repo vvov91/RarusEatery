@@ -1,6 +1,7 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import rarus.eatery.R;
 import android.os.Bundle;
@@ -16,14 +17,18 @@ import android.widget.ListView;
 public class SlidingMenuFragment extends Fragment {
 
 	ArrayList<String> mDatesString;
+	ArrayList<Integer> mDates;
+
 	ListView slidingMenuLV;
 	SlidingMenuListAdapter slidingMenuListAdapter;
 
 	public SlidingMenuFragment() {
 	}
 
-	public SlidingMenuFragment(ArrayList<String> datesString) {
+	public SlidingMenuFragment(ArrayList<String> datesString,
+			ArrayList<Integer> dates) {
 		mDatesString = datesString;
+		mDates = dates;
 	}
 
 	@Override
@@ -36,7 +41,7 @@ public class SlidingMenuFragment extends Fragment {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
 		slidingMenuLV = (ListView) v.findViewById(R.id.lv);
 		slidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
-				R.id.lv, mDatesString);
+				R.id.lv, mDatesString, mDates);
 		slidingMenuLV.setAdapter(slidingMenuListAdapter);
 		slidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -57,12 +62,12 @@ public class SlidingMenuFragment extends Fragment {
 	}
 
 	public void setSelectedItem(int position) {
-		Log.d("int","position"+position);
+		Log.d("int", "position" + position);
 		try {
-		slidingMenuListAdapter.setSelected(position);
-		slidingMenuListAdapter.notifyDataSetChanged();}
-		catch (Exception e) {
-			Log.d("int","Exception "+e.toString());
+			slidingMenuListAdapter.setSelected(position);
+			slidingMenuListAdapter.notifyDataSetChanged();
+		} catch (Exception e) {
+			Log.d("int", "Exception " + e.toString());
 		}
 	}
 }
