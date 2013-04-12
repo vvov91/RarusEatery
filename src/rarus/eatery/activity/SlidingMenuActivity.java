@@ -56,13 +56,16 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	SlidingMenu mSlidingMenu;
 
 	EateryDB mEateryDB;
-	int mCurrentFragmentId = 0, mNextFragmentId = 0;
+	int mCurrentFragmentId = -1, mNextFragmentId = -1;
 	List<DayMenuFragment> mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 	List<String> mDatesString = new ArrayList<String>();
+	List<Integer> mDates = new ArrayList<Integer>();
 	static Boolean mChangedOrderedAmount = false;
 	FirstRunFragment mFirstRunFragment;
 	Boolean mWaiting = false;
-	final int DIALOG_EXIT = 3,DIALOG_CLEAR=2,DIALOG_SAVE=1;
+	final int DIALOG_EXIT = 3, DIALOG_CLEAR = 2, DIALOG_SAVE = 1;
+	final int MENU_SETTINGS = 1, MENU_SAVE = 2, MENU_CLEAR = 3;
+	MenuItem mMenuItemSave, mMenuItemClear;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -90,7 +93,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			mWaiting = savedInstanceState.getBoolean("mWaiting");
 			showDownloadDialog(mWaiting);
 		}
-		if (mEateryDB.getMenuDates().size() == 0) {
+		if (mEateryDB.getMenuDates().isEmpty()) {
 			mFirstRunFragment = new FirstRunFragment();
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content_frame, mFirstRunFragment).commit();
@@ -103,7 +106,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						.getInt("mCurrentFragmentId");
 				mDatesString = savedInstanceState
 						.getStringArrayList("mDatesString");
-				makeSlidingMenu(mDatesString);
+				mDates = savedInstanceState.getIntegerArrayList("mDates");
+				makeSlidingMenu();
 				mNextFragmentId = mCurrentFragmentId;
 				getSupportActionBar().setSelectedNavigationItem(
 						mCurrentFragmentId);
@@ -111,9 +115,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						+ "mNextFragmentId=" + mNextFragmentId);
 			} else {
 				makeFragments();
-				Log.d("int", "makeFragments ---mCurrentFragmentId="
-						+ mCurrentFragmentId + "mNextFragmentId="
-						+ mNextFragmentId);
+				Log.d("int", "asdasdasdasd");
 				getSupportActionBar().setSelectedNavigationItem(
 						mCurrentFragmentId);
 			}
@@ -142,6 +144,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		}, 50);
 		Log.d("int", "mNextFragmentId=" + mNextFragmentId);
 		mSlidingMenuFragment.setSelectedItem(mNextFragmentId);
+		long currentUnixTime = System.currentTimeMillis() / 1000L;
+		int menuUnixTime = mDayMenuFragmentFragments.get(mCurrentFragmentId)
+				.getDate(0) - DishAdapter.HOURS_7;
+		mMenuItemSave.setVisible(currentUnixTime < menuUnixTime);
+		mMenuItemClear.setVisible(currentUnixTime < menuUnixTime);
 	}
 
 	@Override
@@ -247,6 +254,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			}
 		}
 	};
+
 	public void onDishPressed(int dayId, int dishId) {
 		Intent intent = new Intent(this, DishPageViewActivity.class);
 		intent.putExtra(DishPageViewActivity.DISH_ID, dishId);
@@ -273,10 +281,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	public void makeFragments() {
 		// создание основного фрагмента
 
-		List<Integer> dates = mEateryDB.getMenuDates();
+		mDates = mEateryDB.getMenuDates();
 		mDatesString = new ArrayList<String>();
 		mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
-		for (Integer date : dates) {
+		for (Integer date : mDates) {
 			DayMenuFragment tempDayMenuFragment = new DayMenuFragment();
 			tempDayMenuFragment.setRarusMenu((ArrayList<RarusMenu>) mEateryDB
 					.getMenu(date));
@@ -288,20 +296,27 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			mDatesString.add(tempDayMenuFragment.mStringDate);
 			tempDayMenuFragment.setPosition(mDayMenuFragmentFragments.size());
 			mDayMenuFragmentFragments.add(tempDayMenuFragment);
+
+			long currentUnixTime = System.currentTimeMillis() / 1000L;
+			if ((mCurrentFragmentId == -1)
+					&& (currentUnixTime < (date - DishAdapter.HOURS_7))) {
+				mCurrentFragmentId = mDates.indexOf(date);
+				mNextFragmentId = mDates.indexOf(date);
+			}
 		}
-		makeSlidingMenu(mDatesString);
+		makeSlidingMenu();
 
 	}
 
-	public void makeSlidingMenu(List<String> dates) {
+	public void makeSlidingMenu() {
 		mSlidingMenuFragment = new SlidingMenuFragment(
-				(ArrayList<String>) dates);
+				(ArrayList<String>) mDatesString, (ArrayList<Integer>) mDates);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
 		ArrayAdapter<String> list = new ArrayAdapter<String>(
 				getSupportActionBar().getThemedContext(),
-				R.layout.sherlock_spinner_item, dates);
+				R.layout.sherlock_spinner_item, mDatesString);
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(list, this);
@@ -311,19 +326,22 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		// системное меню
-		MenuItem mi = menu.add(0, 1, 0, R.string.menu_settings);
-		mi.setIntent(new Intent(this, SettingsActivity.class));
+		MenuItem menuItem = menu.add(0, MENU_SETTINGS, 0,
+				R.string.menu_settings);
+		menuItem.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
-		menu.add(0, 2, 0, R.string.save)
+		menu.add(0, MENU_SAVE, 0, R.string.save)
 				.setIcon(R.drawable.save)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		menu.add(0, 3, 0, R.string.clean)
+		menu.add(0, MENU_CLEAR, 0, R.string.clean)
 				.setIcon(R.drawable.clean)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		mMenuItemSave = menu.findItem(MENU_SAVE);
+		mMenuItemClear = menu.findItem(MENU_CLEAR);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -516,6 +534,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		outState.putInt("mCurrentFragmentId", mCurrentFragmentId);
 		outState.putStringArrayList("mDatesString",
 				(ArrayList<String>) mDatesString);
+		outState.putIntegerArrayList("mDates", (ArrayList<Integer>) mDates);
 		outState.putBoolean("mWaiting", mWaiting);
 	}
 

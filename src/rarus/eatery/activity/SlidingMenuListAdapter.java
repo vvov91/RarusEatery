@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +16,17 @@ import android.widget.TextView;
  */
 public class SlidingMenuListAdapter extends ArrayAdapter {
 
-	private ArrayList<String> dates;
-	private int selectedPosition = -1;
-	private Context context;
+	private ArrayList<String> mDatesString;
+	private ArrayList<Integer> mDates;
+	private int mSelectedPosition = -1;
+	private Context mContext;
 
 	public SlidingMenuListAdapter(Context context, int textViewResourceId,
-			ArrayList<String> objects) {
-		super(context, textViewResourceId, objects);
-		this.context = context;
-		this.dates = objects;
+			ArrayList<String> datesString, ArrayList<Integer> dates) {
+		super(context, textViewResourceId, datesString);
+		this.mContext = context;
+		this.mDatesString = datesString;
+		this.mDates = dates;
 	}
 
 	@Override
@@ -41,18 +44,23 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 		} else {
 			viewHolder = (MenuListViewHolder) v.getTag();
 		}
-		String str = dates.get(position);
+		String str = mDatesString.get(position);
 		viewHolder.text1.setText(str);
-		if ((selectedPosition != -1) && (selectedPosition == position))
-			v.setBackgroundColor(Color.DKGRAY);
+		long currentUnixTime = System.currentTimeMillis() / 1000L;
+		int menuUnixTime = mDates.get(position) - DishAdapter.HOURS_7;
+		if (currentUnixTime > menuUnixTime)
+			viewHolder.text1.setTextColor(Color.LTGRAY);
+		else
+			viewHolder.text1.setTextColor(Color.BLACK);
+		if ((mSelectedPosition != -1) && (mSelectedPosition == position))
+			v.setBackgroundColor(Color.GRAY);
 		else
 			v.setBackgroundColor(Color.WHITE);
-
 		return v;
 	}
 
 	public void setSelected(int selectedPosition) {
-		this.selectedPosition = selectedPosition;
+		this.mSelectedPosition = selectedPosition;
 	}
 
 	static class MenuListViewHolder {
