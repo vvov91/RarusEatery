@@ -29,6 +29,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -89,10 +91,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportActionBar().hide();
 
 		mEateryDB = new EateryDB(getApplicationContext());
-		if (savedInstanceState != null) {
-			mWaiting = savedInstanceState.getBoolean("mWaiting");
-			showDownloadDialog(mWaiting);
-		}
 		if (mEateryDB.getMenuDates().isEmpty()) {
 			mFirstRunFragment = new FirstRunFragment();
 			getSupportFragmentManager().beginTransaction()
@@ -115,7 +113,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 						+ "mNextFragmentId=" + mNextFragmentId);
 			} else {
 				makeFragments();
-				Log.d("int", "asdasdasdasd");
 				getSupportActionBar().setSelectedNavigationItem(
 						mCurrentFragmentId);
 			}
@@ -177,6 +174,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 					client.cancel();
 					Toast.makeText(getApplicationContext(), R.string.cancel,
 							Toast.LENGTH_SHORT).show();
+					setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
 				}
 			});
@@ -280,7 +278,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void makeFragments() {
 		// создание основного фрагмента
-
+		mCurrentFragmentId = -1;
+		mNextFragmentId = -1;
 		mDates = mEateryDB.getMenuDates();
 		mDatesString = new ArrayList<String>();
 		mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
@@ -303,6 +302,10 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				mCurrentFragmentId = mDates.indexOf(date);
 				mNextFragmentId = mDates.indexOf(date);
 			}
+		}
+		if ((mCurrentFragmentId == -1) || (mNextFragmentId == -1)) {
+			mCurrentFragmentId = 0;
+			mNextFragmentId = 0;
 		}
 		makeSlidingMenu();
 
@@ -406,6 +409,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				Toast.LENGTH_SHORT).show();
 		showDownloadDialog(true);
 		mWaiting = true;
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 	}
 
 	// method to display the menu (link in the layout)
@@ -449,6 +453,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				"MainActivity: ѕолученно сообщение от сервиса");
 		pd.dismiss();
 		mWaiting = false;
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 		if (result) {
 			int operationCode = intent.getIntExtra(
 					EateryWebService.SERVICE_RESULT_CODE, 0);
@@ -535,7 +540,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		outState.putStringArrayList("mDatesString",
 				(ArrayList<String>) mDatesString);
 		outState.putIntegerArrayList("mDates", (ArrayList<Integer>) mDates);
-		outState.putBoolean("mWaiting", mWaiting);
 	}
 
 	public void onBackPressed() {
@@ -552,8 +556,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	@Override
 	protected void onPause() {
-		if (mWaiting)
-			pd.dismiss();
+		// if (mWaiting)
+		// pd.dismiss();
 		super.onPause();
 	}
 
@@ -561,7 +565,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	protected void onDestroy() {
 		unbindService(connection);
 		unregisterReceiver(receiver);
+		stopService(serviceIntent);
 		Log.d(getClass().getName(), "MainActivity: onDestroy()");
 		super.onDestroy();
 	}
+
 }
