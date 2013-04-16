@@ -38,6 +38,16 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="5"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/abs__action_bar_subtitle_bottom_margin"
+            android:text="Сумма: 200"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
     </RelativeLayout>
@@ -63,7 +73,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tvName"
-            android:text="50 грн" />
+            android:text="50 грн"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
 </LinearLayout>

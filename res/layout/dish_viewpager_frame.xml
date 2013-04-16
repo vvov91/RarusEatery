@@ -32,26 +32,12 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp" >
-
-            <TextView
-                android:id="@+id/tvRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:text="4.7(50)" />
-
-            <TextView
-                android:id="@+id/tvPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="50 грн" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,6 +73,37 @@
                 android:focusableInTouchMode="false"
                 android:text="+" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/linearLayout1"
+            android:layout_margin="@dimen/abs__action_bar_subtitle_bottom_margin"
+            android:text="Сумма: 200"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tvTotal"
+            android:layout_alignTop="@+id/linearLayout2"
+            android:layout_marginLeft="22dp"
+            android:text="50 грн" />
+
+        <TextView
+            android:id="@+id/tvRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/tvPrice"
+            android:layout_alignBottom="@+id/tvPrice"
+            android:layout_marginRight="18dp"
+            android:layout_toLeftOf="@+id/linearLayout1"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="4.7(50)" />
 
     </RelativeLayout>
 

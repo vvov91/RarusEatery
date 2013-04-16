@@ -1,5 +1,7 @@
 package rarus.eatery.activity;
 
+import java.text.DecimalFormat;
+
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.graphics.Typeface;
@@ -21,21 +23,31 @@ public class DishPageViewFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.dish_viewpager_frame, null);
-
-		((TextView) v.findViewById(R.id.tvName)).setText(p.getName());
+		TextView tvName = (TextView) v.findViewById(R.id.tvName);
+		tvName.setText(p.getName());
+		tvName.setTypeface(null, Typeface.BOLD);
 		((TextView) v.findViewById(R.id.tvPrice)).setText(getResources()
-				.getString(R.string.price) + p.getPrice() + " грн");
+				.getString(R.string.price)
+				+ p.getPrice()
+				+ getResources().getString(R.string.hrn));
 		((TextView) v.findViewById(R.id.tvRating)).setText(getResources()
 				.getString(R.string.rating) + p.getRating());
+		TextView tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 		TextView tvAmount = (TextView) v.findViewById(R.id.tvAmount);
 		tvAmount.setText("" + p.getAmmount());
 		if (p.getAmmount() != 0) {
 			tvAmount.setTypeface(null, Typeface.BOLD);
-		} else
+			float total = p.getAmmount() * p.getPrice();
+			DecimalFormat decimalFormat = new DecimalFormat("###.##");
+			tvTotal.setText(getResources().getString(R.string.total) + "\n"
+					+ decimalFormat.format(total)+getResources().getString(R.string.hrn));
+		} else {
 			tvAmount.setTypeface(null, Typeface.NORMAL);
+			tvTotal.setText(null);
+		}
 
-		((TextView) v.findViewById(R.id.tvDescription)).setText(p
-				.getDescription());
+		((TextView) v.findViewById(R.id.tvDescription)).setText(getResources()
+				.getString(R.string.description) + "\n" + p.getDescription());
 
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
@@ -92,5 +104,4 @@ public class DishPageViewFragment extends Fragment {
 		}
 		return v;
 	}
-
 }

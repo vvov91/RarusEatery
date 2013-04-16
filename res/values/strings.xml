@@ -41,5 +41,6 @@
     <string name="total">Сумма: </string>
     <string name="description">Состав: </string>
     <string name="updated">Обновлено: </string>
-
+    <string name="hrn"> грн.</string>
+    
 </resources>

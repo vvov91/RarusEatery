@@ -1,13 +1,12 @@
 package rarus.eatery.activity;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,6 +43,7 @@ public class DishAdapter extends ArrayAdapter {
 			viewHolder = new DishViewHolder();
 			viewHolder.tvName = (TextView) v.findViewById(R.id.tvName);
 			viewHolder.tvPrice = (TextView) v.findViewById(R.id.tvPrice);
+			viewHolder.tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 			viewHolder.tvAmount = (TextView) v.findViewById(R.id.tvAmount);
 			viewHolder.btnMinus = (Button) v.findViewById(R.id.btnMinus);
 			viewHolder.btnPlus = (Button) v.findViewById(R.id.btnPlus);
@@ -55,12 +55,24 @@ public class DishAdapter extends ArrayAdapter {
 		final RarusMenu rarusMenu = mMenu.get(position);
 		if (rarusMenu != null) {
 			viewHolder.tvName.setText(rarusMenu.getName());
-			viewHolder.tvPrice.setText(rarusMenu.getPrice() + " грн");
+			viewHolder.tvPrice.setText(getContext().getResources().getString(
+					R.string.price)
+					+ rarusMenu.getPrice()
+					+ getContext().getResources().getString(R.string.hrn));
 			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
+
 			if (rarusMenu.getAmmount() != 0) {
+				float total = rarusMenu.getAmmount() * rarusMenu.getPrice();
+				DecimalFormat decimalFormat = new DecimalFormat("###.#");
+				viewHolder.tvTotal.setText(getContext().getResources()
+						.getString(R.string.total)
+						+ "\n"
+						+ decimalFormat.format(total)+getContext().getResources().getString(R.string.hrn));
 				viewHolder.tvAmount.setTypeface(null, Typeface.BOLD);
-			} else
+			} else {
 				viewHolder.tvAmount.setTypeface(null, Typeface.NORMAL);
+				viewHolder.tvTotal.setText(null);
+			}
 			viewHolder.btnMinus.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -89,6 +101,7 @@ public class DishAdapter extends ArrayAdapter {
 		TextView tvAmount;
 		TextView tvName;
 		TextView tvPrice;
+		TextView tvTotal;
 		Button btnMinus;
 		Button btnPlus;
 	}
