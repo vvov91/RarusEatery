@@ -2,6 +2,7 @@ package rarus.eatery.activity;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -22,10 +23,17 @@ public class DishPageViewFragment extends Fragment {
 		View v = inflater.inflate(R.layout.dish_viewpager_frame, null);
 
 		((TextView) v.findViewById(R.id.tvName)).setText(p.getName());
-		((TextView) v.findViewById(R.id.tvPrice))
-				.setText(p.getPrice() + " грн");
-		((Button) v.findViewById(R.id.btnRating)).setText(p.getRating());
-		((TextView) v.findViewById(R.id.tvAmount)).setText("" + p.getAmmount());
+		((TextView) v.findViewById(R.id.tvPrice)).setText(getResources()
+				.getString(R.string.price) + p.getPrice() + " грн");
+		((TextView) v.findViewById(R.id.tvRating)).setText(getResources()
+				.getString(R.string.rating) + p.getRating());
+		TextView tvAmount = (TextView) v.findViewById(R.id.tvAmount);
+		tvAmount.setText("" + p.getAmmount());
+		if (p.getAmmount() != 0) {
+			tvAmount.setTypeface(null, Typeface.BOLD);
+		} else
+			tvAmount.setTypeface(null, Typeface.NORMAL);
+
 		((TextView) v.findViewById(R.id.tvDescription)).setText(p
 				.getDescription());
 

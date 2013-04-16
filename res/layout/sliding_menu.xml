@@ -60,10 +60,10 @@
         android:layout_alignParentLeft="true" >
 
         <ImageView
-            android:id="@+id/imageButton2"
+            android:id="@+id/btmMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageButton1"
+            android:layout_alignBottom="@+id/btnRefresh"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="5dp"
@@ -72,18 +72,17 @@
             android:src="@drawable/abs__ic_menu_moreoverflow_holo_light" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/tvTimeStamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="16dp"
-            android:layout_toLeftOf="@+id/imageButton2"
-            android:layout_toRightOf="@+id/imageButton1"
-            android:text="Обновлено: 12-12-2012 12:12"
+            android:layout_toLeftOf="@+id/btmMenu"
+            android:layout_toRightOf="@+id/btnRefresh"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <ImageView
-            android:id="@+id/imageButton1"
+            android:id="@+id/btnRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

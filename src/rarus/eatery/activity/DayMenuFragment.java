@@ -122,6 +122,13 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		return mRarusMenu.get(position).getDate();
 	}
 
+	public int getTimeStamp() {
+		if (!mRarusMenu.isEmpty())
+			return mRarusMenu.get(0).getTimestamp();
+		else
+			return 0;
+	}
+
 	@Override
 	public void onClickMinus(RarusMenu rarusMenu) {
 		float orderedAmmount = rarusMenu.getAmmount();

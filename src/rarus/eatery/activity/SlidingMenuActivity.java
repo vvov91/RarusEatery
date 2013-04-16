@@ -314,8 +314,17 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void makeSlidingMenu() {
+		int timeStamp = 0;
+		if (!mDayMenuFragmentFragments.isEmpty()) {
+			timeStamp = mDayMenuFragmentFragments.get(0).getTimeStamp();
+		}
+		java.util.Date d = new Date(((long) timeStamp) * 1000);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		String timeStampString = df.format(d);
+		mSlidingMenuFragment = new SlidingMenuFragment();
 		mSlidingMenuFragment = new SlidingMenuFragment(
-				(ArrayList<String>) mDatesString, (ArrayList<Integer>) mDates);
+				(ArrayList<String>) mDatesString, (ArrayList<Integer>) mDates,
+				timeStampString);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
@@ -409,7 +418,8 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		mWaiting = true;
 		if (mChangedOrderedAmount)
 			showDialog(1);
-		// downloadMenu();
+		else
+			downloadMenu();
 	}
 
 	public void downloadMenu() {

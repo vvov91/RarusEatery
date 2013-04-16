@@ -36,5 +36,10 @@
     <string name="download_menu">Загрузить меню</string>
     <string name="demo">Демо</string>
     <string name="available_ammount">Максимальное доступное количество: </string>
-    
+    <string name="rating">Рейтинг: </string>
+    <string name="price">Цена: </string>
+    <string name="total">Сумма: </string>
+    <string name="description">Состав: </string>
+    <string name="updated">Обновлено: </string>
+
 </resources>

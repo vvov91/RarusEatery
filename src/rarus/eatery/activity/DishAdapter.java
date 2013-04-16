@@ -6,6 +6,7 @@ import java.util.Calendar;
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,10 @@ public class DishAdapter extends ArrayAdapter {
 			viewHolder.tvName.setText(rarusMenu.getName());
 			viewHolder.tvPrice.setText(rarusMenu.getPrice() + " грн");
 			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
+			if (rarusMenu.getAmmount() != 0) {
+				viewHolder.tvAmount.setTypeface(null, Typeface.BOLD);
+			} else
+				viewHolder.tvAmount.setTypeface(null, Typeface.NORMAL);
 			viewHolder.btnMinus.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {

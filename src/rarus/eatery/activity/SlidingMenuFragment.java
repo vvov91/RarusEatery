@@ -1,7 +1,6 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import rarus.eatery.R;
 import android.os.Bundle;
@@ -13,22 +12,24 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class SlidingMenuFragment extends Fragment {
 
 	ArrayList<String> mDatesString;
 	ArrayList<Integer> mDates;
-
-	ListView slidingMenuLV;
-	SlidingMenuListAdapter slidingMenuListAdapter;
+	String mTimeStamp;
+	ListView mSlidingMenuLV;
+	SlidingMenuListAdapter mSlidingMenuListAdapter;
 
 	public SlidingMenuFragment() {
 	}
 
-	public SlidingMenuFragment(ArrayList<String> datesString,
-			ArrayList<Integer> dates) {
-		mDatesString = datesString;
-		mDates = dates;
+	public SlidingMenuFragment(ArrayList<String> mDatesString,
+			ArrayList<Integer> mDates, String mTimeStamp) {
+		this.mDatesString = mDatesString;
+		this.mDates = mDates;
+		this.mTimeStamp = mTimeStamp;
 	}
 
 	@Override
@@ -39,11 +40,13 @@ public class SlidingMenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
-		slidingMenuLV = (ListView) v.findViewById(R.id.lv);
-		slidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
+		TextView tvTimeStamp = (TextView) v.findViewById(R.id.tvTimeStamp);
+		tvTimeStamp.setText(getResources().getString(R.string.updated)+" "+mTimeStamp);
+		mSlidingMenuLV = (ListView) v.findViewById(R.id.lv);
+		mSlidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
 				R.id.lv, mDatesString, mDates);
-		slidingMenuLV.setAdapter(slidingMenuListAdapter);
-		slidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
+		mSlidingMenuLV.setAdapter(mSlidingMenuListAdapter);
+		mSlidingMenuLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -64,8 +67,8 @@ public class SlidingMenuFragment extends Fragment {
 	public void setSelectedItem(int position) {
 		Log.d("int", "position" + position);
 		try {
-			slidingMenuListAdapter.setSelected(position);
-			slidingMenuListAdapter.notifyDataSetChanged();
+			mSlidingMenuListAdapter.setSelected(position);
+			mSlidingMenuListAdapter.notifyDataSetChanged();
 		} catch (Exception e) {
 			Log.d("int", "Exception " + e.toString());
 		}
