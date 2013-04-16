@@ -35,5 +35,6 @@
     <string name="exit">Выход</string>
     <string name="download_menu">Загрузить меню</string>
     <string name="demo">Демо</string>
-
+    <string name="available_ammount">Максимальное доступное количество: </string>
+    
 </resources>

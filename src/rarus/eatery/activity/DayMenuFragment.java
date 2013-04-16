@@ -149,7 +149,7 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		else
 			Toast.makeText(
 					getActivity().getBaseContext(),
-					"AvailableAmmount "
+					R.string.available_ammount
 							+ Float.toString(rarusMenu.getAvailable()), 3)
 					.show();
 		rarusMenu.setAmmount(orderedAmmount);
