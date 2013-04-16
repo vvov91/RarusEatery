@@ -218,13 +218,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			switch (which) {
 			case Dialog.BUTTON_POSITIVE:
 				onSaveClick();
-				switchContent();
 				break;
 			case Dialog.BUTTON_NEGATIVE:
 				removeChanges();
-				switchContent();
 				break;
 			}
+			if (mWaiting)
+				downloadMenu();
+			else
+				switchContent();
 		}
 	};
 	OnClickListener cleanDialog = new OnClickListener() {
@@ -404,11 +406,17 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	// method for synchronizing the menu (link in the layout)
 	public void onRefreshClick(View v) {
+		mWaiting = true;
+		if (mChangedOrderedAmount)
+			showDialog(1);
+		// downloadMenu();
+	}
+
+	public void downloadMenu() {
 		client.update();
 		Toast.makeText(getBaseContext(), R.string.synchronization,
 				Toast.LENGTH_SHORT).show();
 		showDownloadDialog(true);
-		mWaiting = true;
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 	}
 
@@ -552,13 +560,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		super.onStart();
 		bindService(serviceIntent, connection, 0);
 		Log.d(getClass().getName(), "MainActivity: onStart()");
-	}
-
-	@Override
-	protected void onPause() {
-		// if (mWaiting)
-		// pd.dismiss();
-		super.onPause();
 	}
 
 	@Override
