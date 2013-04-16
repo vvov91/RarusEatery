@@ -89,7 +89,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		mSlidingMenu.setFadeDegree(0.25f);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().hide();
-
+		getSupportActionBar().setIcon(R.drawable.ic_menu_menu);
 		mEateryDB = new EateryDB(getApplicationContext());
 		if (mEateryDB.getMenuDates().isEmpty()) {
 			mFirstRunFragment = new FirstRunFragment();
@@ -345,12 +345,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		menuItem.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
 		menu.add(0, MENU_SAVE, 0, R.string.save)
-				.setIcon(R.drawable.save)
+				.setIcon(R.drawable.ic_menu_save)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		menu.add(0, MENU_CLEAR, 0, R.string.clean)
-				.setIcon(R.drawable.clean)
+				.setIcon(R.drawable.ic_action_clear)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);

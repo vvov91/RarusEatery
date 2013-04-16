@@ -60,7 +60,7 @@
         android:layout_alignParentLeft="true" >
 
         <ImageView
-            android:id="@+id/btmMenu"
+            android:id="@+id/ivMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/btnRefresh"
@@ -68,28 +68,25 @@
             android:layout_alignParentTop="true"
             android:layout_marginRight="5dp"
             android:background="@drawable/border"
-            android:onClick="onMenuClick"
-            android:src="@drawable/abs__ic_menu_moreoverflow_holo_light" />
+            android:onClick="onMenuClick"/>
 
         <TextView
             android:id="@+id/tvTimeStamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="16dp"
-            android:layout_toLeftOf="@+id/btmMenu"
-            android:layout_toRightOf="@+id/btnRefresh"
+            android:layout_toLeftOf="@+id/ivMenu"
+            android:layout_toRightOf="@+id/ivRefresh"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <ImageView
-            android:id="@+id/btnRefresh"
+            android:id="@+id/ivRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="5dp"
             android:background="@drawable/border"
-            android:onClick="onRefreshClick"
-            android:src="@drawable/ic_refresh" />
+            android:onClick="onRefreshClick" />
     </RelativeLayout>
 
 </RelativeLayout>

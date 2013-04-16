@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,7 +42,12 @@ public class SlidingMenuFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.sliding_menu, null);
 		TextView tvTimeStamp = (TextView) v.findViewById(R.id.tvTimeStamp);
-		tvTimeStamp.setText(getResources().getString(R.string.updated)+" "+mTimeStamp);
+		tvTimeStamp.setText(getResources().getString(R.string.updated) + " "
+				+ mTimeStamp);
+		ImageView ivRefresh = (ImageView) v.findViewById(R.id.ivRefresh);
+		ImageView ivMenu = (ImageView) v.findViewById(R.id.ivMenu);
+		ivRefresh.setImageResource(R.drawable.ic_action_refresh);
+		ivMenu.setImageResource(R.drawable.abs__ic_menu_moreoverflow_holo_light);
 		mSlidingMenuLV = (ListView) v.findViewById(R.id.lv);
 		mSlidingMenuListAdapter = new SlidingMenuListAdapter(v.getContext(),
 				R.id.lv, mDatesString, mDates);
