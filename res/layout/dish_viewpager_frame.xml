@@ -1,116 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:background="@drawable/rect"
-    android:orientation="horizontal" >
+    android:layout_margin="@dimen/margin_5dp" >
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/tvName"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:lines="2"
+        android:text="Название блюда можно длинное"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/linearLayout1"
-            android:layout_marginTop="56dp"
-            android:gravity="center_horizontal"
-            android:lines="2"
-            android:text="Название блюда можно длинное"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvName"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="34dp"
-            android:text="Описание"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp" >
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="22dp" >
-
-            <Button
-                android:id="@+id/btnMinus"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:text="-" />
-
-            <TextView
-                android:id="@+id/tvAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <Button
-                android:id="@+id/btnPlus"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:text="+" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvTotal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/linearLayout1"
-            android:layout_margin="@dimen/abs__action_bar_subtitle_bottom_margin"
-            android:text="Сумма: 200"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/tvTotal"
-            android:layout_alignTop="@+id/linearLayout2"
-            android:layout_marginLeft="22dp"
-            android:text="50 грн" />
-
-        <TextView
-            android:id="@+id/tvRating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/tvPrice"
-            android:layout_alignBottom="@+id/tvPrice"
-            android:layout_marginRight="18dp"
-            android:layout_toLeftOf="@+id/linearLayout1"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="4.7(50)" />
-
-    </RelativeLayout>
-
-    <LinearLayout
+    <RatingBar
+        android:id="@+id/rbRating"
         android:layout_width="wrap_content"
-        android:layout_height="184dp"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvName"
+        android:layout_centerHorizontal="true" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tvRating"
+        android:layout_margin="@dimen/abs__action_bar_subtitle_bottom_margin"
+        android:text="Сумма: 200"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/rbRating"
+        android:text="Описание"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tvDescription"
+        android:layout_margin="@dimen/margin_5dp"
+        android:text="50 грн" />
+
+    <TextView
+        android:id="@+id/tvRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tvPrice"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="4.7(50)" />
+
+    <Button
+        android:id="@+id/btnMinus"
+        style="?android:attr/buttonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rbRating"
+        android:layout_below="@+id/tvTotal"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="-" />
+
+    <Button
+        android:id="@+id/btnPlus"
+        style="?android:attr/buttonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/rbRating"
+        android:layout_alignTop="@+id/btnMinus"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="+" />
+
+    <TextView
+        android:id="@+id/tvAmount"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnPlus"
+        android:layout_alignBottom="@+id/btnPlus"
+        android:layout_centerHorizontal="true"
+        android:text="5"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>

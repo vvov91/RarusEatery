@@ -1,9 +1,13 @@
 package rarus.eatery.activity;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,13 +39,30 @@ public class DishPageViewFragment extends Fragment {
 				.getString(R.string.rating) + p.getRating());
 		TextView tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 		TextView tvAmount = (TextView) v.findViewById(R.id.tvAmount);
+
+		String ratingNum = p.getRating().substring(0,
+				p.getRating().indexOf(" "));
+		NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+		Number number;
+		try {
+			number = format.parse(ratingNum);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			number = 0.0;
+		}
+		float ratingFloatNum = number.floatValue();
+		RatingBar rbRating = (RatingBar) v.findViewById(R.id.rbRating);
+		rbRating.setEnabled(false);
+		rbRating.setBackgroundColor(Color.rgb(255, 165, 0));
+		rbRating.setRating(ratingFloatNum);
 		tvAmount.setText("" + p.getAmmount());
 		if (p.getAmmount() != 0) {
 			tvAmount.setTypeface(null, Typeface.BOLD);
 			float total = p.getAmmount() * p.getPrice();
 			DecimalFormat decimalFormat = new DecimalFormat("###.##");
 			tvTotal.setText(getResources().getString(R.string.total) + "\n"
-					+ decimalFormat.format(total)+getResources().getString(R.string.hrn));
+					+ decimalFormat.format(total)
+					+ getResources().getString(R.string.hrn));
 		} else {
 			tvAmount.setTypeface(null, Typeface.NORMAL);
 			tvTotal.setText(null);
