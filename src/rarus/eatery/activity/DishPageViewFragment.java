@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
-import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -70,6 +70,8 @@ public class DishPageViewFragment extends Fragment {
 
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
+		btnPlus.getBackground().setColorFilter(new LightingColorFilter(R.color.orange, 0xFFAA0000));
+
 		btnMinus.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

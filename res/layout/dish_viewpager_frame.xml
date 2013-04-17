@@ -5,8 +5,8 @@
     android:layout_height="match_parent" >
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="282dp"
         android:layout_margin="@dimen/margin_10dp" >
 
         <TextView
@@ -57,36 +57,41 @@
             android:text="50 грн" />
 
         <Button
-            android:id="@+id/btnPlus"
-            style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/rbRating"
-            android:layout_below="@+id/tvTotal"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:text="+" />
-
-        <TextView
-            android:id="@+id/tvAmount"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/btnPlus"
-            android:layout_alignBottom="@+id/btnPlus"
-            android:layout_toLeftOf="@+id/btnPlus"
-            android:text="5"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <Button
             android:id="@+id/btnMinus"
             style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/tvPrice"
+            android:layout_alignLeft="@+id/tvTotal"
+            android:layout_below="@+id/tvTotal"
             android:focusable="false"
             android:focusableInTouchMode="false"
+            android:minHeight="80dp"
+            android:minWidth="80dp"
             android:text="-" />
+
+        <Button
+            android:id="@+id/btnPlus"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tvTotal"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:minHeight="80dp"
+            android:minWidth="80dp"
+            android:text="+" />
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btnPlus"
+            android:layout_centerHorizontal="true"
+            android:text="5"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="50sp" />
+
     </RelativeLayout>
 
 </ScrollView>
