@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +56,6 @@ public class DishAdapter extends ArrayAdapter {
 		final RarusMenu rarusMenu = mMenu.get(position);
 		if (rarusMenu != null) {
 			viewHolder.tvName.setText(rarusMenu.getName());
-			viewHolder.tvName.setTextColor(Color.rgb(255, 99, 33));
 			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
 
 			if (rarusMenu.getAmmount() != 0) {

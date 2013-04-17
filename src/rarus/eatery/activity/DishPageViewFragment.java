@@ -35,8 +35,6 @@ public class DishPageViewFragment extends Fragment {
 				.getString(R.string.price)
 				+ p.getPrice()
 				+ getResources().getString(R.string.hrn));
-		((TextView) v.findViewById(R.id.tvRating)).setText(getResources()
-				.getString(R.string.rating) + p.getRating());
 		TextView tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 		TextView tvAmount = (TextView) v.findViewById(R.id.tvAmount);
 
@@ -59,7 +57,7 @@ public class DishPageViewFragment extends Fragment {
 			tvAmount.setTypeface(null, Typeface.BOLD);
 			float total = p.getAmmount() * p.getPrice();
 			DecimalFormat decimalFormat = new DecimalFormat("###.##");
-			tvTotal.setText(getResources().getString(R.string.total) + "\n"
+			tvTotal.setText(getResources().getString(R.string.total)
 					+ decimalFormat.format(total)
 					+ getResources().getString(R.string.hrn));
 		} else {
@@ -68,7 +66,7 @@ public class DishPageViewFragment extends Fragment {
 		}
 
 		((TextView) v.findViewById(R.id.tvDescription)).setText(getResources()
-				.getString(R.string.description) + "\n" + p.getDescription());
+				.getString(R.string.description) + p.getDescription());
 
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
