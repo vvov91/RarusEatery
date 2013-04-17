@@ -20,8 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvName"
-        android:layout_centerHorizontal="true"
-        android:progressDrawable="@drawable/rating_bar_rarus" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/tvTotal"
