@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="rarus_1" parent="android:Theme.Light">
+
+    <item name="android:editTextStyle">@style/EditTextrarus_1</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewrarus_1</item>
+
+    <item name="android:checkboxStyle">@style/CheckBoxrarus_1</item>
+
+    <item name="android:buttonStyle">@style/Buttonrarus_1</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonrarus_1</item>
+
+    <item name="android:progressBarStyleHorizontal">@style/ProgressBarrarus_1</item>
+
+    <item name="android:buttonStyleToggle">@style/Togglerarus_1</item>
+
+    <item name="android:listViewStyle">@style/ListViewrarus_1</item>
+
+    <item name="android:listViewWhiteStyle">@style/ListViewrarus_1.White</item>
+
+    <item name="android:spinnerItemStyle">@style/SpinnerItemrarus_1</item>
+
+  </style>
+
+</resources>
