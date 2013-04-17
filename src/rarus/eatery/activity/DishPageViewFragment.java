@@ -53,7 +53,6 @@ public class DishPageViewFragment extends Fragment {
 		float ratingFloatNum = number.floatValue();
 		RatingBar rbRating = (RatingBar) v.findViewById(R.id.rbRating);
 		rbRating.setEnabled(false);
-		rbRating.setBackgroundColor(Color.rgb(255, 165, 0));
 		rbRating.setRating(ratingFloatNum);
 		tvAmount.setText("" + p.getAmmount());
 		if (p.getAmmount() != 0) {
