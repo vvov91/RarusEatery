@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -44,10 +45,10 @@ public class DishAdapter extends ArrayAdapter {
 			viewHolder = new DishViewHolder();
 			viewHolder.tvName = (TextView) v.findViewById(R.id.tvName);
 			viewHolder.tvPrice = (TextView) v.findViewById(R.id.tvPrice);
-			viewHolder.tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 			viewHolder.tvAmount = (TextView) v.findViewById(R.id.tvAmount);
 			viewHolder.btnMinus = (Button) v.findViewById(R.id.btnMinus);
 			viewHolder.btnPlus = (Button) v.findViewById(R.id.btnPlus);
+			viewHolder.ivLock = (ImageView) v.findViewById(R.id.ivLock);
 			v.setTag(viewHolder);
 		} else {
 			viewHolder = (DishViewHolder) v.getTag();
@@ -57,23 +58,22 @@ public class DishAdapter extends ArrayAdapter {
 		if (rarusMenu != null) {
 			viewHolder.tvName.setText(rarusMenu.getName());
 			viewHolder.tvName.setTextColor(Color.rgb(255, 99, 33));
-			viewHolder.tvPrice.setText(getContext().getResources().getString(
-					R.string.price)
-					+ rarusMenu.getPrice()
-					+ getContext().getResources().getString(R.string.hrn));
 			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
 
 			if (rarusMenu.getAmmount() != 0) {
 				float total = rarusMenu.getAmmount() * rarusMenu.getPrice();
 				DecimalFormat decimalFormat = new DecimalFormat("###.#");
-				viewHolder.tvTotal.setText(getContext().getResources()
+				viewHolder.tvPrice.setText(getContext().getResources()
 						.getString(R.string.total)
 						+ decimalFormat.format(total)
 						+ getContext().getResources().getString(R.string.hrn));
 				viewHolder.tvAmount.setTypeface(null, Typeface.BOLD);
 			} else {
 				viewHolder.tvAmount.setTypeface(null, Typeface.NORMAL);
-				viewHolder.tvTotal.setText(null);
+				viewHolder.tvPrice.setText(getContext().getResources()
+						.getString(R.string.price)
+						+ rarusMenu.getPrice()
+						+ getContext().getResources().getString(R.string.hrn));
 			}
 			viewHolder.btnMinus.setOnClickListener(new OnClickListener() {
 				@Override
@@ -94,9 +94,10 @@ public class DishAdapter extends ArrayAdapter {
 			if (currentUnixTime > menuUnixTime) {
 				viewHolder.btnPlus.setEnabled(false);
 				viewHolder.btnMinus.setEnabled(false);
+				viewHolder.ivLock
+						.setImageResource(R.drawable.ic_device_access_secure);
 			}
 		}
-		v.setBackgroundColor(Color.WHITE);
 
 		return v;
 	}
@@ -105,7 +106,7 @@ public class DishAdapter extends ArrayAdapter {
 		TextView tvAmount;
 		TextView tvName;
 		TextView tvPrice;
-		TextView tvTotal;
+		ImageView ivLock;
 		Button btnMinus;
 		Button btnPlus;
 	}

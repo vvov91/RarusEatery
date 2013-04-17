@@ -1,12 +1,10 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -56,8 +54,6 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		mGridView.setAdapter(mDishAdapter);
 		Configuration config = getResources().getConfiguration();
 		mGridView.setNumColumns(config.orientation);
-		mGridView.setVerticalSpacing(1);
-		mGridView.setHorizontalSpacing(1);
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -68,7 +64,6 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 				activity.onDishPressed(mPosition, position);
 			}
 		});
-		v.setBackgroundColor(Color.RED);
 		return v;
 	}
 

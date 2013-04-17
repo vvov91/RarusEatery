@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:background="@drawable/menu_grid_border_red" >
 
     <TextView
         android:id="@+id/tvAmount"
@@ -70,13 +70,11 @@
         android:text="50 грн"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/tvTotal"
+    <ImageView
+        android:id="@+id/ivLock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tvPrice"
-        android:layout_below="@+id/tvPrice"
-        android:text="Сумма: 200"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tvPrice" />
 
 </RelativeLayout>
