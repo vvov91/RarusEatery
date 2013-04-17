@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ public class DishAdapter extends ArrayAdapter {
 		final RarusMenu rarusMenu = mMenu.get(position);
 		if (rarusMenu != null) {
 			viewHolder.tvName.setText(rarusMenu.getName());
+			viewHolder.tvName.setTextColor(Color.rgb(255, 99, 33));
 			viewHolder.tvPrice.setText(getContext().getResources().getString(
 					R.string.price)
 					+ rarusMenu.getPrice()
@@ -66,8 +68,8 @@ public class DishAdapter extends ArrayAdapter {
 				DecimalFormat decimalFormat = new DecimalFormat("###.#");
 				viewHolder.tvTotal.setText(getContext().getResources()
 						.getString(R.string.total)
-						+ "\n"
-						+ decimalFormat.format(total)+getContext().getResources().getString(R.string.hrn));
+						+ decimalFormat.format(total)
+						+ getContext().getResources().getString(R.string.hrn));
 				viewHolder.tvAmount.setTypeface(null, Typeface.BOLD);
 			} else {
 				viewHolder.tvAmount.setTypeface(null, Typeface.NORMAL);
@@ -94,6 +96,8 @@ public class DishAdapter extends ArrayAdapter {
 				viewHolder.btnMinus.setEnabled(false);
 			}
 		}
+		v.setBackgroundColor(Color.WHITE);
+
 		return v;
 	}
 
