@@ -6,8 +6,10 @@
     <uses-sdk
         android:minSdkVersion="9"
         android:targetSdkVersion="17" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -22,10 +24,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".service.EateryWebService"></service>
+
+        <service android:name=".service.EateryWebService" >
+        </service>
+
         <activity android:name=".activity.SettingsActivity" >
         </activity>
-         <activity android:name=".activity.DishPageViewActivity" >
+        <activity android:name=".activity.DishPageViewActivity" >
         </activity>
     </application>
 
