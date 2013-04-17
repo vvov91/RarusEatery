@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- File created by the Android Action Bar Style Generator
+<!--
+     File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
      Copyright (C) 2012 readyState Software Ltd
@@ -29,8 +30,6 @@
         <item name="actionModeBackground">@drawable/cab_background_top_rarus_2</item>
         <item name="actionModeSplitBackground">@drawable/cab_background_bottom_rarus_2</item>
         <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Rarus_2</item>
-
-        
     </style>
 
     <style name="ActionBar.Solid.Rarus_2" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">
@@ -40,15 +39,22 @@
         <item name="progressBarStyle">@style/ProgressBar.Rarus_2</item>
     </style>
 
+    <style name="RatingBarBigrarus_2">
+        <item name="android:progressDrawable">@drawable/ratingbar_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/ratingbar_holo_light</item>
+        <item name="android:minHeight">35dip</item>
+        <item name="android:maxHeight">35dip</item>
+    </style>
+
     <style name="ActionBar.Transparent.Rarus_2" parent="@style/Widget.Sherlock.Light.ActionBar">
         <item name="background">@drawable/ab_transparent_rarus_2</item>
         <item name="progressBarStyle">@style/ProgressBar.Rarus_2</item>
     </style>
-	
-    <style name="PopupMenu.Rarus_2" parent="@style/Widget.Sherlock.Light.ListPopupWindow">	
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_rarus_2</item>	
+
+    <style name="PopupMenu.Rarus_2" parent="@style/Widget.Sherlock.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_rarus_2</item>
     </style>
-	
+
     <style name="DropDownListView.Rarus_2" parent="@style/Widget.Sherlock.Light.ListView.DropDown">
         <item name="android:listSelector">@drawable/selectable_background_rarus_2</item>
     </style>
@@ -56,21 +62,21 @@
     <style name="ActionBarTabStyle.Rarus_2" parent="@style/Widget.Sherlock.Light.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_rarus_2</item>
     </style>
-	
+
     <style name="DropDownNav.Rarus_2" parent="@style/Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
         <item name="android:background">@drawable/spinner_background_ab_rarus_2</item>
         <item name="android:popupBackground">@drawable/menu_dropdown_panel_rarus_2</item>
         <item name="android:dropDownSelector">@drawable/selectable_background_rarus_2</item>
     </style>
-    
+
     <style name="ProgressBar.Rarus_2" parent="@style/Widget.Sherlock.Light.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_rarus_2</item>
     </style>
-    
+
     <style name="ActionButton.CloseMode.Rarus_2" parent="@style/Widget.Sherlock.Light.ActionButton.CloseMode">
         <item name="android:background">@drawable/btn_cab_done_rarus_2</item>
     </style>
-    
+
     <!-- this style is only referenced in a Light.DarkActionBar based theme -->
     <style name="Theme.Rarus_2.Widget" parent="@style/Theme.Sherlock">
         <item name="popupMenuStyle">@style/PopupMenu.Rarus_2</item>

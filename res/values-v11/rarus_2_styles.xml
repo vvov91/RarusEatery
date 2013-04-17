@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="RatingBarBigrarus_2" parent="android:Widget.Holo.Light.RatingBar.Indicator">
+      <item name="android:progressDrawable">@drawable/ratingbar_holo_light</item>
+      <item name="android:indeterminateDrawable">@drawable/ratingbar_holo_light</item>
+  </style>
+
+</resources>
