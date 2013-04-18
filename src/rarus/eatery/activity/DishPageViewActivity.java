@@ -66,7 +66,7 @@ public class DishPageViewActivity extends SherlockFragmentActivity {
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
-		MenuItem mi = menu.add(0, 1, 0, "Настройки");
+		MenuItem mi = menu.add(0, 1, 0, R.string.menu_settings);
 		mi.setIntent(new Intent(this, SettingsActivity.class));
 		return super.onCreateOptionsMenu(menu);
 	}

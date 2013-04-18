@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
 import android.content.Context;
+import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +74,10 @@ public class DishAdapter extends ArrayAdapter {
 						+ rarusMenu.getPrice()
 						+ getContext().getResources().getString(R.string.hrn));
 			}
+			viewHolder.btnPlus.getBackground().setColorFilter(
+					new LightingColorFilter(R.color.orange, 0xFFffae1a));
+			viewHolder.btnMinus.getBackground().setColorFilter(
+					new LightingColorFilter(R.color.orange, 0xFFffae1a));
 			viewHolder.btnMinus.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {

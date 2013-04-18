@@ -38,8 +38,6 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 		if (v == null) {
 			LayoutInflater li = (LayoutInflater) getContext().getSystemService(
 					Context.LAYOUT_INFLATER_SERVICE);
-			// v = li.inflate(android.R.layout.simple_list_item_1, parent,
-			// false);
 			v = li.inflate(R.layout.sliding_menu_list_item, parent, false);
 			viewHolder = new MenuListViewHolder();
 			viewHolder.tvDate = (TextView) v.findViewById(R.id.tvDate);
@@ -56,10 +54,14 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 			viewHolder.tvDate.setTextColor(Color.LTGRAY);
 			viewHolder.ivLock
 					.setImageResource(R.drawable.ic_device_access_secure);
-		} else
-			viewHolder.tvDate.setTextColor(Color.BLACK);
+		} else {
+			viewHolder.tvDate.setTextColor(getContext().getResources()
+					.getColor(R.color.pressed_rarus_2));
+			viewHolder.ivLock.setImageDrawable(null);
+		}
 		if ((mSelectedPosition != -1) && (mSelectedPosition == position))
-			v.setBackgroundColor(Color.GRAY);
+			v.setBackgroundColor(getContext().getResources().getColor(
+					R.color.orange));
 		else
 			v.setBackgroundColor(Color.WHITE);
 		return v;

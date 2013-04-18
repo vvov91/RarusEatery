@@ -37,7 +37,6 @@ public class DishPageViewFragment extends Fragment {
 				+ getResources().getString(R.string.hrn));
 		TextView tvTotal = (TextView) v.findViewById(R.id.tvTotal);
 		TextView tvAmount = (TextView) v.findViewById(R.id.tvAmount);
-
 		String ratingNum = p.getRating().substring(0,
 				p.getRating().indexOf(" "));
 		NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
@@ -53,21 +52,18 @@ public class DishPageViewFragment extends Fragment {
 		rbRating.setEnabled(false);
 		rbRating.setRating(ratingFloatNum);
 		tvAmount.setText("" + p.getAmmount());
+		float total = p.getAmmount() * p.getPrice();
+		DecimalFormat decimalFormat = new DecimalFormat("###.##");
+		tvTotal.setText(getResources().getString(R.string.total)
+				+ decimalFormat.format(total)
+				+ getResources().getString(R.string.hrn));
 		if (p.getAmmount() != 0) {
 			tvAmount.setTypeface(null, Typeface.BOLD);
-			float total = p.getAmmount() * p.getPrice();
-			DecimalFormat decimalFormat = new DecimalFormat("###.##");
-			tvTotal.setText(getResources().getString(R.string.total)
-					+ decimalFormat.format(total)
-					+ getResources().getString(R.string.hrn));
 		} else {
 			tvAmount.setTypeface(null, Typeface.NORMAL);
-			tvTotal.setText(null);
 		}
-
 		((TextView) v.findViewById(R.id.tvDescription)).setText(getResources()
 				.getString(R.string.description) + p.getDescription());
-
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
 		btnPlus.getBackground().setColorFilter(
