@@ -2,13 +2,15 @@ package rarus.eatery.activity;
 
 import java.util.ArrayList;
 
+import rarus.eatery.R;
+
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -36,22 +38,26 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 		if (v == null) {
 			LayoutInflater li = (LayoutInflater) getContext().getSystemService(
 					Context.LAYOUT_INFLATER_SERVICE);
-			v = li.inflate(android.R.layout.simple_list_item_1, parent, false);
-
+			// v = li.inflate(android.R.layout.simple_list_item_1, parent,
+			// false);
+			v = li.inflate(R.layout.sliding_menu_list_item, parent, false);
 			viewHolder = new MenuListViewHolder();
-			viewHolder.text1 = (TextView) v.findViewById(android.R.id.text1);
+			viewHolder.tvDate = (TextView) v.findViewById(R.id.tvDate);
+			viewHolder.ivLock = (ImageView) v.findViewById(R.id.ivLock);
 			v.setTag(viewHolder);
 		} else {
 			viewHolder = (MenuListViewHolder) v.getTag();
 		}
 		String str = mDatesString.get(position);
-		viewHolder.text1.setText(str);
+		viewHolder.tvDate.setText(str);
 		long currentUnixTime = System.currentTimeMillis() / 1000L;
 		int menuUnixTime = mDates.get(position) - DishAdapter.HOURS_7;
-		if (currentUnixTime > menuUnixTime)
-			viewHolder.text1.setTextColor(Color.LTGRAY);
-		else
-			viewHolder.text1.setTextColor(Color.BLACK);
+		if (currentUnixTime > menuUnixTime) {
+			viewHolder.tvDate.setTextColor(Color.LTGRAY);
+			viewHolder.ivLock
+					.setImageResource(R.drawable.ic_device_access_secure);
+		} else
+			viewHolder.tvDate.setTextColor(Color.BLACK);
 		if ((mSelectedPosition != -1) && (mSelectedPosition == position))
 			v.setBackgroundColor(Color.GRAY);
 		else
@@ -64,6 +70,7 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 	}
 
 	static class MenuListViewHolder {
-		TextView text1;
+		TextView tvDate;
+		ImageView ivLock;
 	}
 }

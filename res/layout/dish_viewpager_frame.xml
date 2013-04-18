@@ -67,7 +67,8 @@
             android:focusableInTouchMode="false"
             android:minHeight="80dp"
             android:minWidth="80dp"
-            android:text="-" />
+            android:text="-"
+            android:textSize="50sp" />
 
         <Button
             android:id="@+id/btnPlus"
@@ -80,7 +81,8 @@
             android:focusableInTouchMode="false"
             android:minHeight="80dp"
             android:minWidth="80dp"
-            android:text="+" />
+            android:text="+"
+            android:textSize="50sp" />
 
         <TextView
             android:id="@+id/tvAmount"
@@ -91,7 +93,6 @@
             android:text="5"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="50sp" />
-
     </RelativeLayout>
 
 </ScrollView>
