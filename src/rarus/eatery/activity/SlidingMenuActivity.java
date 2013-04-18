@@ -275,7 +275,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		DayMenuFragment tempDM = mDayMenuFragmentFragments
 				.get(mCurrentFragmentId);
 		tempDM.setRarusMenu(tempRM);
-		tempDM.refreshAdapter();
+		Log.d("int", "mIsSwitched" + data.getBooleanExtra("mIsSwitched", false));
+		if (!data.getBooleanExtra("mIsSwitched", false))
+			tempDM.refreshAdapter();
 	}
 
 	public void makeFragments() {

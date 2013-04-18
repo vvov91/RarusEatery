@@ -70,7 +70,10 @@ public class DishPageViewFragment extends Fragment {
 
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
-		btnPlus.getBackground().setColorFilter(new LightingColorFilter(R.color.orange, 0xFFAA0000));
+		btnPlus.getBackground().setColorFilter(
+				new LightingColorFilter(R.color.orange, 0xFFffae1a));
+		btnMinus.getBackground().setColorFilter(
+				new LightingColorFilter(R.color.orange, 0xFFffae1a));
 
 		btnMinus.setOnClickListener(new OnClickListener() {
 			@Override
