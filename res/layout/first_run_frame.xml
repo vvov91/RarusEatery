@@ -10,7 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cardNumber"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/orange" />
 
     <EditText
         android:id="@+id/etCardNumber"
@@ -26,7 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/server1"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/orange" />
 
     <EditText
         android:id="@+id/etServer1"
@@ -39,7 +41,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/server2"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/orange" />
 
     <EditText
         android:id="@+id/etServer2"
@@ -51,18 +54,21 @@
         android:id="@+id/cbWifi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Синхронизация только по WI-FI" />
+        android:text="Синхронизация только по WI-FI"
+        android:textColor="@color/orange" />
 
     <Button
         android:id="@+id/btnDownload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/download_menu" />
+        android:text="@string/download_menu"
+        android:textColor="@color/pressed_rarus_2" />
 
     <Button
         android:id="@+id/btnDemo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/demo" />
+        android:text="@string/demo"
+        android:textColor="@color/pressed_rarus_2" />
 
 </LinearLayout>

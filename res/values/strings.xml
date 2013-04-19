@@ -5,10 +5,10 @@
     <string name="menu_settings">Настройки</string>
     <string name="cardNumber">Номер карточки</string>
     <string name="cardNumberInfo">Введите номер карточки</string>
-    <string name="server1">Сервер1:</string>
-    <string name="server1Info">Адрес севера 1:</string>
-    <string name="server2">Сервер2:</string>
-    <string name="server2Info">Адрес севера 2:</string>
+    <string name="server1">Внешний сервер:</string>
+    <string name="server1Info">Адрес внешнего севера:</string>
+    <string name="server2">Внутренний сервер:</string>
+    <string name="server2Info">Адрес внутреннего севера:</string>
     <string name="date_change">Смена даты</string>
     <string name="save_menu">Сохранить заказ?</string>
     <string name="clear_menu">Очистить меню</string>

@@ -30,7 +30,7 @@ public class DishPageViewFragment extends Fragment {
 		View v = inflater.inflate(R.layout.dish_viewpager_frame, null);
 		TextView tvName = (TextView) v.findViewById(R.id.tvName);
 		tvName.setText(p.getName());
-		tvName.setTypeface(null, Typeface.BOLD);
+//		tvName.setTypeface(null, Typeface.BOLD);
 		((TextView) v.findViewById(R.id.tvPrice)).setText(getResources()
 				.getString(R.string.price)
 				+ p.getPrice()

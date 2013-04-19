@@ -3,6 +3,7 @@ package rarus.eatery.activity;
 import rarus.eatery.R;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,10 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		btnDownload.setOnClickListener(this);
 		btnDemo = (Button) v.findViewById(R.id.btnDemo);
 		btnDemo.setOnClickListener(this);
+		btnDemo.getBackground().setColorFilter(
+				new LightingColorFilter(R.color.orange, 0xFFffae1a));
+		btnDownload.getBackground().setColorFilter(
+				new LightingColorFilter(R.color.orange, 0xFFffae1a));
 		return v;
 	}
 
