@@ -330,12 +330,21 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
-		ArrayAdapter<String> list = new ArrayAdapter<String>(
-				getSupportActionBar().getThemedContext(),
-				R.layout.sherlock_spinner_item, mDatesString);
-		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+		Context context = getSupportActionBar().getThemedContext();
+		NavigationListAdapter adapter = new NavigationListAdapter(context,
+				(ArrayList<String>) mDatesString, (ArrayList<Integer>) mDates);
+
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setListNavigationCallbacks(adapter, this);
+
+		// ArrayAdapter<String> list = new ArrayAdapter<String>(
+		// getSupportActionBar().getThemedContext(),
+		// R.layout.sherlock_spinner_item, mDatesString);
+		// list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		// getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		// getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
 	}
