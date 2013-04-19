@@ -16,7 +16,6 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:gravity="center_horizontal"
-            android:lines="2"
             android:text="Название блюда можно длинное"
             android:textColor="@color/orange"
             android:textSize="30sp" />
