@@ -56,7 +56,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	SlidingMenu mSlidingMenu;
 
 	EateryDB mEateryDB;
-	int mCurrentFragmentId = -1, mNextFragmentId = -1;
+	int mCurrentFragmentId = -1, mNextFragmentId = -1, mCurrentDate = -1;
 	List<DayMenuFragment> mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 	List<String> mDatesString = new ArrayList<String>();
 	List<Integer> mDates = new ArrayList<Integer>();
@@ -280,9 +280,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 
 	public void makeFragments() {
 		// создание основного фрагмента
-		mCurrentFragmentId = -1;
-		mNextFragmentId = -1;
 		mDates = mEateryDB.getMenuDates();
+		if (mCurrentDate != -1) {
+			mCurrentFragmentId = mDates.indexOf(mCurrentDate);
+		} else {
+			mCurrentFragmentId = -1;
+		}
 		mDatesString = new ArrayList<String>();
 		mDayMenuFragmentFragments = new ArrayList<DayMenuFragment>();
 		for (Integer date : mDates) {
@@ -303,15 +306,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				menuUnixTime = date - DishAdapter.HOURS_7;
 			else
 				menuUnixTime = date - DishAdapter.HOURS_55;
-			if ((mCurrentFragmentId == -1) && (currentUnixTime < menuUnixTime)) {
-				mCurrentFragmentId = mDates.indexOf(date);
-				mNextFragmentId = mDates.indexOf(date);
-			}
+			if (!mDates.contains(mCurrentDate))
+				if ((currentUnixTime < menuUnixTime)
+						&& (mCurrentFragmentId == -1)) {
+					mCurrentFragmentId = mDates.indexOf(date);
+				}
 		}
-		if ((mCurrentFragmentId == -1) || (mNextFragmentId == -1)) {
-			mCurrentFragmentId = 0;
-			mNextFragmentId = 0;
-		}
+		mNextFragmentId = mCurrentFragmentId;
 		makeSlidingMenu();
 	}
 
@@ -425,11 +426,11 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 	}
 
 	public void downloadMenu() {
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 		client.update();
 		Toast.makeText(getBaseContext(), R.string.synchronization,
 				Toast.LENGTH_SHORT).show();
 		showDownloadDialog(true);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 	}
 
 	// method to display the menu (link in the layout)
@@ -486,6 +487,9 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				// update fragment
 				this.mEateryDB = new EateryDB(getApplicationContext());
 				if (mEateryDB.getMenuDates().size() != 0) {
+					if (!mDayMenuFragmentFragments.isEmpty())
+						mCurrentDate = mDayMenuFragmentFragments.get(
+								mCurrentFragmentId).getDate(0);
 					makeFragments();
 					mNextFragmentId = mCurrentFragmentId;
 					getSupportActionBar().setSelectedNavigationItem(
