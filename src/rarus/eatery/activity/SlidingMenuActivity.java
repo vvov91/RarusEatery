@@ -351,6 +351,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 				R.string.menu_settings);
 		menuItem.setIntent(new Intent(this, SettingsActivity.class));
 		// add save/clean on taskbar
+
 		menu.add(0, MENU_SAVE, 0, R.string.save)
 				.setIcon(R.drawable.ic_menu_save)
 				.setShowAsAction(
