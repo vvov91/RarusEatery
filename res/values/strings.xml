@@ -42,5 +42,6 @@
     <string name="description">Состав: </string>
     <string name="updated">Обновлено: </string>
     <string name="hrn"> грн.</string>
-
+    <string name="available_ammount">Максимальное доступное количество: </string>
+    
 </resources>

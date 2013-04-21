@@ -153,9 +153,9 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		else
 			Toast.makeText(
 					getActivity().getBaseContext(),
-					R.string.available_ammount
-							+ Float.toString(rarusMenu.getAvailable()), 3)
-					.show();
+					getResources().getString(R.string.available_ammount)
+							+ Float.toString(rarusMenu.getAvailable()),
+					Toast.LENGTH_SHORT).show();
 		rarusMenu.setAmmount(orderedAmmount);
 		rarusMenu.setModified(true);
 		SlidingMenuActivity.mChangedOrderedAmount = true;

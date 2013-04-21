@@ -109,9 +109,10 @@ public class DishPageViewFragment extends Fragment {
 				else
 					Toast.makeText(
 							v.getContext(),
-							"AvailableAmmount "
-									+ Float.toString(p.getAvailable()), 3)
-							.show();
+							getResources()
+									.getString(R.string.available_ammount)
+									+ Float.toString(p.getAvailable()),
+							Toast.LENGTH_SHORT).show();
 				p.setAmmount(orderedAmmount);
 				p.setModified(true);
 				// reload fragment
