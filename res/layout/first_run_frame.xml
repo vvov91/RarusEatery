@@ -51,6 +51,7 @@
         android:id="@+id/etServer2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:imeOptions="actionGo"
         android:singleLine="true" />
 
     <CheckBox

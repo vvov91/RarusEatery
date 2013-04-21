@@ -7,13 +7,18 @@ import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class FirstRunFragment extends Fragment implements OnClickListener {
 	EditText etCardNumber, etServer1, etServer2;
@@ -32,6 +37,17 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 		etCardNumber = (EditText) v.findViewById(R.id.etCardNumber);
 		etServer1 = (EditText) v.findViewById(R.id.etServer1);
 		etServer2 = (EditText) v.findViewById(R.id.etServer2);
+		etServer2.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+				if (arg1 == EditorInfo.IME_ACTION_GO) {
+					downloadMenu();
+				}
+				return false;
+			}
+
+		});
 		chWifi = (CheckBox) v.findViewById(R.id.cbWifi);
 		btnDownload = (Button) v.findViewById(R.id.btnDownload);
 		btnDownload.setOnClickListener(this);
@@ -49,15 +65,19 @@ public class FirstRunFragment extends Fragment implements OnClickListener {
 
 		switch (v.getId()) {
 		case R.id.btnDownload:
-			savePreference();
-			SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
-			ra.onRefreshClick(v);
+			downloadMenu();
 			break;
 		case R.id.btnDemo:
 			setDefaultPreferences();
 			loadPreference();
 			break;
 		}
+	}
+
+	void downloadMenu() {
+		savePreference();
+		SlidingMenuActivity ra = (SlidingMenuActivity) getActivity();
+		ra.onRefreshClick(getView().findViewById(R.id.btnDownload));
 	}
 
 	void savePreference() {
