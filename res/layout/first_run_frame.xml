@@ -7,8 +7,9 @@
 
     <TextView
         android:id="@+id/tvCardNumber"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="@string/cardNumber"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />
@@ -24,8 +25,9 @@
 
     <TextView
         android:id="@+id/tvServer1"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="@string/server1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />
@@ -38,8 +40,9 @@
 
     <TextView
         android:id="@+id/tvServer2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="@string/server2"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />
@@ -57,18 +60,24 @@
         android:text="Синхронизация только по WI-FI"
         android:textColor="@color/orange" />
 
-    <Button
-        android:id="@+id/btnDownload"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/download_menu"
-        android:textColor="@color/pressed_rarus_2" />
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/btnDemo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/demo"
-        android:textColor="@color/pressed_rarus_2" />
+        <Button
+            android:id="@+id/btnDownload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/download_menu"
+            android:textColor="@color/pressed_rarus_2" />
+
+        <Button
+            android:id="@+id/btnDemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/demo"
+            android:textColor="@color/pressed_rarus_2" />
+    </LinearLayout>
 
 </LinearLayout>
