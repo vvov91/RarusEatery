@@ -23,5 +23,10 @@
     <color name="pressed_rarus_2">#CCFF0000</color>
     <color name="orange">#ffa500</color>
     <color name="orange2">#ffae1a</color>
+    <color name="red">#ff00</color>
+    <color name="green">#f0f0</color>
+    <color name="blue">#f00f</color>
+    <color name="white">#ffff</color>
+    <color name="black">#f000</color>
 
 </resources>
