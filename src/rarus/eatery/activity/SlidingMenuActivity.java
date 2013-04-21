@@ -296,8 +296,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			Locale locale = new Locale("ru", "RU");
 			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM", locale);
 			String reportDate = df.format(d);
+			// to upper case 1 char
+			char[] stringArray = reportDate.toCharArray();
+			stringArray[0] = Character.toUpperCase(stringArray[0]);
+			reportDate = new String(stringArray);
 			tempDayMenuFragment.setStringDate(reportDate);
-			mDatesString.add(tempDayMenuFragment.mStringDate);
+			mDatesString.add(reportDate);
 			tempDayMenuFragment.setPosition(mDayMenuFragmentFragments.size());
 			mDayMenuFragmentFragments.add(tempDayMenuFragment);
 			long currentUnixTime = System.currentTimeMillis() / 1000L;
