@@ -19,11 +19,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class DishPageViewFragment extends Fragment {
 	public RarusMenu p;
+	ScrollView scrollView;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,6 +33,7 @@ public class DishPageViewFragment extends Fragment {
 		View v = inflater.inflate(R.layout.dish_viewpager_frame, null);
 		TextView tvName = (TextView) v.findViewById(R.id.tvName);
 		tvName.setText(p.getName());
+		scrollView = (ScrollView) v.findViewById(R.id.scrollView);
 		// tvName.setTypeface(null, Typeface.BOLD);
 		((TextView) v.findViewById(R.id.tvPrice)).setText(getResources()
 				.getString(R.string.price)
@@ -92,8 +95,11 @@ public class DishPageViewFragment extends Fragment {
 				DishPageViewActivity activity = (DishPageViewActivity) getActivity();
 				activity.reloadFragmentData();
 				SlidingMenuActivity.mChangedOrderedAmount = true;
-				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
-
+				scrollView.post(new Runnable() {
+					public void run() {
+						scrollView.scrollTo(0, scrollView.getBottom());
+					}
+				});
 			}
 		});
 		btnPlus.setOnClickListener(new OnClickListener() {
@@ -120,6 +126,11 @@ public class DishPageViewFragment extends Fragment {
 				activity.reloadFragmentData();
 				SlidingMenuActivity.mChangedOrderedAmount = true;
 				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
+				scrollView.post(new Runnable() {
+					public void run() {
+						scrollView.scrollTo(0, scrollView.getBottom());
+					}
+				});
 			}
 		});
 		Date d = new Date(((long) p.getDate()) * 1000);
