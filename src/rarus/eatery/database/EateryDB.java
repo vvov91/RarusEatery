@@ -3,7 +3,6 @@ package rarus.eatery.database;
 import java.util.List;
 
 import rarus.eatery.model.RarusMenu;
-import rarus.eatery.model.Order;
 
 import android.content.Context;
 
@@ -69,58 +68,15 @@ public class EateryDB {
 	 *     {@link List} of {@link RarusMenu} objects
 	 */
 	public void saveMenu(List<RarusMenu> menu) {
-		if (menu.size() == 0) return;
+		if (menu.size() == 0) { 
+			return;
+		}
 				
 		db.open();
-		//db.deleteMenuAll();
 		db.deleteMenuAtDate(menu.get(0).getDate());
 		db.addMenu(menu);
 		db.deleteDishesUnused();
 		db.close();
-	}
-	
-	/**
-	 * Removes all menus
-	 */
-	public void deleteMenu() {
-		db.open();
-		db.deleteMenuAll();
-		db.close();
-	}
-	
-	
-	// Orders
-	
-	/**
-	 * Returns a list of the dates on which there are orders
-	 * 
-	 * @param date
-	 *     Unix time date 
-	 * @return
-	 *     {@link List} of {@link RarusMenu} objects
-	 */
-	public List<Integer> getOrdersDates() {
-		db.open();
-		List<Integer> result = db.getOrdersDates();
-		db.close();
-		
-		return result;
-	}
-	
-	/**
-	 * Returns orders at a given date
-	 * 
-	 * @param date
-	 *     Unix time date 
-	 * @return
-	 *     {@link List} of {@link Order} objects
-	 */
-	public List<Order> getOrders(int date) {
-		db.open();
-		List<Order> result = db.getOrdersAtDate(date);
-		db.close();
-		
-		return result;
 	}
 	
 	/**
@@ -133,32 +89,16 @@ public class EateryDB {
 		db.open();
 		List<RarusMenu> result = db.getOrdersNotSent();
 		db.close();
-		
+
 		return result;
-	}
-		
-	/**
-	 * Saves the orders
-	 * 
-	 * @param orders
-	 *     {@link List} of {@link Order} objects
-	 */
-	public void saveOrders(List<Order> orders) {
-		if (orders.size() == 0) return;
-		
-		db.open();
-		db.deleteOrdersAll();
-		db.addOrder(orders);
-		db.deleteDishesUnused();
-		db.close();
 	}
 	
 	/**
-	 * Removes all orders
+	 * Removes all menus
 	 */
-	public void deleteOrders() {
+	public void deleteMenu() {
 		db.open();
-		db.deleteOrdersAll();
+		db.deleteMenuAll();
 		db.close();
 	}
 }
