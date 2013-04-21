@@ -35,7 +35,8 @@
             android:layout_below="@+id/tvPrice"
             android:layout_margin="@dimen/abs__action_bar_subtitle_bottom_margin"
             android:text="Сумма: 200"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textColor="@color/pressed_rarus_2"
+            android:textSize="30sp" />
 
         <TextView
             android:id="@+id/tvDescription"
@@ -53,7 +54,8 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tvDescription"
             android:layout_margin="@dimen/margin_5dp"
-            android:text="50 грн" />
+            android:text="50 грн"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Button
             android:id="@+id/btnMinus"

@@ -30,9 +30,10 @@ public class DishPageViewFragment extends Fragment {
 		View v = inflater.inflate(R.layout.dish_viewpager_frame, null);
 		TextView tvName = (TextView) v.findViewById(R.id.tvName);
 		tvName.setText(p.getName());
-//		tvName.setTypeface(null, Typeface.BOLD);
+		// tvName.setTypeface(null, Typeface.BOLD);
 		((TextView) v.findViewById(R.id.tvPrice)).setText(getResources()
 				.getString(R.string.price)
+				+ " "
 				+ p.getPrice()
 				+ getResources().getString(R.string.hrn));
 		TextView tvTotal = (TextView) v.findViewById(R.id.tvTotal);
@@ -51,10 +52,13 @@ public class DishPageViewFragment extends Fragment {
 		RatingBar rbRating = (RatingBar) v.findViewById(R.id.rbRating);
 		rbRating.setEnabled(false);
 		rbRating.setRating(ratingFloatNum);
-		tvAmount.setText("" + p.getAmmount());
+		if (p.getAmmount() % 1 != 0)
+			tvAmount.setText(Float.toString(p.getAmmount()));
+		else
+			tvAmount.setText(Integer.toString((int) p.getAmmount()));
 		float total = p.getAmmount() * p.getPrice();
 		DecimalFormat decimalFormat = new DecimalFormat("###.##");
-		tvTotal.setText(getResources().getString(R.string.total)
+		tvTotal.setText(getResources().getString(R.string.total) + " "
 				+ decimalFormat.format(total)
 				+ getResources().getString(R.string.hrn));
 		if (p.getAmmount() != 0) {
@@ -63,7 +67,7 @@ public class DishPageViewFragment extends Fragment {
 			tvAmount.setTypeface(null, Typeface.NORMAL);
 		}
 		((TextView) v.findViewById(R.id.tvDescription)).setText(getResources()
-				.getString(R.string.description) + p.getDescription());
+				.getString(R.string.description) + " " + p.getDescription());
 		Button btnMinus = (Button) v.findViewById(R.id.btnMinus);
 		Button btnPlus = (Button) v.findViewById(R.id.btnPlus);
 		btnPlus.getBackground().setColorFilter(

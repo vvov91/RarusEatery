@@ -57,13 +57,17 @@ public class DishAdapter extends ArrayAdapter {
 		final RarusMenu rarusMenu = mMenu.get(position);
 		if (rarusMenu != null) {
 			viewHolder.tvName.setText(rarusMenu.getName());
-			viewHolder.tvAmount.setText(rarusMenu.getAmmount() + "");
-
+			if (rarusMenu.getAmmount() % 1 != 0)
+				viewHolder.tvAmount.setText(Float.toString(rarusMenu
+						.getAmmount()));
+			else
+				viewHolder.tvAmount.setText(" " + (int) rarusMenu.getAmmount());
 			if (rarusMenu.getAmmount() != 0) {
 				float total = rarusMenu.getAmmount() * rarusMenu.getPrice();
 				DecimalFormat decimalFormat = new DecimalFormat("###.#");
 				viewHolder.tvPrice.setText(getContext().getResources()
 						.getString(R.string.total)
+						+ " "
 						+ decimalFormat.format(total)
 						+ getContext().getResources().getString(R.string.hrn));
 				viewHolder.tvAmount.setTypeface(null, Typeface.BOLD);
@@ -71,6 +75,7 @@ public class DishAdapter extends ArrayAdapter {
 				viewHolder.tvAmount.setTypeface(null, Typeface.NORMAL);
 				viewHolder.tvPrice.setText(getContext().getResources()
 						.getString(R.string.price)
+						+ " "
 						+ rarusMenu.getPrice()
 						+ getContext().getResources().getString(R.string.hrn));
 			}

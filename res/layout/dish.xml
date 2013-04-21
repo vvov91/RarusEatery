@@ -6,10 +6,10 @@
 
     <TextView
         android:id="@+id/tvAmount"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_alignBaseline="@+id/btnMinus"
-        android:layout_alignBottom="@+id/btnMinus"
         android:layout_toLeftOf="@+id/btnPlus"
         android:text="5"
         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -23,10 +23,10 @@
         android:layout_toLeftOf="@+id/tvAmount"
         android:focusable="false"
         android:focusableInTouchMode="false"
-         android:minHeight="40dp"
+        android:minHeight="40dp"
         android:minWidth="40dp"
         android:text="-"
-        android:textSize="25sp"/>
+        android:textSize="25sp" />
 
     <ImageView
         android:id="@+id/imageView1"
@@ -59,7 +59,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/tvName"
-        android:layout_marginRight="14dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:minHeight="40dp"
