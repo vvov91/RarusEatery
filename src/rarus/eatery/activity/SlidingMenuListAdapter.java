@@ -1,9 +1,9 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import rarus.eatery.R;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -48,8 +48,13 @@ public class SlidingMenuListAdapter extends ArrayAdapter {
 		}
 		String str = mDatesString.get(position);
 		viewHolder.tvDate.setText(str);
+		Date d = new Date(((long) mDates.get(position)) * 1000);
 		long currentUnixTime = System.currentTimeMillis() / 1000L;
-		int menuUnixTime = mDates.get(position) - DishAdapter.HOURS_7;
+		int menuUnixTime;
+		if (d.getDay() != 1)
+			menuUnixTime = mDates.get(position) - DishAdapter.HOURS_7;
+		else
+			menuUnixTime = mDates.get(position) - DishAdapter.HOURS_55;
 		if (currentUnixTime > menuUnixTime) {
 			viewHolder.tvDate.setTextColor(Color.LTGRAY);
 			viewHolder.ivLock

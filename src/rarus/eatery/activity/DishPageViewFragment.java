@@ -3,6 +3,7 @@ package rarus.eatery.activity;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Locale;
 
 import rarus.eatery.R;
@@ -120,8 +121,13 @@ public class DishPageViewFragment extends Fragment {
 				Log.d("int", "" + SlidingMenuActivity.mChangedOrderedAmount);
 			}
 		});
+		Date d = new Date(((long) p.getDate()) * 1000);
 		long currentUnixTime = System.currentTimeMillis() / 1000L;
-		int menuUnixTime = p.getDate() - DishAdapter.HOURS_7;
+		int menuUnixTime;
+		if (d.getDay() != 1)
+			menuUnixTime = p.getDate() - DishAdapter.HOURS_7;
+		else
+			menuUnixTime = p.getDate() - DishAdapter.HOURS_55;
 		if (currentUnixTime > menuUnixTime) {
 			btnPlus.setEnabled(false);
 			btnMinus.setEnabled(false);

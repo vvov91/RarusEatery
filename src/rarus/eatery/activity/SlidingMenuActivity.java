@@ -4,10 +4,10 @@
  * ќсновное окно программы
  * ¬ нем содержитс¤ фрагмент меню на день 
  */
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,14 +30,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -291,7 +289,7 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			DayMenuFragment tempDayMenuFragment = new DayMenuFragment();
 			tempDayMenuFragment.setRarusMenu((ArrayList<RarusMenu>) mEateryDB
 					.getMenu(date));
-			java.util.Date d = new Date(((long) date.intValue()) * 1000);
+			Date d = new Date(((long) date.intValue()) * 1000);
 			Locale locale = new Locale("ru", "RU");
 			DateFormat df = new SimpleDateFormat("EEEEEE, d MMM", locale);
 			String reportDate = df.format(d);
@@ -299,10 +297,13 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			mDatesString.add(tempDayMenuFragment.mStringDate);
 			tempDayMenuFragment.setPosition(mDayMenuFragmentFragments.size());
 			mDayMenuFragmentFragments.add(tempDayMenuFragment);
-
 			long currentUnixTime = System.currentTimeMillis() / 1000L;
-			if ((mCurrentFragmentId == -1)
-					&& (currentUnixTime < (date - DishAdapter.HOURS_7))) {
+			int menuUnixTime;
+			if (d.getDay() != 1)
+				menuUnixTime = date - DishAdapter.HOURS_7;
+			else
+				menuUnixTime = date - DishAdapter.HOURS_55;
+			if ((mCurrentFragmentId == -1) && (currentUnixTime < menuUnixTime)) {
 				mCurrentFragmentId = mDates.indexOf(date);
 				mNextFragmentId = mDates.indexOf(date);
 			}
@@ -312,7 +313,6 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 			mNextFragmentId = 0;
 		}
 		makeSlidingMenu();
-
 	}
 
 	public void makeSlidingMenu() {
@@ -330,21 +330,12 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.rootlayout, mSlidingMenuFragment).commit();
 		// создание выпадающей навигации
-
 		Context context = getSupportActionBar().getThemedContext();
 		NavigationListAdapter adapter = new NavigationListAdapter(context,
 				(ArrayList<String>) mDatesString, (ArrayList<Integer>) mDates);
-
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(adapter, this);
-
-		// ArrayAdapter<String> list = new ArrayAdapter<String>(
-		// getSupportActionBar().getThemedContext(),
-		// R.layout.sherlock_spinner_item, mDatesString);
-		// list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-		// getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		// getSupportActionBar().setListNavigationCallbacks(list, this);
 		getSlidingMenu().setSlidingEnabled(true);
 		getSupportActionBar().show();
 	}

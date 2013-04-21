@@ -1,5 +1,6 @@
 package rarus.eatery.activity;
 
+import java.sql.Date;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -26,6 +27,7 @@ public class DishAdapter extends ArrayAdapter {
 	private ArrayList<RarusMenu> mMenu;
 	private OnDishItemListener changeAmount;
 	public static final int HOURS_7 = 25200;
+	public static final int HOURS_55 = 198000;
 
 	public DishAdapter(Context context, int textViewResourceId,
 			ArrayList<RarusMenu> menu, OnDishItemListener changeAmount) {
@@ -97,8 +99,13 @@ public class DishAdapter extends ArrayAdapter {
 					notifyDataSetChanged();
 				}
 			});
+			Date d = new Date(((long) rarusMenu.getDate()) * 1000);
 			long currentUnixTime = System.currentTimeMillis() / 1000L;
-			int menuUnixTime = rarusMenu.getDate() - HOURS_7;
+			int menuUnixTime;
+			if (d.getDay() != 1)
+				menuUnixTime = rarusMenu.getDate() - HOURS_7;
+			else
+				menuUnixTime = rarusMenu.getDate() - HOURS_55;
 			if (currentUnixTime > menuUnixTime) {
 				viewHolder.btnPlus.setEnabled(false);
 				viewHolder.btnMinus.setEnabled(false);
