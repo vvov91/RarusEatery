@@ -140,8 +140,15 @@ public class SlidingMenuActivity extends SlidingFragmentActivity implements
 		Log.d("int", "mNextFragmentId=" + mNextFragmentId);
 		mSlidingMenuFragment.setSelectedItem(mNextFragmentId);
 		long currentUnixTime = System.currentTimeMillis() / 1000L;
-		int menuUnixTime = mDayMenuFragmentFragments.get(mCurrentFragmentId)
-				.getDate(0) - DishAdapter.HOURS_7;
+		int menuUnixTime;
+		Date d = new Date(((long) mDayMenuFragmentFragments.get(
+				mCurrentFragmentId).getDate(0)) * 1000);
+		if (d.getDay() != 1)
+			menuUnixTime = mDayMenuFragmentFragments.get(mCurrentFragmentId)
+					.getDate(0) - DishAdapter.HOURS_7;
+		else
+			menuUnixTime = mDayMenuFragmentFragments.get(mCurrentFragmentId)
+					.getDate(0) - DishAdapter.HOURS_55;
 		mMenuItemSave.setVisible(currentUnixTime < menuUnixTime);
 		mMenuItemClear.setVisible(currentUnixTime < menuUnixTime);
 	}
