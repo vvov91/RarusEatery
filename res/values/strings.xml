@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Eda v0.2</string>
+    <string name="app_name">Rarus.Eda v0.4</string>
     <string name="menu_settings">Настройки</string>
     <string name="cardNumber">Номер карточки</string>
     <string name="cardNumberInfo">Введите номер карточки</string>
-    <string name="server1">Сервер1:</string>
-    <string name="server1Info">Адрес севера 1:</string>
-    <string name="server2">Сервер2:</string>
-    <string name="server2Info">Адрес севера 2:</string>
+    <string name="server1">Внешний сервер:</string>
+    <string name="server1Info">Адрес внешнего севера:</string>
+    <string name="server2">Внутренний сервер:</string>
+    <string name="server2Info">Адрес внутреннего севера:</string>
     <string name="date_change">Смена даты</string>
     <string name="save_menu">Сохранить заказ?</string>
     <string name="clear_menu">Очистить меню</string>
@@ -35,5 +35,13 @@
     <string name="exit">Выход</string>
     <string name="download_menu">Загрузить меню</string>
     <string name="demo">Демо</string>
-
+    <string name="available_ammount">Максимальное доступное количество: </string>
+    <string name="rating">Рейтинг: </string>
+    <string name="price">Цена: </string>
+    <string name="total">Сумма: </string>
+    <string name="description">Состав: </string>
+    <string name="updated">Обновлено: </string>
+    <string name="hrn"> грн.</string>
+    <string name="available_ammount">Максимальное доступное количество: </string>
+    
 </resources>

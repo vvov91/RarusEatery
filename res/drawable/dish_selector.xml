@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@color/pressed_rarus_2" android:state_pressed="true"></item>
+    <item android:drawable="@color/orange" android:state_selected="true"/>
+    <item><shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+            <solid android:color="#ffffff" />
+
+            <stroke android:width="0.5dip" android:color="@color/pressed_rarus_2" />
+        </shape></item>
+
+</selector>

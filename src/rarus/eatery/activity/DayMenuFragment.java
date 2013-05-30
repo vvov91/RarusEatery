@@ -1,7 +1,6 @@
 package rarus.eatery.activity;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import rarus.eatery.R;
 import rarus.eatery.model.RarusMenu;
@@ -55,8 +54,6 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		mGridView.setAdapter(mDishAdapter);
 		Configuration config = getResources().getConfiguration();
 		mGridView.setNumColumns(config.orientation);
-		mGridView.setVerticalSpacing(5);
-		mGridView.setHorizontalSpacing(5);
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -122,6 +119,13 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		return mRarusMenu.get(position).getDate();
 	}
 
+	public int getTimeStamp() {
+		if (!mRarusMenu.isEmpty())
+			return mRarusMenu.get(0).getTimestamp();
+		else
+			return 0;
+	}
+
 	@Override
 	public void onClickMinus(RarusMenu rarusMenu) {
 		float orderedAmmount = rarusMenu.getAmmount();
@@ -149,9 +153,9 @@ public class DayMenuFragment extends Fragment implements Parcelable,
 		else
 			Toast.makeText(
 					getActivity().getBaseContext(),
-					"AvailableAmmount "
-							+ Float.toString(rarusMenu.getAvailable()), 3)
-					.show();
+					getResources().getString(R.string.available_ammount)
+							+ Float.toString(rarusMenu.getAvailable()),
+					Toast.LENGTH_SHORT).show();
 		rarusMenu.setAmmount(orderedAmmount);
 		rarusMenu.setModified(true);
 		SlidingMenuActivity.mChangedOrderedAmount = true;

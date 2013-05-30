@@ -19,7 +19,7 @@ public class DishPageViewActivity extends SherlockFragmentActivity {
 	PagerAdapter mPageAdapter;
 	int mDayId;
 	List<RarusMenu> mMenu;
-
+	boolean mIsSwitched;
 	public static final String DISH_ID = "dishId";
 	public static final String DATE = "date";
 	public static final String LIST_DAY_MENU = "listDayMenu";
@@ -30,9 +30,10 @@ public class DishPageViewActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.dish_viewpager);
 		Intent intent = getIntent();
 		int dishId = intent.getIntExtra(DISH_ID, -1);
-		if (savedInstanceState != null)
+		if (savedInstanceState != null) {
 			mMenu = (List<RarusMenu>) getLastCustomNonConfigurationInstance();
-		else
+			mIsSwitched = true;
+		} else
 			mMenu = getIntent().getParcelableArrayListExtra(LIST_DAY_MENU);
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		for (RarusMenu m : mMenu) {
@@ -65,7 +66,7 @@ public class DishPageViewActivity extends SherlockFragmentActivity {
 
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
-		MenuItem mi = menu.add(0, 1, 0, "Настройки");
+		MenuItem mi = menu.add(0, 1, 0, R.string.menu_settings);
 		mi.setIntent(new Intent(this, SettingsActivity.class));
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -85,6 +86,7 @@ public class DishPageViewActivity extends SherlockFragmentActivity {
 		Intent intent = new Intent();
 		intent.putParcelableArrayListExtra(LIST_DAY_MENU,
 				(ArrayList<? extends Parcelable>) mMenu);
+		intent.putExtra("mIsSwitched", mIsSwitched);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
